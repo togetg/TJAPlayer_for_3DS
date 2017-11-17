@@ -1,4 +1,6 @@
 #pragma once
+#ifndef _SAMPLE
+#define _SAMPLE
 #include <3ds.h>
 #include <sf2d.h>
 #include <sfil.h>
@@ -9,5 +11,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
-#include <tremor/ivorbiscodec.h>
-#include <tremor/ivorbisfile.h>
+#include <math.h>
+//#include <tremor/ivorbiscodec.h>
+//#include <tremor/ivorbisfile.h>
+
+#endif

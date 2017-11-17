@@ -10,59 +10,53 @@ TOPDIR ?= $(CURDIR)
 include $(DEVKITARM)/3ds_rules
 
 #---------------------------------------------------------------------------------
-#TARGETは出力の名前です
-#BUILDは、オブジェクトファイルと中間ファイルが配置されるディレクトリです
-#SOURCESは、ソースコードを含むディレクトリのリストです
-#DATAはデータファイルを含むディレクトリのリストです
-#INCLUDESはヘッダファイルを含むディレクトリのリストです
-#
-#NO_SMDH：何も設定されていない場合、SMDHファイルは生成されません。
-#APP_TITLEは、SMDHファイルに保存されているアプリの名前です（オプション）。
-#APP_DESCRIPTIONは、SMDHファイルに保存されているアプリの説明です（オプション）。
-#APP_AUTHORは、SMDHファイルに格納されているアプリの作者です（オプション）
-#ICONは、プロジェクトフォルダを基準にしたアイコン（.png）のファイル名です。
-#設定されていない場合、以下のいずれかを（この順序で）使用しようとします。
-# - <プロジェクト名> .png
-# - icon.png
-# - <libctru folder> /default_icon.png
+# TARGETは出力の名前です
+# BUILDは、オブジェクトファイルと中間ファイルが配置されるディレクトリです
+# SOURCESは、ソースコードを含むディレクトリのリストです
+# DATAはデータファイルを含むディレクトリのリストです
+# INCLUDESはヘッダファイルを含むディレクトリのリストです
+# RESOURCESは、AppInfo template.rsfなどが見つかるディレクトリです。
+# OUTPUTは、最終実行ファイルが配置されるディレクトリです
+# ROMFSはRomFSを含むディレクトリで、Makefileに関連しています
 #---------------------------------------------------------------------------------
-TARGET		:=	TJAplayer_on_3DS
-BUILD		:=	build
-SOURCES		:=	source
-DATA		:=	data
-INCLUDES	:=	include
-ROMFS		:=	romfs
-ICON        :=  icon.png
-#BANNER_IMAGE := banner.png
-APP_TITLE	:= TJAplayer on 3DS
-APP_DESCRIPTION	:= TJAplayer on 3DS
-APP_AUTHOR	:= Togetoge
-APP_UNIQUE_ID := 0xb765
+TARGET      := $(notdir $(CURDIR))
+BUILD       := build
+SOURCES     := source
+DATA        := data
+INCLUDES    := include
+ROMFS       := romfs
+OUTPUT      := output
+RESOURCES   := resources
+
+#---------------------------------------------------------------------------------
+# リソースセットアップ
+#---------------------------------------------------------------------------------
+APP_INFO        := $(RESOURCES)/AppInfo
+BANNER_AUDIO    := $(RESOURCES)/audio
+BANNER_IMAGE    := $(RESOURCES)/banner
+ICON            := $(RESOURCES)/icon.png
+RSF             := $(TOPDIR)/$(RESOURCES)/template.rsf
 
 #---------------------------------------------------------------------------------
 # コード生成のオプション
 #---------------------------------------------------------------------------------
-ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
-
-CFLAGS	:=	-g -Wall -O2 -mword-relocations \
-			-fomit-frame-pointer -ffast-math -ffunction-sections\
-			$(ARCH)
-
-CFLAGS	+=	$(INCLUDE) -DARM11 -D_3DS
-
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
-
-ASFLAGS	:=	-g $(ARCH)
-LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
-
-LIBS	:= -lsfil -lpng -ljpeg -lz -lsf2d -lcitro3d -lctru -lm -lsftd -lfreetype -lvorbisidec
+ARCH        := -march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
+COMMON      := -Wall -O2 -mword-relocations -fomit-frame-pointer -ffunction-sections $(ARCH) $(INCLUDE) -DARM11 -D_3DS
+CFLAGS      := $(COMMON) -std=gnu99
+CXXFLAGS    := $(COMMON) -fno-rtti -fno-exceptions -std=gnu++11
+ASFLAGS     := $(ARCH)
+LDFLAGS     = -specs=3dsx.specs $(ARCH) -Wl,-Map,$(notdir $*.map)
 
 #---------------------------------------------------------------------------------
-# ライブラリを含むディレクトリのリストです
-# include and lib
+# ライブラリは実行可能ファイルにリンクする必要がありました。
 #---------------------------------------------------------------------------------
-LIBDIRS	:= $(CTRULIB) $(PORTLIBS)
+LIBS := -lsf2d -lsfil -lsftd -lfreetype -lpng -ljpeg -lz -lcitro3d -lctru -lm -lvorbisidec
 
+#---------------------------------------------------------------------------------
+# ライブラリを含むディレクトリのリストは、これは含むトップレベルでなければなりません
+# include と lib
+#---------------------------------------------------------------------------------
+LIBDIRS	:= $(PORTLIBS) $(CTRULIB)
 
 #---------------------------------------------------------------------------------
 # 追加する必要がない限り、この時点を過ぎて何かを編集する必要はありません
@@ -71,150 +65,221 @@ LIBDIRS	:= $(CTRULIB) $(PORTLIBS)
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
 
-export OUTPUT	:=	$(CURDIR)/$(TARGET)
-export TOPDIR	:=	$(CURDIR)
-
-export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
-			$(foreach dir,$(DATA),$(CURDIR)/$(dir))
-
-export DEPSDIR	:=	$(CURDIR)/$(BUILD)
+export TOPDIR      := $(CURDIR)
+export OUTPUT_DIR  := $(TOPDIR)/$(OUTPUT)
+export OUTPUT_FILE := $(OUTPUT_DIR)/$(TARGET)
+export VPATH       := $(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) $(foreach dir,$(DATA),$(CURDIR)/$(dir))
+export DEPSDIR     := $(TOPDIR)/$(BUILD)
 
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
+PICAFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.v.pica)))
+SHLISTFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.shlist)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 
 #---------------------------------------------------------------------------------
-# use CXX for linking C++ projects, CC for standard C
+# C++プロジェクトをリンクするにはCXXを使用し、標準CにはCCを使用します
 #---------------------------------------------------------------------------------
 ifeq ($(strip $(CPPFILES)),)
-#---------------------------------------------------------------------------------
-	export LD	:=	$(CC)
-#---------------------------------------------------------------------------------
+	export LD := $(CC)
 else
-#---------------------------------------------------------------------------------
-	export LD	:=	$(CXX)
-#---------------------------------------------------------------------------------
+	export LD := $(CXX)
 endif
 #---------------------------------------------------------------------------------
 
-export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
-			$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
-
-export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
-			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
-			-I$(CURDIR)/$(BUILD)
-
-export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
-
-ifeq ($(strip $(ICON)),)
-	icons := $(wildcard *.png)
-	ifneq (,$(findstring $(TARGET).png,$(icons)))
-		export APP_ICON := $(TOPDIR)/$(TARGET).png
-	else
-		ifneq (,$(findstring icon.png,$(icons)))
-			export APP_ICON := $(TOPDIR)/icon.png
-		endif
-	endif
-else
-	export APP_ICON := $(TOPDIR)/$(ICON)
-endif
-
-ifeq ($(strip $(NO_SMDH)),)
-	export _3DSXFLAGS += --smdh=$(CURDIR)/$(TARGET).smdh
-endif
-
-ifneq ($(ROMFS),)
-	export _3DSXFLAGS += --romfs=$(CURDIR)/$(ROMFS)
-endif
-
-.PHONY: $(BUILD) clean all
+export OFILES_SOURCES := $(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
+export OFILES_BIN     := $(addsuffix .o,$(BINFILES)) $(PICAFILES:.v.pica=.shbin.o) $(SHLISTFILES:.shlist=.shbin.o)
+export OFILES         := $(OFILES_BIN) $(OFILES_SOURCES)
+export HFILES         := $(PICAFILES:.v.pica=_shbin.h) $(addsuffix .h,$(subst .,_,$(BINFILES)))
+export INCLUDE        := $(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) $(foreach dir,$(LIBDIRS),-I$(dir)/include) -I$(CURDIR)/$(BUILD)
+export LIBPATHS       := $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
 #---------------------------------------------------------------------------------
-all: $(BUILD)
+# romfsフォルダとSMDHの組み込み
+#---------------------------------------------------------------------------------
+export _3DSXFLAGS += --romfs=$(CURDIR)/$(ROMFS)
+export _3DSXFLAGS += --smdh=$(OUTPUT_FILE).smdh
 
-$(BUILD):
-	@[ -d $@ ] || mkdir -p $@
+#---------------------------------------------------------------------------------
+#ビルド/出力ディレクトリが作成され、BUILDディレクトリのコンテキストで実行されることをターゲットの最初のセットで確認します。
+#---------------------------------------------------------------------------------
+.PHONY : clean all bootstrap 3dsx cia elf 3ds citra release
+
+all : bootstrap
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
-#---------------------------------------------------------------------------------
-clean:
+3dsx : bootstrap
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
+
+cia : bootstrap
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
+
+3ds : bootstrap
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
+
+elf : bootstrap
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
+
+citra : bootstrap
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
+
+release : bootstrap
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $@
+
+bootstrap :
+	@[ -d $(BUILD) ] || mkdir -p $(BUILD)
+	@[ -d $(OUTPUT_DIR) ] || mkdir -p $(OUTPUT_DIR)
+
+clean :
 	@echo clean ...
-	@rm -fr $(BUILD) $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf $(TARGET)-strip.elf $(TARGET).cia $(TARGET).3ds
-#---------------------------------------------------------------------------------
-$(TARGET)-strip.elf: $(BUILD)
-	@$(STRIP) $(TARGET).elf -o $(TARGET)-strip.elf
-#---------------------------------------------------------------------------------
-cci: $(TARGET)-strip.elf
-	@makerom -f cci -rsf resources/$(TARGET).rsf -target d -exefslogo -elf $(TARGET)-strip.elf -o $(TARGET).3ds
-	@echo "built ... sfil_sample.3ds"
-#---------------------------------------------------------------------------------
-cia: $(TARGET)-strip.elf
-	@makerom -f cia -o $(TARGET).cia -elf $(TARGET)-strip.elf -rsf resources/$(TARGET).rsf -exefslogo -target t
-	@echo "built ... sfil_sample.cia"
-#---------------------------------------------------------------------------------
-send: $(BUILD)
-	@3dslink $(TARGET).3dsx
-#---------------------------------------------------------------------------------
-run: $(BUILD)
-	@citra $(TARGET).3dsx
+	@rm -rf $(BUILD) $(OUTPUT)
 
 #---------------------------------------------------------------------------------
 else
 
 DEPENDS	:=	$(OFILES:.o=.d)
 
+include $(TOPDIR)/$(APP_INFO)
+APP_TITLE         := $(shell echo "$(APP_TITLE)" | cut -c1-128)
+APP_DESCRIPTION   := $(shell echo "$(APP_DESCRIPTION)" | cut -c1-256)
+APP_AUTHOR        := $(shell echo "$(APP_AUTHOR)" | cut -c1-128)
+APP_PRODUCT_CODE  := $(shell echo $(APP_PRODUCT_CODE) | cut -c1-16)
+APP_UNIQUE_ID     := $(shell echo $(APP_UNIQUE_ID) | cut -c1-7)
+APP_VERSION_MAJOR := $(shell echo $(APP_VERSION_MAJOR) | cut -c1-3)
+APP_VERSION_MINOR := $(shell echo $(APP_VERSION_MINOR) | cut -c1-3)
+APP_VERSION_MICRO := $(shell echo $(APP_VERSION_MICRO) | cut -c1-3)
+
+ifneq ("$(wildcard $(TOPDIR)/$(BANNER_IMAGE).cgfx)","")
+	BANNER_IMAGE_FILE := $(TOPDIR)/$(BANNER_IMAGE).cgfx
+	BANNER_IMAGE_ARG  := -ci $(BANNER_IMAGE_FILE)
+else
+	BANNER_IMAGE_FILE := $(TOPDIR)/$(BANNER_IMAGE).png
+	BANNER_IMAGE_ARG  := -i $(BANNER_IMAGE_FILE)
+endif
+
+ifneq ("$(wildcard $(TOPDIR)/$(BANNER_AUDIO).cwav)","")
+	BANNER_AUDIO_FILE := $(TOPDIR)/$(BANNER_AUDIO).cwav
+	BANNER_AUDIO_ARG  := -ca $(BANNER_AUDIO_FILE)
+else
+	BANNER_AUDIO_FILE := $(TOPDIR)/$(BANNER_AUDIO).wav
+	BANNER_AUDIO_ARG  := -a $(BANNER_AUDIO_FILE)
+endif
+
+APP_ICON := $(TOPDIR)/$(ICON)
+APP_ROMFS := $(TOPDIR)/$(ROMFS)
+
+COMMON_MAKEROM_PARAMS := -rsf $(RSF) -target t -exefslogo -elf $(OUTPUT_FILE).elf -icon icon.icn \
+-banner banner.bnr -DAPP_TITLE="$(APP_TITLE)" -DAPP_PRODUCT_CODE="$(APP_PRODUCT_CODE)" \
+-DAPP_UNIQUE_ID="$(APP_UNIQUE_ID)" -DAPP_ROMFS="$(APP_ROMFS)" -DAPP_SYSTEM_MODE="64MB" \
+-DAPP_SYSTEM_MODE_EXT="Legacy" -major "$(APP_VERSION_MAJOR)" -minor "$(APP_VERSION_MINOR)" \
+-micro "$(APP_VERSION_MICRO)"
+
+ifeq ($(OS),Windows_NT)
+	MAKEROM = makerom.exe
+	BANNERTOOL = bannertool.exe
+else
+	MAKEROM = makerom
+	BANNERTOOL = bannertool
+endif
+
 #---------------------------------------------------------------------------------
 # メインターゲット
 #---------------------------------------------------------------------------------
-ifeq ($(strip $(NO_SMDH)),)
-$(OUTPUT).3dsx	:	$(OUTPUT).elf $(OUTPUT).smdh
-else
-$(OUTPUT).3dsx	:	$(OUTPUT).elf
-endif
+.PHONY: all 3dsx cia elf 3ds citra release
 
-$(OUTPUT).elf	:	$(OFILES)
+$(OUTPUT_FILE).3dsx : $(OUTPUT_FILE).elf $(OUTPUT_FILE).smdh
+
+$(OFILES_SOURCES) : $(HFILES)
+
+$(OUTPUT_FILE).elf : $(OFILES)
+
+$(OUTPUT_FILE).3ds : $(OUTPUT_FILE).elf banner.bnr icon.icn
+	@$(MAKEROM) -f cci -o $(OUTPUT_FILE).3ds -DAPP_ENCRYPTED=true $(COMMON_MAKEROM_PARAMS)
+	@echo "built ... $(notdir $@)"
+
+$(OUTPUT_FILE).cia : $(OUTPUT_FILE).elf banner.bnr icon.icn
+	@$(MAKEROM) -f cia -o $(OUTPUT_FILE).cia -DAPP_ENCRYPTED=false $(COMMON_MAKEROM_PARAMS)
+
+$(OUTPUT_FILE).zip : $(OUTPUT_FILE).smdh $(OUTPUT).3dsx
+	@cd $(OUTPUT_DIR) \
+	mkdir -p 3ds/$(TARGET) \
+	cp $(OUTPUT_FILE).3dsx 3ds/$(TARGET) \
+	cp $(OUTPUT_FILE).smdh 3ds/$(TARGET) \
+	zip -r $(OUTPUT_FILE).zip 3ds > /dev/null \
+	rm -r 3ds
+
+banner.bnr : $(BANNER_IMAGE_FILE) $(BANNER_AUDIO_FILE)
+	@$(BANNERTOOL) makebanner $(BANNER_IMAGE_ARG) $(BANNER_AUDIO_ARG) -o banner.bnr > /dev/null
+
+icon.icn : $(TOPDIR)/$(ICON)
+	@$(BANNERTOOL) makesmdh -s "$(APP_TITLE)" -l "$(APP_TITLE)" -p "$(APP_AUTHOR)" -i $(TOPDIR)/$(ICON) -o icon.icn > /dev/null
+
+3dsx : $(OUTPUT_FILE).3dsx
+
+cia : $(OUTPUT_FILE).cia
+
+3ds : $(OUTPUT_FILE).3ds
+
+elf : $(OUTPUT_FILE).elf
+
+citra : 3dsx
+	citra $(OUTPUT_FILE).3dsx
+
+release : $(OUTPUT_FILE).zip cia 3ds
 
 #---------------------------------------------------------------------------------
-# バイナリデータとして使用する各拡張子に対して、このようなルールが必要です
+# バイナリデータルール
 #---------------------------------------------------------------------------------
 %.bin.o	:	%.bin
-#---------------------------------------------------------------------------------
 	@echo $(notdir $<)
 	@$(bin2o)
-#---------------------------------------------------------------------------------
+
 %.ttf.o	:	%.ttf
-#---------------------------------------------------------------------------------
 	@echo $(notdir $<)
 	@$(bin2o)
-#---------------------------------------------------------------------------------
 %.jpeg.o:	%.jpeg
-#---------------------------------------------------------------------------------
 	@echo $(notdir $<)
 	@$(bin2o)
 
-#---------------------------------------------------------------------------------
 %.png.o	:	%.png
-#---------------------------------------------------------------------------------
 	@echo $(notdir $<)
 	@$(bin2o)
 
-%.png.o	:	%.ogg
-#---------------------------------------------------------------------------------
+%.ogg.o	:	%.ogg
 	@echo $(notdir $<)
 	@$(bin2o)
 
-# 警告：これはこれを行う正しい方法ではありません！ TODO：そうだよ！
-#---------------------------------------------------------------------------------
-%.vsh.o	:	%.vsh
-#---------------------------------------------------------------------------------
+%.wav.o	:	%.wav
 	@echo $(notdir $<)
-	@python $(AEMSTRO)/aemstro_as.py $< ../$(notdir $<).shbin
-	@bin2s ../$(notdir $<).shbin | $(PREFIX)as -o $@
-	@echo "extern const u8" `(echo $(notdir $<).shbin | sed -e 's/^\([0-9]\)/_\1/' | tr . _)`"_end[];" > `(echo $(notdir $<).shbin | tr . _)`.h
-	@echo "extern const u8" `(echo $(notdir $<).shbin | sed -e 's/^\([0-9]\)/_\1/' | tr . _)`"[];" >> `(echo $(notdir $<).shbin | tr . _)`.h
-	@echo "extern const u32" `(echo $(notdir $<).shbin | sed -e 's/^\([0-9]\)/_\1/' | tr . _)`_size";" >> `(echo $(notdir $<).shbin | tr . _)`.h
-	@rm ../$(notdir $<).shbin
+	@$(bin2o)
+
+#---------------------------------------------------------------------------------
+# GPUシェーダの組み立てルール
+#---------------------------------------------------------------------------------
+define shader-as
+	$(eval CURBIN := $*.shbin)
+	$(eval DEPSFILE := $(DEPSDIR)/$*.shbin.d)
+	echo "$(CURBIN).o: $< $1" > $(DEPSFILE)
+	echo "extern const u8" `(echo $(CURBIN) | sed -e 's/^\([0-9]\)/_\1/' | tr . _)`"_end[];" > `(echo $(CURBIN) | tr . _)`.h
+	echo "extern const u8" `(echo $(CURBIN) | sed -e 's/^\([0-9]\)/_\1/' | tr . _)`"[];" >> `(echo $(CURBIN) | tr . _)`.h
+	echo "extern const u32" `(echo $(CURBIN) | sed -e 's/^\([0-9]\)/_\1/' | tr . _)`_size";" >> `(echo $(CURBIN) | tr . _)`.h
+	picasso -o $(CURBIN) $1
+	bin2s $(CURBIN) | $(AS) -o $*.shbin.o
+endef
+
+%.shbin.o %_shbin.h : %.v.pica %.g.pica
+	@echo $(notdir $^)
+	@$(call shader-as,$^)
+
+%.shbin.o %_shbin.h : %.v.pica
+	@echo $(notdir $<)
+	@$(call shader-as,$<)
+
+%.shbin.o %_shbin.h : %.shlist
+	@echo $(notdir $<)
+	@$(call shader-as,$(foreach file,$(shell cat $<),$(dir $<)$(file)))
+	@$(call shader-as,$<)
 
 -include $(DEPENDS)
 
