@@ -7,6 +7,12 @@
 #include "circle_png.h"
 #include "don_png.h"
 #include "ka_png.h"
+#include "big_don_png.h"
+#include "big_ka_png.h"
+#include "renda_png.h"
+#include "big_renda_png.h"
+#include "renda_fini_png.h"
+#include "big_renda_fini_png.h"
 #include "FreeSans_ttf.h"
 
 int main(int argc, char* argv[]) {
@@ -14,13 +20,19 @@ int main(int argc, char* argv[]) {
 	sftd_init();
 	ndspInit();
 	touchPosition tp;
-	const int image_number = 5;
+	const int image_number = 11;
 	sf2d_texture *tex[image_number];
 	tex[0] = sfil_load_PNG_buffer(bg_png, SF2D_PLACE_RAM);
 	tex[1] = sfil_load_PNG_buffer(taiko_png, SF2D_PLACE_RAM);
 	tex[2] = sfil_load_PNG_buffer(circle_png, SF2D_PLACE_RAM);
 	tex[3] = sfil_load_PNG_buffer(don_png, SF2D_PLACE_RAM);
 	tex[4] = sfil_load_PNG_buffer(ka_png, SF2D_PLACE_RAM);
+	tex[5] = sfil_load_PNG_buffer(big_don_png, SF2D_PLACE_RAM);
+	tex[6] = sfil_load_PNG_buffer(big_ka_png, SF2D_PLACE_RAM);
+	tex[7] = sfil_load_PNG_buffer(renda_png, SF2D_PLACE_RAM);
+	tex[8] = sfil_load_PNG_buffer(big_renda_png, SF2D_PLACE_RAM);
+	tex[9] = sfil_load_PNG_buffer(renda_fini_png, SF2D_PLACE_RAM);
+	tex[10] = sfil_load_PNG_buffer(big_renda_fini_png, SF2D_PLACE_RAM);
 	sftd_font *font = sftd_load_font_mem(FreeSans_ttf, FreeSans_ttf_size);
 
 	const int sounds_number = 3;
@@ -111,9 +123,9 @@ int main(int argc, char* argv[]) {
 
 		sf2d_start_frame(GFX_TOP, GFX_LEFT);
 		sf2d_draw_texture(tex[0], 400 / 2 - tex[0]->width / 2, 240 / 2 - tex[0]->height / 2);
-		sf2d_draw_texture(tex[2],25,44);
+		//sf2d_draw_texture(tex[2],25,44);
 		sftd_draw_textf(font, 10, 0, RGBA8(0, 255, 0, 255), 20, "FPS %f", sf2d_get_fps());
-		tja_to_notes(cnt, font,tex[3],tex[4]);
+		tja_to_notes(cnt, font,tex[3],tex[4],tex[5],tex[6],tex[7],tex[8],tex[9],tex[10]);
 
 		//sf2d_draw_rectangle(100, 43, 1, 47, RGBA8(255, 255, 255, 255));
 		sf2d_end_frame();
