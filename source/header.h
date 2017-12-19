@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _SAMPLE
-#define _SAMPLE
+#ifndef _HEADER
+#define _HEADER
 #include <3ds.h>
 #include <sf2d.h>
 #include <sfil.h>
@@ -12,7 +12,8 @@
 #include <cstring>
 #include <cstdio>
 #include <math.h>
-//#include <tremor/ivorbiscodec.h>
-//#include <tremor/ivorbisfile.h>
+#include <time.h>
+#include <tremor/ivorbiscodec.h>
+#include <tremor/ivorbisfile.h>
 
 #endif

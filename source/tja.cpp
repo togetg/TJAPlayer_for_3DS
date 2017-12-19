@@ -5,10 +5,10 @@ double bpm = -1;
 char tja_notes[2048][128];
 int tja_cnt = 0;
 
-int tja_head_load(){
+void tja_head_load(double *p_offset, double *p_bpm,int *p_measure){
 	FILE *fp; 
 	char buf[128];
-	char default_title[8] = "Notitle", 
+	char default_title[9] = "No title", 
 		 default_subtitle[1] = "",
 		 default_level[2] = "0",
 		 default_bpm[3] = "60", 
@@ -124,10 +124,9 @@ int tja_head_load(){
 				continue;}
 		}
 		fclose(fp);
+		*p_offset = atof(tja_offset);
+		*p_bpm = atof(tja_bpm);
 	}
-	return bpm;
-
-
 }
 
 void tja_draw(sftd_font *font,int cnt) {
@@ -144,7 +143,7 @@ void tja_draw(sftd_font *font,int cnt) {
 void tja_notes_load() {
 	bool start_flag = false;
 	FILE *fp;
-	if ((fp = fopen("tjafiles/syaruru.tja", "r")) != NULL) {
+	if ((fp = fopen("tjafiles/saitama.tja", "r")) != NULL) {
 		while (fgets(tja_notes[tja_cnt], 128, fp) != NULL) {
 			if (strstr(tja_notes[tja_cnt], "#START") != NULL) {
 				start_flag = true;
@@ -160,6 +159,6 @@ void tja_notes_load() {
 		fclose(fp);
 	}
 }
-void tja_to_notes(int count, sftd_font* font, sf2d_texture *don, sf2d_texture *ka, sf2d_texture *big_don, sf2d_texture *big_ka, sf2d_texture *renda, sf2d_texture *big_renda, sf2d_texture *renda_fini, sf2d_texture *big_renda_fini) {
-	notes_main(tja_notes,count,tja_title,tja_subtitle,tja_level,tja_bpm,tja_wave,tja_offset,tja_balloon,tja_songvol,tja_sevol,tja_scoreinit,tja_scorediff,tja_course,tja_style,tja_game,tja_life,tja_demostart,tja_side,tja_scoremode,font,don,ka,big_don,big_ka,renda,big_renda,renda_fini,big_renda_fini);
+void tja_to_notes(char *p_now_notes,int count, sftd_font* font, sf2d_texture *don, sf2d_texture *ka, sf2d_texture *big_don, sf2d_texture *big_ka, sf2d_texture *renda, sf2d_texture *big_renda, sf2d_texture *renda_fini, sf2d_texture *big_renda_fini, sf2d_texture *balloon) {
+	notes_main(p_now_notes, tja_notes,count,tja_title,tja_subtitle,tja_level,tja_bpm,tja_wave,tja_offset,tja_balloon,tja_songvol,tja_sevol,tja_scoreinit,tja_scorediff,tja_course,tja_style,tja_game,tja_life,tja_demostart,tja_side,tja_scoremode,font,don,ka,big_don,big_ka,renda,big_renda,renda_fini,big_renda_fini,balloon);
 }

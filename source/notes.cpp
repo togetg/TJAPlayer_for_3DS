@@ -1,11 +1,12 @@
 #include "header.h"
 #define Notes_Area 400
-int notes_id_check(); void notes_calc(sf2d_texture *don, sf2d_texture *ka, sf2d_texture *big_don, sf2d_texture *big_ka, sf2d_texture *renda, sf2d_texture *big_renda, sf2d_texture *renda_fini, sf2d_texture *big_renda_fini); void frame_draw();
+int notes_id_check(); void notes_calc(int cnt,char *p_now_notes, sftd_font* font,sf2d_texture *don, sf2d_texture *ka, sf2d_texture *big_don, sf2d_texture *big_ka, sf2d_texture *renda, sf2d_texture *big_renda, sf2d_texture *renda_fini, sf2d_texture *big_renda_fini,sf2d_texture *balloon); void frame_draw();
 
 typedef struct{
 	double x,speed;
 	char kind;
 	bool flag;
+	int time;
 } NOTES_T;
 NOTES_T Notes[64];
 
@@ -16,7 +17,7 @@ int notes_count;
 double bar_x;
 double speed;
 
-void notes_main(char tja_notes[2048][128],int cnt, char *tja_title, char *tja_subtitle, char *tja_level, char *tja_bpm, char *tja_wave, char *tja_offset, char *tja_balloon, char *tja_songvol, char *tja_sevol, char *tja_scoreinit, char *tja_scorediff, char *tja_course, char *tja_style, char *tja_game, char *tja_life, char *tja_demostart, char *tja_side, char *tja_scoremode, sftd_font* font, sf2d_texture *don, sf2d_texture *ka, sf2d_texture *big_don, sf2d_texture *big_ka, sf2d_texture *renda, sf2d_texture *big_renda, sf2d_texture *renda_fini, sf2d_texture *big_renda_fini) {
+void notes_main(char *p_now_notes, char tja_notes[2048][128],int cnt, char *tja_title, char *tja_subtitle, char *tja_level, char *tja_bpm, char *tja_wave, char *tja_offset, char *tja_balloon, char *tja_songvol, char *tja_sevol, char *tja_scoreinit, char *tja_scorediff, char *tja_course, char *tja_style, char *tja_game, char *tja_life, char *tja_demostart, char *tja_side, char *tja_scoremode, sftd_font* font, sf2d_texture *don, sf2d_texture *ka, sf2d_texture *big_don, sf2d_texture *big_ka, sf2d_texture *renda, sf2d_texture *big_renda, sf2d_texture *renda_fini, sf2d_texture *big_renda_fini, sf2d_texture *balloon) {
 	double bpm = atof(tja_bpm);
 	double tempo = 4;
 	if (int(fmod(double(cnt), (3600 / bpm))) == 0 && cnt >= 0) {
@@ -44,6 +45,7 @@ void notes_main(char tja_notes[2048][128],int cnt, char *tja_title, char *tja_su
 						Notes[id].x = (Notes_Area / notes_count)*i + 400.0;
 						Notes[id].speed = Notes_Area / (3600 / bpm*tempo);
 						Notes[id].kind = tja_notes[sec_count][i];
+						Notes[id].time = cnt + (400-90)/ Notes[id].speed + (( 3600/bpm*tempo) / notes_count)*i;
 						switch (Notes[id].kind) {
 						case '5':
 							renda_flag = 1;
@@ -74,13 +76,12 @@ void notes_main(char tja_notes[2048][128],int cnt, char *tja_title, char *tja_su
 	}
 	bar_x -= speed;
 	sf2d_draw_rectangle(bar_x, 86, 1, 46, RGBA8(255, 255, 255, 255));
-	notes_calc(don,ka,big_don,big_ka,renda,big_renda,renda_fini,big_renda_fini);
-	sf2d_draw_rectangle(92, 86, 1, 46, RGBA8(255, 0, 255, 255));
+	notes_calc(cnt,p_now_notes, font,don,ka,big_don,big_ka,renda,big_renda,renda_fini,big_renda_fini,balloon);
+	sf2d_draw_rectangle(93, 86, 1, 46, RGBA8(255, 0, 255, 255));
 	//sf2d_draw_rectangle(65, 86, 1, 46, RGBA8(255, 255, 0, 255));
 	sftd_draw_textf(font, 10, 40, RGBA8(0, 255, 0, 255), 20, "%s", tja_notes[sec_count-1]);
 	sftd_draw_textf(font, 10, 20, RGBA8(0, 255, 0, 255), 20, "%d", notes_count);
 	sftd_draw_textf(font, 10, 60, RGBA8(0, 255, 0, 255), 20, "%d", int(bar_x));
-	frame_draw();
 }
 
 int notes_id_check() {
@@ -92,9 +93,10 @@ int notes_id_check() {
 	return -1;
 }
 
-void notes_calc(sf2d_texture *don, sf2d_texture *ka, sf2d_texture *big_don, sf2d_texture *big_ka, sf2d_texture *renda, sf2d_texture *big_renda, sf2d_texture *renda_fini, sf2d_texture *big_renda_fini) {
+void notes_calc(int cnt,char *p_now_notes, sftd_font* font,sf2d_texture *don, sf2d_texture *ka, sf2d_texture *big_don, sf2d_texture *big_ka, sf2d_texture *renda, sf2d_texture *big_renda, sf2d_texture *renda_fini, sf2d_texture *big_renda_fini,sf2d_texture *balloon) {
 	int small_y = 95, big_y = 90;
-	for (int i=64; i > 0; i--) {
+	*p_now_notes = 0;
+	for (int i=64; i >= 0; i--) {
 		if (Notes[i].flag == true) {
 			Notes[i].x -= Notes[i].speed;
 			switch (Notes[i].kind) {
@@ -116,6 +118,9 @@ void notes_calc(sf2d_texture *don, sf2d_texture *ka, sf2d_texture *big_don, sf2d
 				case '6':
 					sf2d_draw_texture(big_renda, Notes[i].x - 20, big_y);
 					break;
+				case '7':
+					sf2d_draw_texture(balloon, Notes[i].x - 15, small_y);
+					break;
 				case '8'://8:連打終了 9:大連打終了
 					sf2d_draw_texture(renda_fini, Notes[i].x - 15, small_y);
 					break;
@@ -125,11 +130,11 @@ void notes_calc(sf2d_texture *don, sf2d_texture *ka, sf2d_texture *big_don, sf2d
 				default:
 					break;
 			}
+			if (cnt == Notes[i].time) {
+				*p_now_notes = Notes[i].kind;
+			}
+			sftd_draw_textf(font, Notes[i].x, 132, RGBA8(0, 255, 0, 255), 10, "%d", Notes[i].time);
 			if (Notes[i].x <= 64-20) { Notes[i].flag = false; }
 		}
 	}
-}
-
-void frame_draw() {
-	sf2d_draw_rectangle(0, 86, 63, 58, RGBA8(255, 0, 0, 255));
 }
