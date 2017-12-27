@@ -28,7 +28,7 @@ void music_load() {
 	char sound_address[MUSIC_NUMBER][30] = {
 		"tjafiles/don.ogg",
 		"tjafiles/ka.ogg",
-		"tjafiles/saitama.ogg" };
+		"tjafiles/yawaraka.ogg" };
 	for (int i = 0; i < MUSIC_NUMBER; i++) {
 		memset(&music[i], 0, sizeof(music[i]));
 		music[i].mix[0] = 1.0f;

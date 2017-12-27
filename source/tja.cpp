@@ -26,8 +26,8 @@ void tja_head_load(double *p_offset, double *p_bpm,int *p_measure){
 		 default_demostart[2] = "0", 
 		 default_side[2] = "3",
 		 default_scoremode[2]="1";
-
-	if ((fp = fopen("tjafiles/syaruru.tja", "r")) != NULL) {
+	
+	if ((fp = fopen("tjafiles/yawaraka.tja", "r")) != NULL) {
 		tja_title = &(default_title[0]);
 		tja_subtitle = &(default_subtitle[0]);
 		tja_level = &(default_level[0]);
@@ -143,7 +143,7 @@ void tja_draw(sftd_font *font,int cnt) {
 void tja_notes_load() {
 	bool start_flag = false;
 	FILE *fp;
-	if ((fp = fopen("tjafiles/saitama.tja", "r")) != NULL) {
+	if ((fp = fopen("tjafiles/yawaraka.tja", "r")) != NULL) {
 		while (fgets(tja_notes[tja_cnt], 128, fp) != NULL) {
 			if (strstr(tja_notes[tja_cnt], "#START") != NULL) {
 				start_flag = true;
