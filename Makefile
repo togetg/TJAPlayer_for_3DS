@@ -15,7 +15,7 @@ endif
 
 # COMMON CONFIGURATION #
 
-NAME := Tjaplayer_on_3DS
+NAME := Tjaplayer on 3DS
 
 BUILD_DIR := build
 OUTPUT_DIR := output
