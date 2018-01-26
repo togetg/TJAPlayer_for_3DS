@@ -3,40 +3,28 @@
 #include "notes.h"
 #include "tja.h"
 #include "audio.h"
-#include "taiko_png.h"
-#include "bg_png.h"
-#include "circle_png.h"
-#include "don_png.h"
-#include "ka_png.h"
-#include "big_don_png.h"
-#include "big_ka_png.h"
-#include "renda_png.h"
-#include "big_renda_png.h"
-#include "renda_fini_png.h"
-#include "big_renda_fini_png.h"
-#include "balloon_png.h"
-#include "FreeSans_ttf.h"
 
 int main(int argc, char* argv[]) {
 	sf2d_init();
 	sftd_init();
 	ndspInit();
+	romfsInit();
 	touchPosition tp;
 	const int image_number = 12;
 	sf2d_texture *tex[image_number];
-	tex[0] = sfil_load_PNG_buffer(bg_png, SF2D_PLACE_RAM);
-	tex[1] = sfil_load_PNG_buffer(taiko_png, SF2D_PLACE_RAM);
-	tex[2] = sfil_load_PNG_buffer(circle_png, SF2D_PLACE_RAM);
-	tex[3] = sfil_load_PNG_buffer(don_png, SF2D_PLACE_RAM);
-	tex[4] = sfil_load_PNG_buffer(ka_png, SF2D_PLACE_RAM);
-	tex[5] = sfil_load_PNG_buffer(big_don_png, SF2D_PLACE_RAM);
-	tex[6] = sfil_load_PNG_buffer(big_ka_png, SF2D_PLACE_RAM);
-	tex[7] = sfil_load_PNG_buffer(renda_png, SF2D_PLACE_RAM);
-	tex[8] = sfil_load_PNG_buffer(big_renda_png, SF2D_PLACE_RAM);
-	tex[9] = sfil_load_PNG_buffer(renda_fini_png, SF2D_PLACE_RAM);
-	tex[10] = sfil_load_PNG_buffer(big_renda_fini_png, SF2D_PLACE_RAM);
-	tex[11] = sfil_load_PNG_buffer(balloon_png, SF2D_PLACE_RAM);
-	sftd_font *font = sftd_load_font_mem(FreeSans_ttf, FreeSans_ttf_size);
+	tex[0] = sfil_load_PNG_file("romfs:/bg.png", SF2D_PLACE_RAM);
+	tex[1] = sfil_load_PNG_file("romfs:/taiko.png", SF2D_PLACE_RAM);
+	tex[2] = sfil_load_PNG_file("romfs:/circle.png", SF2D_PLACE_RAM);
+	tex[3] = sfil_load_PNG_file("romfs:/don.png", SF2D_PLACE_RAM);
+	tex[4] = sfil_load_PNG_file("romfs:/ka.png", SF2D_PLACE_RAM);
+	tex[5] = sfil_load_PNG_file("romfs:/big_don.png", SF2D_PLACE_RAM);
+	tex[6] = sfil_load_PNG_file("romfs:/big_ka.png", SF2D_PLACE_RAM);
+	tex[7] = sfil_load_PNG_file("romfs:/renda.png", SF2D_PLACE_RAM);
+	tex[8] = sfil_load_PNG_file("romfs:/big_renda.png", SF2D_PLACE_RAM);
+	tex[9] = sfil_load_PNG_file("romfs:/renda_fini.png", SF2D_PLACE_RAM);
+	tex[10] = sfil_load_PNG_file("romfs:/big_renda_fini.png", SF2D_PLACE_RAM);
+	tex[11] = sfil_load_PNG_file("romfs:/balloon.png", SF2D_PLACE_RAM);
+	sftd_font *font = sftd_load_font_file("romfs:/FreeSans.ttf");
 
 	int cnt = 0, notes_cnt = 0;
 	bool notes_start_flag = false,music_start_flag=false;
@@ -130,6 +118,7 @@ int main(int argc, char* argv[]) {
 
 	sf2d_fini();
 	sftd_fini();
+	romfsExit();
 	music_exit();
 	return 0;
 }
