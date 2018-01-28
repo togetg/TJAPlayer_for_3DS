@@ -79,27 +79,13 @@ int main(int argc, char* argv[]) {
 			}
 		}
 
-		sf2d_start_frame(GFX_TOP, GFX_LEFT);
+		sf2d_start_frame(GFX_TOP, GFX_LEFT);		//上画面
 		sf2d_draw_texture(tex[0], 400 / 2 - tex[0]->width / 2, 240 / 2 - tex[0]->height / 2);
-		//sf2d_draw_texture(tex[2],25,44);
 
-		if (isNotesStart == true) {
-			sftd_draw_textf(font, 100, 10, RGBA8(0, 255, 0, 255), 10, "TEST");
-			tja_to_notes(notes_cnt, font, tex[3], tex[4], tex[5], tex[6], tex[7], tex[8], tex[9], tex[10], tex[11]);
-			notes_cnt++;
-		}
-		sftd_draw_textf(font, 100, 0, RGBA8(0, 255, 0, 255), 10, "Music:%d",*p_isPlayMain);
-		sftd_draw_textf(font, 0, 0, RGBA8(0, 255, 0, 255), 10, "%d", cnt);
+		bool isDon = false, isKa = false;
 
-		sf2d_draw_rectangle(0, 86, 63, 58, RGBA8(255, 0, 0, 255));
-		//sf2d_draw_rectangle(100, 43, 1, 47, RGBA8(255, 255, 255, 255));
-		sf2d_end_frame();
 
-		sf2d_start_frame(GFX_BOTTOM, GFX_LEFT);
-		sf2d_draw_texture(tex[1], 320 / 2 - tex[1]->width / 2, 240 / 2 - tex[1]->height / 2);
-		sf2d_draw_fill_circle(160, 145, 105, RGBA8(0xFF, 0x00, 0xFF, 0xFF));
-
-		if ((((tp.px - 160)*(tp.px - 160) + (tp.py - 145)*(tp.py - 145)) <= 105 * 105 && key & KEY_TOUCH )|| 
+		if ((((tp.px - 160)*(tp.px - 160) + (tp.py - 145)*(tp.py - 145)) <= 105 * 105 && key & KEY_TOUCH) ||
 			key & KEY_B ||
 			key & KEY_Y ||
 			key & KEY_RIGHT ||
@@ -107,10 +93,8 @@ int main(int argc, char* argv[]) {
 			key & KEY_CSTICK_LEFT ||
 			key & KEY_CSTICK_DOWN) {//ドン
 
-			sftd_draw_text(font, 10, 10, RGBA8(255, 0, 0, 255), 20, "Don!");
-
-			music_play(0);
-		} 
+			isDon = true;
+		}
 		else if (key & KEY_TOUCH ||
 			key & KEY_A ||
 			key & KEY_X ||
@@ -123,8 +107,34 @@ int main(int argc, char* argv[]) {
 			key & KEY_ZR ||
 			key & KEY_ZL) {//カツ
 
-			sftd_draw_text(font, 10, 10, RGBA8(0, 0, 255, 255), 20, "Ka!");
+			isKa = true;
+		}
 
+		if (isNotesStart == true) {
+
+			tja_to_notes(isDon,isKa,notes_cnt, font, tex[3], tex[4], tex[5], tex[6], tex[7], tex[8], tex[9], tex[10], tex[11]);
+			notes_cnt++;
+		}
+
+		sftd_draw_textf(font, 100, 0, RGBA8(0, 255, 0, 255), 10, "Music:%d",*p_isPlayMain);
+		sftd_draw_textf(font, 0, 0, RGBA8(0, 255, 0, 255), 10, "%d", cnt);
+		sf2d_draw_rectangle(0, 86, 63, 58, RGBA8(255, 0, 0, 255));
+
+		sf2d_end_frame();
+
+
+		sf2d_start_frame(GFX_BOTTOM, GFX_LEFT);		//下画面
+		sf2d_draw_texture(tex[1], 320 / 2 - tex[1]->width / 2, 240 / 2 - tex[1]->height / 2);
+		sf2d_draw_fill_circle(160, 145, 105, RGBA8(0xFF, 0x00, 0xFF, 0xFF));
+
+		if (isDon == true) {	//ドン
+
+			sftd_draw_text(font, 10, 10, RGBA8(255, 0, 0, 255), 20, "Don!");
+			music_play(0);
+		}
+		if (isKa == true) {		//カツ
+
+			sftd_draw_text(font, 10, 10, RGBA8(0, 0, 255, 255), 20, "Ka!");
 			music_play(1);
 		}
 
