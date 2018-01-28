@@ -36,7 +36,6 @@ int main(int argc, char* argv[]) {
 	int cnt = 0, notes_cnt = 0;
 	bool isNotesStart = false,isMusicStart=false;
 	double FirstSecTime=9999.0,offset, bpm,time;int measure=4;double *p_offset = &offset, *p_bpm = &bpm;int *p_measure = &measure;
-	char CurrentNotes; char *p_CurrentNotes = &CurrentNotes;
 	
 	tja_head_load(p_offset,p_bpm,p_measure);
 	tja_notes_load();
@@ -68,7 +67,6 @@ int main(int argc, char* argv[]) {
 				isMusicStart = true;
 			}
 		}else if (offset < 0 && (isNotesStart == false || isMusicStart==false)) {
-
 			//if (cnt == 0) first_time = time;
 			if (time >= FirstSecTime ) {
 				//music_play(2);
@@ -86,10 +84,10 @@ int main(int argc, char* argv[]) {
 		//sf2d_draw_texture(tex[2],25,44);
 
 		if (isNotesStart == true) {
-			tja_to_notes(p_CurrentNotes, notes_cnt, font, tex[3], tex[4], tex[5], tex[6], tex[7], tex[8], tex[9], tex[10], tex[11]);
+			sftd_draw_textf(font, 100, 10, RGBA8(0, 255, 0, 255), 10, "TEST");
+			tja_to_notes(notes_cnt, font, tex[3], tex[4], tex[5], tex[6], tex[7], tex[8], tex[9], tex[10], tex[11]);
 			notes_cnt++;
 		}
-
 		sftd_draw_textf(font, 100, 0, RGBA8(0, 255, 0, 255), 10, "Music:%d",*p_isPlayMain);
 		sftd_draw_textf(font, 0, 0, RGBA8(0, 255, 0, 255), 10, "%d", cnt);
 
