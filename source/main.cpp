@@ -118,8 +118,6 @@ int main(int argc, char* argv[]) {
 
 		sftd_draw_textf(font, 100, 0, RGBA8(0, 255, 0, 255), 10, "Music:%d",*p_isPlayMain);
 		sftd_draw_textf(font, 0, 0, RGBA8(0, 255, 0, 255), 10, "%d", cnt);
-		sftd_draw_textf(font, 0, 20, RGBA8(0, 255, 0, 255), 10, "%ffps", sf2d_get_fps());
-
 		sf2d_draw_rectangle(0, 86, 63, 58, RGBA8(255, 0, 0, 255));
 
 		sf2d_end_frame();

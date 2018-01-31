@@ -61,12 +61,15 @@ int ctoi(char c) {
 }
 
 void notes_main(bool isDon,bool isKa, char tja_notes[2048][128], int cnt, char *tja_title, char *tja_subtitle, char *tja_level, char *tja_bpm, char *tja_wave, char *tja_offset, char *tja_balloon, char *tja_songvol, char *tja_sevol, char *tja_scoreinit, char *tja_scorediff, char *tja_course, char *tja_style, char *tja_game, char *tja_life, char *tja_demostart, char *tja_side, char *tja_scoremode, sftd_font* font, sf2d_texture *don, sf2d_texture *ka, sf2d_texture *big_don, sf2d_texture *big_ka, sf2d_texture *renda, sf2d_texture *big_renda, sf2d_texture *renda_fini, sf2d_texture *big_renda_fini, sf2d_texture *balloon) {
-	
 	double bpm = atof(tja_bpm);
 	double tempo = 4;
 	double time = time_now(0);
 	if (notes_main_count == 0) bpm_time = 60.0 / bpm * bpm_count2;
 
+	sftd_draw_textf(font, 0, 10, RGBA8(0, 255, 0, 255), 10, "1:%f", SecTime[0]);
+	sftd_draw_textf(font, 0, 20, RGBA8(0, 255, 0, 255), 10, "2:%f", SecTime[1]);
+	sftd_draw_textf(font, 0, 30, RGBA8(0, 255, 0, 255), 10, "3:%f", SecTime[2]);
+	sftd_draw_textf(font, 0, 40, RGBA8(0, 255, 0, 255), 10, "3:%f", SecTime[3]);
 	sftd_draw_textf(font, 100, 20, RGBA8(0, 255, 0, 255), 10, "BpmTime:%f", bpm_time);
 	sftd_draw_textf(font, 100, 30, RGBA8(0, 255, 0, 255), 10, "BpmCount2:%d", bpm_count2);
 	
@@ -128,9 +131,8 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][128], int cnt, char *
 						Notes[id].notes_max = notes_count;
 						Notes[id].notes_number = i;
 						Notes[id].x_ini = (Notes_Area / notes_count)*i + 400.0;
-						Notes[id].x = Notes[id].x_ini;
-						//Notes[id].speed = Notes_Area / (3600 / bpm * tempo);
-						Notes[id].speed = Notes_Area / (60.0 / bpm * tempo);
+						Notes[id].x = Notes[id].x;
+						Notes[id].speed = Notes_Area / (3600 / bpm * tempo);	Notes[id].x = Notes[id].x_ini;
 						Notes[id].kind = ctoi(tja_notes[sec_count][i]);
 						Notes[id].sec = sec_count;
 						Notes[id].create_time = time;
@@ -272,7 +274,7 @@ void notes_judge(double time, bool isDon, bool isKa, sftd_font* font) {
 
 	if (isAuto == false) {			//手動
 		
-		if (isDon == true && CurrentJudgeNotes[0] != -1) {		//ドン
+		if (isDon == true) {		//ドン
 
 			if (CurrentJudgeNotesLag[0] <= 0.034) {			//良
 				make_judge(0,time);
@@ -288,7 +290,7 @@ void notes_judge(double time, bool isDon, bool isKa, sftd_font* font) {
 			}
 		}
 
-		if (isKa == true && CurrentJudgeNotes[1] != -1) {			//カツ
+		if (isKa == true) {			//カツ
 
 			if (CurrentJudgeNotesLag[1] <= 0.034) {			//良
 				make_judge(0, time);
@@ -312,17 +314,14 @@ void notes_judge(double time, bool isDon, bool isKa, sftd_font* font) {
 
 
 void notes_calc(bool isDon,bool isKa,double bpm, double tempo, double time, int cnt, sftd_font* font, sf2d_texture *don, sf2d_texture *ka, sf2d_texture *big_don, sf2d_texture *big_ka, sf2d_texture *renda, sf2d_texture *big_renda, sf2d_texture *renda_fini, sf2d_texture *big_renda_fini, sf2d_texture *balloon) {
-	
 	int small_y = 95, big_y = 90;
 
 	for (int i = 64; i >= 0; i--) {
 
 		if (Notes[i].flag == true) {
 
-
-			//Notes[i].x = Notes[i].x_ini - 400 * (time - Notes[i].create_time) / (60 / bpm * tempo);
-			Notes[i].x = Notes[i].x_ini - (time - Notes[i].create_time) * Notes[i].speed;
-
+			//Notes[i].x -= Notes[i].speed;
+			Notes[i].x = Notes[i].x_ini - 400 * (time - Notes[i].create_time) / (60 / bpm * tempo);
 			switch (Notes[i].kind) {
 			case Don:
 				sf2d_draw_texture(don, Notes[i].x - 15, small_y);
