@@ -162,8 +162,8 @@ void playFile(void* infoIn){
 		if(ndspChnIsPaused(CHANNEL) == true || lastbuf == true)
 			continue;
 
-		if(waveBuf[0].status == NDSP_WBUF_DONE)
-		{
+		if(waveBuf[0].status == NDSP_WBUF_DONE){
+
 			size_t read = (*decoder.decode)(&buffer1[0]);
 
 			if(read <= 0)
@@ -192,8 +192,8 @@ void playFile(void* infoIn){
 			ndspChnWaveBufAdd(CHANNEL, &waveBuf[1]);
 		}
 
-		DSP_FlushDataCache(buffer1, decoder.buffSize * sizeof(int16_t));
-		DSP_FlushDataCache(buffer2, decoder.buffSize * sizeof(int16_t));
+		//DSP_FlushDataCache(buffer1, decoder.buffSize * sizeof(int16_t));
+		//DSP_FlushDataCache(buffer2, decoder.buffSize * sizeof(int16_t));
 	}
 
 	(*decoder.exit)();
