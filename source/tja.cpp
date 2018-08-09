@@ -29,7 +29,7 @@ void tja_head_load(double *p_offset, double *p_bpm,int *p_measure){
 		 default_side[2] = "3",
 		 default_scoremode[2]="1";
 	
-	if ((fp = fopen("tjafiles/yawaraka.tja", "r")) != NULL) {
+	if ((fp = fopen("smdc:/tjafiles/senbonzakura/senbonzakura.tja", "r")) != NULL) {
 
 		tja_title = &(default_title[0]);
 		tja_subtitle = &(default_subtitle[0]);
@@ -172,7 +172,7 @@ void tja_head_load(double *p_offset, double *p_bpm,int *p_measure){
 	}
 }
 
-void tja_draw(sftd_font *font,int cnt) {
+void tja_draw(int cnt) {
 
 	int cnt3 = 0;
 
@@ -182,7 +182,7 @@ void tja_draw(sftd_font *font,int cnt) {
 
 		while (tja_notes[cnt/60][cnt3] !='\0') {
 
-			sftd_draw_textf(font, 0, 0, RGBA8(255, 0, 0, 255), 10, "%c", tja_notes[cnt/60][cnt3]);
+			//sftd_draw_textf(font, 0, 0, RGBA8(255, 0, 0, 255), 10, "%c", tja_notes[cnt/60][cnt3]);
 			cnt3++;
 
 		}
@@ -194,7 +194,7 @@ void tja_notes_load() {
 	bool start_flag = false;
 	FILE *fp;
 
-	if ((fp = fopen("tjafiles/yawaraka.tja", "r")) != NULL) {
+	if ((fp = fopen("smdc:/tjafiles/senbonzakura/senbonzakura.tja", "r")) != NULL) {
 
 		while (fgets(tja_notes[tja_cnt], 128, fp) != NULL) {
 
@@ -219,8 +219,8 @@ void tja_notes_load() {
 		fclose(fp);
 	}
 }
-void tja_to_notes(bool isDnon,bool isKa,int count, sftd_font* font, sf2d_texture *don, sf2d_texture *ka, sf2d_texture *big_don, sf2d_texture *big_ka, sf2d_texture *renda, sf2d_texture *big_renda, sf2d_texture *renda_fini, sf2d_texture *big_renda_fini, sf2d_texture *balloon) {
+void tja_to_notes(bool isDnon,bool isKa,int count, C2D_SpriteSheet spriteSheet) {
 	
-	notes_main(isDnon, isKa, tja_notes,count,tja_title,tja_subtitle,tja_level,tja_bpm,tja_wave,tja_offset,tja_balloon,tja_songvol,tja_sevol,tja_scoreinit,tja_scorediff,tja_course,tja_style,tja_game,tja_life,tja_demostart,tja_side,tja_scoremode,font,don,ka,big_don,big_ka,renda,big_renda,renda_fini,big_renda_fini,balloon);
+	notes_main(isDnon, isKa, tja_notes,count,tja_title,tja_subtitle,tja_level,tja_bpm,tja_wave,tja_offset,tja_balloon,tja_songvol,tja_sevol,tja_scoreinit,tja_scorediff,tja_course,tja_style,tja_game,tja_life,tja_demostart,tja_side,tja_scoremode,spriteSheet);
 
 }
