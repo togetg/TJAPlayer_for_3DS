@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <cstdio>
 
-#include "playback.h"
 #include "vorbis.h"
 
 #define delete(ptr) \
@@ -215,7 +215,7 @@ err:
 	goto out;
 }
 
-#define DEFAULT_DIR		"sdmc:/"
+#define DEFAULT_DIR		"sdmc:/tjafiles/"
 struct playbackInfo_t playbackInfo;
 
 int changeFile(const char* ep_file, struct playbackInfo_t* playbackInfo, bool *p_isPlayMain){
@@ -244,7 +244,8 @@ int changeFile(const char* ep_file, struct playbackInfo_t* playbackInfo, bool *p
 }
 
 void play_main_music(bool *p_isPlayMain) {
-	changeFile("tjafiles/yawaraka.ogg", &playbackInfo, p_isPlayMain);
+	char file[] = DEFAULT_DIR "senbonzakura/senbonzakura.ogg";
+	changeFile(file, &playbackInfo, p_isPlayMain);
 }
 
 void pasue_main_music() {
