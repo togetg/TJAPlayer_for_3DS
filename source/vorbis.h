@@ -1,5 +1,5 @@
-#include <tremor/ivorbiscodec.h>
 #include <tremor/ivorbisfile.h>
+#include <ogg/ogg.h>
 #include "playback.h"
 
 void setVorbis(struct decoder_fn* decoder);
