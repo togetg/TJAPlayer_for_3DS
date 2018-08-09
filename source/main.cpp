@@ -5,42 +5,82 @@
 #include "audio.h"
 #include "playback.h"
 
-#include "FreeSans_ttf.h"
+#define TOP_WIDTH  400
+#define TOP_HEIGHT 240
+#define BOTTOM_WIDTH  320
+#define BOTTOM_HEIGHT 240
 
-int main(int argc, char* argv[]) {
+C2D_Sprite sprites[2];			//ただの画像用
+C2D_Sprite notes_sprites[12];	//ノーツとか画像用
+static C2D_SpriteSheet spriteSheet;
+C2D_TextBuf g_dynamicBuf;
 
-	sf2d_init();
-	sftd_init();
-	ndspInit();
+
+static void debug() {
+	// Clear the dynamic text buffer
+	C2D_TextBufClear(g_dynamicBuf);
+
+	// Generate and draw dynamic text
+	char buf[160];
+	C2D_Text dynText;
+	snprintf(buf, sizeof(buf), "太鼓の達人!");
+	C2D_TextParse(&dynText, g_dynamicBuf, buf);
+	C2D_TextOptimize(&dynText);
+	C2D_DrawText(&dynText, C2D_WithColor, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f,C2D_Color32f(0.0f, 1.0f, 0.0f, 1.0f));
+}
+
+void main_init() {
+	// Initialize the libs
 	romfsInit();
+	gfxInitDefault();
+	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
+	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
+	C2D_Prepare();
+	init_main_music();
+}
 
-	touchPosition tp;
-	const int ImageNumber = 12;
-	sf2d_texture *tex[ImageNumber];
+void main_exit() {
+	// Deinitialize the scene
+	C2D_TextBufDelete(g_dynamicBuf);
 
-	tex[0] = sfil_load_PNG_file("romfs:/bg.png", SF2D_PLACE_RAM);
-	tex[1] = sfil_load_PNG_file("romfs:/taiko.png", SF2D_PLACE_RAM);
-	tex[2] = sfil_load_PNG_file("romfs:/circle.png", SF2D_PLACE_RAM);
-	tex[3] = sfil_load_PNG_file("romfs:/don.png", SF2D_PLACE_RAM);
-	tex[4] = sfil_load_PNG_file("romfs:/ka.png", SF2D_PLACE_RAM);
-	tex[5] = sfil_load_PNG_file("romfs:/big_don.png", SF2D_PLACE_RAM);
-	tex[6] = sfil_load_PNG_file("romfs:/big_ka.png", SF2D_PLACE_RAM);
-	tex[7] = sfil_load_PNG_file("romfs:/renda.png", SF2D_PLACE_RAM);
-	tex[8] = sfil_load_PNG_file("romfs:/big_renda.png", SF2D_PLACE_RAM);
-	tex[9] = sfil_load_PNG_file("romfs:/renda_fini.png", SF2D_PLACE_RAM);
-	tex[10] = sfil_load_PNG_file("romfs:/big_renda_fini.png", SF2D_PLACE_RAM);
-	tex[11] = sfil_load_PNG_file("romfs:/balloon.png", SF2D_PLACE_RAM);
+	// Deinitialize the libs
+	C2D_Fini();
+	C3D_Fini();
+	gfxExit();
+	romfsExit();
+	music_exit();
+}
 
-	sftd_font *font = sftd_load_font_mem(FreeSans_ttf, FreeSans_ttf_size);
+int main() {
+
+	main_init();
+
+	touchPosition tp;	//下画面タッチした座標
+
+	C3D_RenderTarget* top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+	C3D_RenderTarget* bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+
+	g_dynamicBuf = C2D_TextBufNew(4096);
+
+	spriteSheet = C2D_SpriteSheetLoad("romfs:/gfx/sprites.t3x");
+	if (!spriteSheet) svcBreak(USERBREAK_PANIC);
+
+	C2D_SpriteFromSheet(&sprites[0], spriteSheet, 0);
+	C2D_SpriteSetCenter(&sprites[0], 0.5f, 0.5f);
+	C2D_SpriteSetPos(&sprites[0], TOP_WIDTH / 2, TOP_HEIGHT / 2);
+	C2D_SpriteFromSheet(&sprites[1], spriteSheet, 1);
+	C2D_SpriteSetCenter(&sprites[1], 0.5f, 0.5f);
+	C2D_SpriteSetPos(&sprites[1], BOTTOM_WIDTH / 2, BOTTOM_HEIGHT / 2);
 
 	int cnt = 0, notes_cnt = 0;
-	bool isNotesStart = false,isMusicStart=false;
-	double FirstSecTime=9999.0,offset, bpm,time;int measure=4;double *p_offset = &offset, *p_bpm = &bpm;int *p_measure = &measure;
-	
-	tja_head_load(p_offset,p_bpm,p_measure);
+	bool isNotesStart = false, isMusicStart = false;
+	double FirstSecTime = 9999.0, offset, bpm, time; int measure = 4; double *p_offset = &offset, *p_bpm = &bpm; int *p_measure = &measure;
+
+	/*tja_head_load(p_offset, p_bpm, p_measure);
 	tja_notes_load();
 	music_load();
-	init_main_music();
+	init_main_music();*/
+
 
 	while (aptMainLoop()) {
 		hidScanInput();
@@ -48,11 +88,11 @@ int main(int argc, char* argv[]) {
 
 		unsigned int key = hidKeysDown();
 		if (key & KEY_START) break;
-
-		time = time_now(1);
+		
+		/*time = time_now(1);
 		bool isPlayMain;
 		bool* p_isPlayMain = &isPlayMain;
-
+		
 		if (cnt == 0) {
 
 			FirstSecTime = (60.0 / bpm * measure)*(307.0 / 400.0) + 60.0 / bpm;
@@ -61,14 +101,15 @@ int main(int argc, char* argv[]) {
 		}
 
 		if (offset >= 0 && (isNotesStart == false || isMusicStart == false)) {
-			if (cnt==0 && isNotesStart==false) //isNotesStart = true;
-			if (cnt == (int)(offset * 60)) {
-				//music_play(2);
-				isMusicStart = true;
-			}
-		}else if (offset < 0 && (isNotesStart == false || isMusicStart==false)) {
+			if (cnt == 0 && isNotesStart == false) //isNotesStart = true;
+				if (cnt == (int)(offset * 60)) {
+					//music_play(2);
+					isMusicStart = true;
+				}
+		}
+		else if (offset < 0 && (isNotesStart == false || isMusicStart == false)) {
 			//if (cnt == 0) first_time = time;
-			if (time >= FirstSecTime ) {
+			if (time >= FirstSecTime) {
 				//music_play(2);
 				isPlayMain = true;
 				isMusicStart = true;
@@ -78,12 +119,14 @@ int main(int argc, char* argv[]) {
 				isNotesStart = true;
 			}
 		}
+		*/
+		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
-		sf2d_start_frame(GFX_TOP, GFX_LEFT);		//����
-		sf2d_draw_texture(tex[0], 400 / 2 - tex[0]->width / 2, 240 / 2 - tex[0]->height / 2);
-
+		C2D_TargetClear(top, C2D_Color32(0x00, 0x00, 0x00, 0xFF));	//上画面
+		C2D_SceneBegin(top);
+		C2D_DrawSprite(&sprites[0]);
+		/*
 		bool isDon = false, isKa = false;
-
 
 		if ((((tp.px - 160)*(tp.px - 160) + (tp.py - 145)*(tp.py - 145)) <= 105 * 105 && key & KEY_TOUCH) ||
 			key & KEY_B ||
@@ -91,7 +134,7 @@ int main(int argc, char* argv[]) {
 			key & KEY_RIGHT ||
 			key & KEY_DOWN ||
 			key & KEY_CSTICK_LEFT ||
-			key & KEY_CSTICK_DOWN) {//�h��
+			key & KEY_CSTICK_DOWN) {//ドン
 
 			isDon = true;
 		}
@@ -105,56 +148,38 @@ int main(int argc, char* argv[]) {
 			key & KEY_R ||
 			key & KEY_L ||
 			key & KEY_ZR ||
-			key & KEY_ZL) {//�J�c
+			key & KEY_ZL) {//カツ
 
 			isKa = true;
 		}
-
+		
 		if (isNotesStart == true) {
 
-			tja_to_notes(isDon,isKa,notes_cnt, font, tex[3], tex[4], tex[5], tex[6], tex[7], tex[8], tex[9], tex[10], tex[11]);
+			tja_to_notes(isDon, isKa, notes_cnt,spriteSheet);
 			notes_cnt++;
 		}
+		*/
+		debug();
 
-		sftd_draw_textf(font, 100, 0, RGBA8(0, 255, 0, 255), 10, "Music:%d",*p_isPlayMain);
-		sftd_draw_textf(font, 0, 0, RGBA8(0, 255, 0, 255), 10, "%d", cnt);
-		sftd_draw_textf(font, 0, 20, RGBA8(0, 255, 0, 255), 10, "%ffps", sf2d_get_fps());
+		C2D_TargetClear(bottom, C2D_Color32(0x00, 0x00, 0x00, 0xFF));	//下画面
+		C2D_SceneBegin(bottom);
+		C2D_DrawSprite(&sprites[1]);
+		/*
+		if (isDon == true) {	//ドン
 
-		sf2d_draw_rectangle(0, 86, 63, 58, RGBA8(255, 0, 0, 255));
-
-		sf2d_end_frame();
-
-
-		sf2d_start_frame(GFX_BOTTOM, GFX_LEFT);		//�����
-		sf2d_draw_texture(tex[1], 320 / 2 - tex[1]->width / 2, 240 / 2 - tex[1]->height / 2);
-		sf2d_draw_fill_circle(160, 145, 105, RGBA8(0xFF, 0x00, 0xFF, 0xFF));
-
-		if (isDon == true) {	//�h��
-
-			sftd_draw_text(font, 10, 10, RGBA8(255, 0, 0, 255), 20, "Don!");
+								//sftd_draw_text(font, 10, 10, RGBA8(255, 0, 0, 255), 20, "Don!");
 			music_play(0);
 		}
-		if (isKa == true) {		//�J�c
+		if (isKa == true) {		//カツ
 
-			sftd_draw_text(font, 10, 10, RGBA8(0, 0, 255, 255), 20, "Ka!");
+								//sftd_draw_text(font, 10, 10, RGBA8(0, 0, 255, 255), 20, "Ka!");
 			music_play(1);
 		}
-
-		sf2d_end_frame();
-		sf2d_swapbuffers();
-		//sf2d_set_vblank_wait(true);
+		*/
+		C3D_FrameEnd(0);
 		cnt++;
-
 	}
 
-	for (int i = 0; i < ImageNumber; i++) {
-		sf2d_free_texture(tex[i]);
-	}
-
-	sf2d_fini();
-	sftd_fini();
-	romfsExit();
-	music_exit();
-
+	main_exit();
 	return 0;
 }
