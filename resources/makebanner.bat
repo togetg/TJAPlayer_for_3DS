@@ -1,0 +1,1 @@
+bannertool makebanner -i banner.png -a banner.wav -o banner.bin
