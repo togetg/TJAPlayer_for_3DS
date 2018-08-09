@@ -1,3 +1,6 @@
+#include <tremor/ivorbisfile.h>
+#include <ogg/ogg.h>
+
 #include "header.h"
 
 #define MUSIC_CHANNEL 1
@@ -11,7 +14,7 @@ typedef struct {
 	u32 encoding;
 	u32 nsamples;
 	u32 size;
-	u8* data;
+	char* data;
 	bool loop;
 	int audiochannel;
 	float mix[12];
@@ -59,7 +62,7 @@ void music_load() {
 		if (linearSpaceFree() < music[i].size) {
 			printf("not enough linear memory available %ld\n", music[i].size);
 		}
-		music[i].data = (u8 *)linearAlloc(music[i].size);
+		music[i].data = (char*)linearAlloc(music[i].size);
 		if (music[i].data == 0) {
 			printf("null\n");
 			while (1);
