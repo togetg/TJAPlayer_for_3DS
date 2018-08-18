@@ -29,8 +29,8 @@ void music_load() {
 	ndspSetOutputMode(NDSP_OUTPUT_STEREO);
 	ndspSetOutputCount(1);
 	char sound_address[MUSIC_NUMBER][30] = {
-		"tjafiles/don.ogg",
-		"tjafiles/ka.ogg"
+		"sdmc:/tjafiles/don.ogg",
+		"sdmc:/tjafiles/ka.ogg"
 	};
 
 	for (int i = 0; i < MUSIC_NUMBER; i++) {
