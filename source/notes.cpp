@@ -38,8 +38,7 @@ enum Sprite_Notes_Kind {	//スプライト用
 };
 
 int notes_id_check(); 
-//void notes_calc(bool isDon, bool isKa,double bpm, double tempo, double NowTime, int cnt, C2D_SpriteSheet spriteSheet);
-void notes_calc(bool isDon, bool isKa, double bpm, double tempo, double NowTime, int cnt);
+void notes_calc(bool isDon, bool isKa,double bpm, double tempo, double NowTime, int cnt, C2D_Sprite sprites[12]);
 
 typedef struct {
 	int notes_number, notes_max;
@@ -49,7 +48,7 @@ typedef struct {
 	int sec;
 	C2D_Sprite spr;
 } NOTES_T;
-NOTES_T Notes[4096];
+NOTES_T Notes[1024];
 
 int bpm_count = 0;
 int bpm_count2 = 1;	//次のbpmの時間計測用
@@ -82,7 +81,7 @@ int ctoi(char c) {
 	}
 }
 
-void notes_main(bool isDon,bool isKa, char tja_notes[2048][128], int cnt, char *tja_title, char *tja_subtitle, char *tja_level, char *tja_bpm, char *tja_wave, char *tja_offset, char *tja_balloon, char *tja_songvol, char *tja_sevol, char *tja_scoreinit, char *tja_scorediff, char *tja_course, char *tja_style, char *tja_game, char *tja_life, char *tja_demostart, char *tja_side, char *tja_scoremode, C2D_SpriteSheet spriteSheet) {
+void notes_main(bool isDon,bool isKa, char tja_notes[2048][128], int cnt, char *tja_title, char *tja_subtitle, char *tja_level, char *tja_bpm, char *tja_wave, char *tja_offset, char *tja_balloon, char *tja_songvol, char *tja_sevol, char *tja_scoreinit, char *tja_scorediff, char *tja_course, char *tja_style, char *tja_game, char *tja_life, char *tja_demostart, char *tja_side, char *tja_scoremode, C2D_Sprite  sprites[12]) {
 
 	double bpm = atof(tja_bpm);
 	double tempo = 4;
@@ -96,7 +95,6 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][128], int cnt, char *
 	
 	if (bpm_time <= NowTime && cnt >= 0 && notes_load_flag == true) {
 		
-		//if (int(fmod(double(cnt), (3600 / bpm))) == 0 && cnt >= 0) {
 		bpm_count2++;
 		bpm_time = 60.0 / bpm * bpm_count2;
 
@@ -196,15 +194,13 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][128], int cnt, char *
 	
 
 	C2D_DrawRectangle(bar_x,86,0,1,46, C2D_Color32f(1,1,1,1), C2D_Color32f(1,1,1,1), C2D_Color32f(1,1,1,1), C2D_Color32f(1,1,1,1));
-	notes_calc(isDon,isKa,bpm, tempo, NowTime, cnt);
+	notes_calc(isDon,isKa,bpm, tempo, NowTime, cnt, sprites);
 	C2D_DrawRectangle(0 ,86, 0, 62, 58, C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1));
 	snprintf(buf_notes, sizeof(buf_notes), "%s", tja_notes[sec_count - 1]);
 	debug_draw(0, 40, tja_notes[sec_count - 1]);
 
 	snprintf(buf_notes, sizeof(buf_notes), "notes_cnt:%d", notes_count);
 	debug_draw(300, 30, buf_notes);
-	snprintf(buf_notes, sizeof(buf_notes), "bar_x:%2f", bar_x);
-	debug_draw(300, 40, buf_notes);
 	snprintf(buf_notes, sizeof(buf_notes), "speed:%.2f", Notes_Area / (3600 / bpm * tempo));
 	debug_draw(300, 50, buf_notes);
 }
@@ -236,15 +232,12 @@ void calc_judge(double NowTime) {
 	if (isJudgeDisp == true) {
 		switch (JudgeDispKind) {
 		case 0:		//良
-			//sftd_draw_textf(font, 80, 80, RGBA8(255, 0, 0, 255), 10, "Ryou");
 			debug_draw(80, 80, "ryou");
 			break;
 		case 1:		//可
-			//sftd_draw_textf(font, 80, 80, RGBA8(255, 255, 255, 255), 10, "Ka");
 			debug_draw(80, 80, "ka");
 			break;
 		case 2:		//不可
-			//sftd_draw_textf(font, 80, 80, RGBA8(0, 255, 255, 255), 10, "Huka");
 			debug_draw(80, 80, "fuka");
 			break;
 		}
@@ -339,16 +332,10 @@ void notes_judge(double NowTime, bool isDon, bool isKa) {
 		}
 	}
 
-	snprintf(buf_notes, sizeof(buf_notes), "CurretDon:%d:::%.1f:::%.2f", CurrentJudgeNotes[0], Notes[CurrentJudgeNotes[0]].judge_time, Notes[CurrentJudgeNotes[0]].judge_time - NowTime );
-	debug_draw(50, 160, buf_notes);
-	snprintf(buf_notes, sizeof(buf_notes), "CurretKa  :%d:::%.1f:::%.2f", CurrentJudgeNotes[1], Notes[CurrentJudgeNotes[1]].judge_time, Notes[CurrentJudgeNotes[1]].judge_time - NowTime);
-	debug_draw(50, 170, buf_notes);	
-	//sftd_draw_textf(font, 100, 40, RGBA8(0, 255, 0, 255), 10, "%f", CurrentJudgeNotesLag[0]);
-	//sftd_draw_textf(font, 100, 50, RGBA8(0, 255, 0, 255), 10, "%f", CurrentJudgeNotesLag[1]);
 }
 
 
-void notes_calc(bool isDon,bool isKa,double bpm, double tempo, double NowTime, int cnt) {
+void notes_calc(bool isDon,bool isKa,double bpm, double tempo, double NowTime, int cnt, C2D_Sprite sprites[12]) {
 	
 	//int small_y = 95, big_y = 90;
 	int notes_y = 108;
@@ -357,23 +344,57 @@ void notes_calc(bool isDon,bool isKa,double bpm, double tempo, double NowTime, i
 		
 		if (Notes[i].flag == true) {
 			
-			//↓ずれるけど正常に作動
 			Notes[i].x = Notes[i].x_ini - Notes_Area * (NowTime - Notes[i].create_time) / (60 /Notes[i].bpm * tempo);
-			//Notes[i].x = Notes[i].x_ini - (NowTime - Notes[i].create_time) * Notes[i].speed;
 
-			//Notes[i].x_ini or speed がバグの原因！？
-
-			snprintf(buf_notes, sizeof(buf_notes), "%d", Notes[i].kind);
-			debug_draw(Notes[i].x, notes_y-5, buf_notes);
 			snprintf(buf_notes, sizeof(buf_notes), "%d", i);
 			debug_draw(Notes[i].x, notes_y+23, buf_notes);
-			//ここでノーツ描画のswitch
 
+			
+			switch (Notes[i].kind) {
+			case Don:
+				C2D_SpriteSetPos(&sprites[dOn], Notes[i].x, notes_y);
+				C2D_DrawSprite(&sprites[dOn]);
+				break;
+			case Ka:
+				C2D_SpriteSetPos(&sprites[kA], Notes[i].x, notes_y);
+				C2D_DrawSprite(&sprites[kA]);
+				break;
+			case BigDon:
+				C2D_SpriteSetPos(&sprites[bIg_don], Notes[i].x, notes_y);
+				C2D_DrawSprite(&sprites[bIg_don]);
+				break;
+			case BigKa:
+				C2D_SpriteSetPos(&sprites[bIg_ka], Notes[i].x, notes_y);
+				C2D_DrawSprite(&sprites[bIg_ka]);
+				break;
+			case Renda:
+				C2D_SpriteSetPos(&sprites[rEnda], Notes[i].x, notes_y);
+				C2D_DrawSprite(&sprites[rEnda]);
+				break;
+			case BigRenda:
+				C2D_SpriteSetPos(&sprites[bIg_renda], Notes[i].x, notes_y);
+				C2D_DrawSprite(&sprites[bIg_renda]);
+				break;
+			case Balloon:
+				C2D_SpriteSetPos(&sprites[bIg_renda_fini], Notes[i].x, notes_y);
+				C2D_DrawSprite(&sprites[bIg_renda_fini]);
+				break;
+			case RendaEnd:		//8:連打終了 9:大連打終了
+				C2D_SpriteSetPos(&sprites[rEnda_fini], Notes[i].x, notes_y);
+				C2D_DrawSprite(&sprites[rEnda_fini]);
+				break;
+			case RendaEnd + 1:
+				C2D_SpriteSetPos(&sprites[bIg_renda_fini], Notes[i].x, notes_y);
+				C2D_DrawSprite(&sprites[bIg_renda_fini]);
+				break;
+			default:
+				break;
+			}
+			
 			//sftd_draw_textf(font, Notes[i].x, 132, RGBA8(0, 255, 0, 255), 10, "%d", i);
 			if (Notes[i].x <= 40 ) Notes[i].flag = false;
 		}
 	}
-	//sftd_draw_textf(font, 100, 60, RGBA8(0, 255, 0, 255), 10, "%f", NowTime);
 	notes_judge(NowTime, isDon, isKa);
 	calc_judge(NowTime);
 }
