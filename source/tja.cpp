@@ -223,8 +223,8 @@ void tja_notes_load() {
 		fclose(fp);
 	}
 }
-void tja_to_notes(bool isDnon,bool isKa,int count, C2D_SpriteSheet spriteSheet) {
+void tja_to_notes(bool isDnon,bool isKa,int count, C2D_Sprite sprites[12]) {
 	
-	notes_main(isDnon, isKa, tja_notes,count,tja_title,tja_subtitle,tja_level,tja_bpm,tja_wave,tja_offset,tja_balloon,tja_songvol,tja_sevol,tja_scoreinit,tja_scorediff,tja_course,tja_style,tja_game,tja_life,tja_demostart,tja_side,tja_scoremode,spriteSheet);
+	notes_main(isDnon, isKa, tja_notes,count,tja_title,tja_subtitle,tja_level,tja_bpm,tja_wave,tja_offset,tja_balloon,tja_songvol,tja_sevol,tja_scoreinit,tja_scorediff,tja_course,tja_style,tja_game,tja_life,tja_demostart,tja_side,tja_scoremode,sprites);
 
 }
