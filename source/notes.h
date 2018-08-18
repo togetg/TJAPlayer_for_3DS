@@ -24,5 +24,5 @@ void notes_main(
 	char *tja_demostart, 
 	char *tja_side, 
 	char *tja_scoremode, 
-	C2D_SpriteSheet spriteSheet
+	C2D_Sprite sprites[12]
 );
