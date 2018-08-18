@@ -10,8 +10,7 @@
 #define BOTTOM_WIDTH  320
 #define BOTTOM_HEIGHT 240
 
-C2D_Sprite sprites[2];			//ただの画像用
-C2D_Sprite notes_sprites[12];	//ノーツとか画像用
+C2D_Sprite sprites[12];			//画像用
 static C2D_SpriteSheet spriteSheet;
 C2D_TextBuf g_dynamicBuf;
 char buf_main[160];
@@ -60,12 +59,15 @@ int main() {
 	spriteSheet = C2D_SpriteSheetLoad("romfs:/gfx/sprites.t3x");
 	if (!spriteSheet) svcBreak(USERBREAK_PANIC);
 
-	C2D_SpriteFromSheet(&sprites[0], spriteSheet, 0);
-	C2D_SpriteSetCenter(&sprites[0], 0.5f, 0.5f);
+	for (int i = 0; i < 12; i++) {
+		C2D_SpriteFromSheet(&sprites[i], spriteSheet, i);
+		C2D_SpriteSetCenter(&sprites[i], 0.5f, 0.5f);
+	}
+
 	C2D_SpriteSetPos(&sprites[0], TOP_WIDTH / 2, TOP_HEIGHT / 2);
-	C2D_SpriteFromSheet(&sprites[1], spriteSheet, 1);
-	C2D_SpriteSetCenter(&sprites[1], 0.5f, 0.5f);
 	C2D_SpriteSetPos(&sprites[1], BOTTOM_WIDTH / 2, BOTTOM_HEIGHT / 2);
+
+
 
 	int cnt = 0, notes_cnt = 0;
 	bool isNotesStart = false, isMusicStart = false;
@@ -112,7 +114,6 @@ int main() {
 		snprintf(buf_main, sizeof(buf_main), "bpm :%.1f", bpm);
 		debug_draw(200, 20, buf_main);
 		debug_draw(50, 200, "日本語テスト");
-
 		
 		//譜面が先
 		if (offset >= 0 && (isNotesStart == false || isMusicStart == false)) {
@@ -160,7 +161,7 @@ int main() {
 		}
 
 		if (isNotesStart == true) {
-			tja_to_notes(isDon, isKa, notes_cnt,spriteSheet);
+			tja_to_notes(isDon, isKa, notes_cnt,sprites);
 			notes_cnt++;
 		}
 
@@ -169,11 +170,9 @@ int main() {
 		C2D_DrawSprite(&sprites[1]);
 		
 		if (isDon == true) {	//ドン
-		//sftd_draw_text(font, 10, 10, RGBA8(255, 0, 0, 255), 20, "Don!");
 		music_play(0);
 		}
 		if (isKa == true) {		//カツ
-		//sftd_draw_text(font, 10, 10, RGBA8(0, 0, 255, 255), 20, "Ka!");
 		music_play(1);
 		}
 		
