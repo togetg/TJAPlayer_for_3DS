@@ -4,9 +4,10 @@ char *tja_title, *tja_subtitle, *tja_level, *tja_bpm, *tja_wave, *tja_offset, *t
 double bpm = -1;
 char tja_notes[2048][128];
 int tja_cnt = 0;
+char buf_tja[160];
 
 void tja_head_load(double *p_offset, double *p_bpm,int *p_measure){
-
+	
 	FILE *fp; 
 	char buf[128];
 
@@ -29,7 +30,7 @@ void tja_head_load(double *p_offset, double *p_bpm,int *p_measure){
 		 default_side[2] = "3",
 		 default_scoremode[2]="1";
 	
-	if ((fp = fopen("smdc:/tjafiles/senbonzakura/senbonzakura.tja", "r")) != NULL) {
+	if ((fp = fopen("sdmc:/tjafiles/senbonzakura/senbonzakura.tja", "r")) != NULL) {
 
 		tja_title = &(default_title[0]);
 		tja_subtitle = &(default_subtitle[0]);
@@ -168,7 +169,10 @@ void tja_head_load(double *p_offset, double *p_bpm,int *p_measure){
 		fclose(fp);
 		*p_offset = atof(tja_offset);
 		*p_bpm = atof(tja_bpm);
+		
 
+	}else {
+		//tjaファイルが開けなかった時
 	}
 }
 
@@ -194,7 +198,7 @@ void tja_notes_load() {
 	bool start_flag = false;
 	FILE *fp;
 
-	if ((fp = fopen("smdc:/tjafiles/senbonzakura/senbonzakura.tja", "r")) != NULL) {
+	if ((fp = fopen("sdmc:/tjafiles/senbonzakura/senbonzakura.tja", "r")) != NULL) {
 
 		while (fgets(tja_notes[tja_cnt], 128, fp) != NULL) {
 
