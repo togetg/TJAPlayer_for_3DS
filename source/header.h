@@ -3,3 +3,4 @@
 #include <stdlib.h>
 #include <3ds.h>
 #include <citro2d.h>
+#define File_Name "sotsuome"
