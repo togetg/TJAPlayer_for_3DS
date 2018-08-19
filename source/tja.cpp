@@ -30,7 +30,7 @@ void tja_head_load(double *p_offset, double *p_bpm,int *p_measure){
 		 default_side[2] = "3",
 		 default_scoremode[2]="1";
 	
-	if ((fp = fopen("sdmc:/tjafiles/senbonzakura/senbonzakura.tja", "r")) != NULL) {
+	if ((fp = fopen("sdmc:/tjafiles/" File_Name "/" File_Name ".tja", "r")) != NULL) {
 
 		tja_title = &(default_title[0]);
 		tja_subtitle = &(default_subtitle[0]);
@@ -198,7 +198,7 @@ void tja_notes_load() {
 	bool start_flag = false;
 	FILE *fp;
 
-	if ((fp = fopen("sdmc:/tjafiles/senbonzakura/senbonzakura.tja", "r")) != NULL) {
+	if ((fp = fopen("sdmc:/tjafiles/" File_Name  "/" File_Name ".tja", "r")) != NULL) {
 
 		while (fgets(tja_notes[tja_cnt], 128, fp) != NULL) {
 
