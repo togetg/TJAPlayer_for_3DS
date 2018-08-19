@@ -1,10 +1,7 @@
-#include <3ds.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 #include <cstdio>
 
+#include "header.h"
 #include "vorbis.h"
 
 #define delete(ptr) \
@@ -244,7 +241,7 @@ int changeFile(const char* ep_file, struct playbackInfo_t* playbackInfo, bool *p
 }
 
 void play_main_music(bool *p_isPlayMain) {
-	char file[] = DEFAULT_DIR "senbonzakura/senbonzakura.ogg";
+	char file[] = DEFAULT_DIR File_Name "/" File_Name ".ogg";
 	changeFile(file, &playbackInfo, p_isPlayMain);
 }
 
