@@ -5,7 +5,7 @@
 
 #define Notes_Area 400.0
 #define Notes_Judge 93
-#define Notes_Max 64
+#define Notes_Max 512
 
 char buf_notes[160];
 
@@ -48,7 +48,7 @@ typedef struct {
 	int sec;
 	C2D_Sprite spr;
 } NOTES_T;
-NOTES_T Notes[1024];
+NOTES_T Notes[512];
 
 int bpm_count = 0;
 int bpm_count2 = 1;	//次のbpmの時間計測用
@@ -207,7 +207,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][128], int cnt, char *
 
 int notes_id_check() {
 
-	for (int i = 0; i < Notes_Max; i++) {
+	for (int i = 0; i < Notes_Max-1; i++) {
 
 		if (Notes[i].flag == false) {
 
@@ -251,7 +251,7 @@ void notes_judge(double NowTime, bool isDon, bool isKa) {
 	int CurrentJudgeNotes[2] = { -1,-1 };		//現在判定すべきノーツ ドン,カツ
 	double CurrentJudgeNotesLag[2] = { -1,-1 };	//判定すべきノーツの誤差(s)
 
-	for (int i = 0; i < Notes_Max; i++) {
+	for (int i = 0; i < Notes_Max-1; i++) {
 
 		if (Notes[i].flag == true) {
 
@@ -284,20 +284,41 @@ void notes_judge(double NowTime, bool isDon, bool isKa) {
 		}
 	}
 
-	for (int n = 0; n < 2; n++) {
+	if (isAuto == true) {	//オート
 
-		if (CurrentJudgeNotes[n] != -1) {
+		bool isSe[2];
 
-			if (isAuto == true &&	//オート
-				Notes[CurrentJudgeNotes[n]].judge_time <= NowTime) {
+		for (int i = 0; i < Notes_Max-1; i++) {
 
-				music_play(n);
-				Notes[CurrentJudgeNotes[n]].flag = false;
+			if (Notes[i].flag == true && Notes[i].judge_time <= NowTime) {
+
+				if (isSe[0] == false ||
+					Notes[i].kind == Don ||
+					Notes[i].kind == BigDon ||
+					Notes[i].kind == Renda ||
+					Notes[i].kind == BigRenda ||
+					Notes[i].kind == Balloon ||
+					Notes[i].kind == RendaEnd ||
+					Notes[i].kind == Potato) {
+					
+					isSe[0] = true;
+					music_play(0);
+				}
+				else if (
+					isSe[1] == false ||
+					Notes[i].kind == Ka ||
+					Notes[i].kind == BigKa) {
+
+					isSe[1] = true;
+					music_play(1);
+				}
+
+				Notes[i].flag = false;
 			}
 		}
 	}
 
-	if (isAuto == false) {			//手動
+	else if (isAuto == false) {			//手動
 		
 		if (isDon == true && CurrentJudgeNotes[0] != -1) {	//ドン
 
@@ -340,7 +361,7 @@ void notes_calc(bool isDon,bool isKa,double bpm, double tempo, double NowTime, i
 	//int small_y = 95, big_y = 90;
 	int notes_y = 108;
 	
-	for (int i = 64; i >= 0; i--) {
+	for (int i = Notes_Max-1; i >= 0; i--) {
 		
 		if (Notes[i].flag == true) {
 			
