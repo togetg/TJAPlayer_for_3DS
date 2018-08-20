@@ -15,14 +15,7 @@ char buf_notes[160];
 int notes_id_check(); 
 void notes_calc(bool isDon, bool isKa,double bpm, double tempo, double NowTime, int cnt, C2D_Sprite sprites[12]);
 
-typedef struct {
-	int num, notes_max;
-	double x_ini, x, create_time,judge_time,bpm;
-	int kind;
-	bool flag=false;
-	int sec;
-	C2D_Sprite spr;
-} NOTES_T;
+
 NOTES_T Notes[512];
 COMMAND_T Command;
 
@@ -58,17 +51,21 @@ int ctoi(char c) {
 	}
 }
 
+double bpm,tempo,offset;
 
-void notes_init() {
+void notes_init(TJA_HEADER_T Tja_Header) {
+
 	Command.data[0] = 0; Command.data[1] = 0; Command.data[2] = 0;
 	Command.knd = 0;
 	Command.val = 0;
+	bpm = Tja_Header.bpm;
+	offset = Tja_Header.offset;
+	tempo = 4;
+
 }
 
-void notes_main(bool isDon,bool isKa, char tja_notes[2048][Max_Notes_Section], int cnt, char *tja_title, char *tja_subtitle, char *tja_level, char *tja_bpm, char *tja_wave, char *tja_offset, char *tja_balloon, char *tja_songvol, char *tja_sevol, char *tja_scoreinit, char *tja_scorediff, char *tja_course, char *tja_style, char *tja_game, char *tja_life, char *tja_demostart, char *tja_side, char *tja_scoremode, C2D_Sprite  sprites[12]) {
+void notes_main(bool isDon,bool isKa, char tja_notes[2048][Max_Notes_Section], int cnt, C2D_Sprite  sprites[12]) {
 
-	double bpm = atof(tja_bpm);
-	double tempo = 4;
 	double NowTime = time_now(0);
 	snprintf(buf_notes, sizeof(buf_notes), "NowTime0:%.2f", NowTime);
 	debug_draw(0, 10, buf_notes);
@@ -120,6 +117,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][Max_Notes_Section], i
 						break;
 
 					case Bpmchange:
+						bpm = Command.val;
 						break;
 
 					default:
@@ -206,6 +204,17 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][Max_Notes_Section], i
 	snprintf(buf_notes, sizeof(buf_notes), "%s", tja_notes[sec_count - 1]);
 	debug_draw(0, 40, tja_notes[sec_count - 1]);
 
+
+	snprintf(buf_notes, sizeof(buf_notes), "NowTime1:%.2f", NowTime);
+	debug_draw(0, 0, buf_notes);
+	snprintf(buf_notes, sizeof(buf_notes), "cnt :%d", cnt);
+	debug_draw(150, 0, buf_notes);
+	//snprintf(buf_notes, sizeof(buf_notes), "firstsec :%.2f", FirstSecTime);
+	//debug_draw(0, 20, buf_notes);
+	snprintf(buf_notes, sizeof(buf_notes), "offset :%.2f", offset);
+	debug_draw(100, 20, buf_notes);
+	snprintf(buf_notes, sizeof(buf_notes), "bpm :%.1f", bpm);
+	debug_draw(0, 20, buf_notes);
 
 	snprintf(buf_notes, sizeof(buf_notes), "knd:%d", Command.knd);
 	debug_draw(0, 170, buf_notes);
