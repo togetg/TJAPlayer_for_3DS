@@ -1,33 +1,16 @@
 #pragma once
+#include "tja.h"
 #include <citro2d.h>
 
 void notes_main(
-	bool isDnon,
-	bool isKa, 
+	bool isDon,
+	bool isKa,
 	char tja_notes[2048][Max_Notes_Section],
-	int cnt, 
-	char *tja_title, 
-	char *tja_subtitle, 
-	char *tja_level, 
-	char *tja_bpm, 
-	char *tja_wave, 
-	char *tja_offset, 
-	char *tja_balloon, 
-	char *tja_songvol, 
-	char *tja_sevol, 
-	char *tja_scoreinit, 
-	char *tja_scorediff,
-	char *tja_course, 
-	char *tja_style, 
-	char *tja_game, 
-	char *tja_life, 
-	char *tja_demostart, 
-	char *tja_side, 
-	char *tja_scoremode, 
-	C2D_Sprite sprites[12]
-);
+	int cnt,
+	C2D_Sprite  sprites[12]);
 
-void notes_init();
+
+void notes_init(TJA_HEADER_T Tja_Header);
 
 enum Notes_Kind {
 	Rest,		//‹x•„
@@ -79,3 +62,12 @@ enum Command_Kind {
 	Barlineon,
 
 };
+
+typedef struct {
+	int num, notes_max;
+	double x_ini, x, create_time, judge_time, bpm;
+	int kind;
+	bool flag = false;
+	int sec;
+	C2D_Sprite spr;
+} NOTES_T;
