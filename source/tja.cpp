@@ -1,8 +1,10 @@
 #include "header.h"
 #include "notes.h"
+#include "tja.h"
+
 char *tja_title, *tja_subtitle, *tja_level, *tja_bpm, *tja_wave, *tja_offset, *tja_balloon, *tja_songvol, *tja_sevol, *tja_scoreinit, *tja_scorediff, *tja_course, *tja_style, *tja_game, *tja_life, *tja_demostart, *tja_side, *tja_scoremode;
 double bpm = -1;
-char tja_notes[2048][128];
+char tja_notes[2048][Max_Notes_Section];
 int tja_cnt = 0;
 char buf_tja[160];
 
@@ -74,7 +76,7 @@ void tja_head_load(double *p_offset, double *p_bpm,int *p_measure){
 				strcpy(tja_level, buf + 6);
 				continue;
 			}
-
+			
 			if ((strstr(buf, "BPM:") != NULL)) {
 				tja_bpm = (char *)malloc((strlen(buf) + 1));
 				strcpy(tja_bpm, buf + 4);
@@ -200,7 +202,7 @@ void tja_notes_load() {
 
 	if ((fp = fopen("sdmc:/tjafiles/" File_Name  "/" File_Name ".tja", "r")) != NULL) {
 
-		while (fgets(tja_notes[tja_cnt], 128, fp) != NULL) {
+		while (fgets(tja_notes[tja_cnt], Max_Notes_Section, fp) != NULL) {
 
 			if (strstr(tja_notes[tja_cnt], "#START") != NULL) {
 
@@ -227,4 +229,142 @@ void tja_to_notes(bool isDnon,bool isKa,int count, C2D_Sprite sprites[12]) {
 	
 	notes_main(isDnon, isKa, tja_notes,count,tja_title,tja_subtitle,tja_level,tja_bpm,tja_wave,tja_offset,tja_balloon,tja_songvol,tja_sevol,tja_scoreinit,tja_scorediff,tja_course,tja_style,tja_game,tja_life,tja_demostart,tja_side,tja_scoremode,sprites);
 
+}
+
+
+char* str_concat(char *str1, const char *str2) {
+
+	char *top = str1;
+
+	while (*(str1++) != '\0');
+
+	str1 -= 1;
+
+	do {
+		*(str1++) = *str2;
+	} while (*(str2++) != '\0');
+
+	return str1;
+}
+
+char* str_concat2(const char *str1, const char *str2, char **result) {
+
+	size_t size = sizeof(char) * (strlen(str1) + strlen(str2) + 1);
+	char *work = (char*)malloc(size);
+	if (work == NULL) {
+		printf("Cannot allocate memory.\n");
+		return NULL;
+	}
+
+	char *top = work;
+
+	strcpy(work, str1);
+
+	work += strlen(str1);
+
+	strcpy(work, str2);
+
+	*result = top;
+
+	return top;
+}
+
+void str_replace(const char *src, const char *target, const char *replace, char **result) {
+
+	char *temp = (char*)malloc(sizeof(char) * 1000);
+	if (temp == NULL) {
+		printf("Cannot allocate memory.\n");
+		return;
+	}
+
+	char *top = temp;
+
+	char *work = (char*)malloc(sizeof(char) * strlen(src));
+	strcpy(work, src);
+
+	char *p;
+	while ((p = strstr(work, target)) != NULL) {
+
+		*p = '\0';
+		p += strlen(target);
+
+		strcpy(temp, p);
+
+		str_concat(work, replace);
+		str_concat(work, temp);
+	}
+
+	free(temp);
+
+	*result = work;
+}
+
+void get_command_value(char* buf,COMMAND_T *Command) {	//コマンドと値を取り出す
+
+	int comment, space, length;
+	double val;
+
+	if (buf[0] == '#') {
+
+		length = strlen(buf);
+		comment = length-3;
+
+		char* command = (char *)malloc((strlen(buf) + 1));
+		char* value = (char *)malloc((strlen(buf) + 1));
+
+		if (strstr(buf, "//") != NULL) {	//コメント処理
+
+			comment = strstr(buf, "//") - buf - 1;
+			strncpy(command, buf + 1, comment);
+		}
+
+		if (strstr(buf, " ") != NULL) {		//値処理
+
+			space = strstr(buf, " ") - buf;
+
+			if (space < comment) {
+
+				strncpy(command, buf + 1, space - 1);
+				strncpy(value, buf + strlen(command) + 1, comment - strlen(command) );
+
+			}else strncpy(command, buf + 1, comment);
+		}
+		else strncpy(command, buf + 1, comment);
+		
+
+		Command->command = command;
+		Command->value = value;
+		
+
+		     if (strcmp(command, "START") == 0) Command->knd = Start;
+		else if (strcmp(command, "END") == 0) Command->knd = End;
+		else if (strcmp(command, "BPMCHANGE") == 0) {
+
+				 Command->knd = Bpmchange;
+				 Command->val = strtod(value, NULL);
+			 }
+		else if (strcmp(command, "GOGOSTART") == 0) Command->knd = Gogostart;
+		else if (strcmp(command, "GOGOEND") == 0) Command->knd = Gogoend;
+		else if (strcmp(command, "MEASURE") == 0) Command->knd = Measure;
+		else if (strcmp(command, "SCROLL") == 0) Command->knd = Scroll;
+		else if (strcmp(command, "DELAY") == 0) Command->knd = Delay;
+		else if (strcmp(command, "SECTION") == 0) Command->knd = Section;
+		else if (strcmp(command, "BRANCHSTART") == 0) Command->knd = Branchstart;
+		else if (strcmp(command, "BRANCHEND") == 0) Command->knd = Branchend;
+		else if (strcmp(command, "N") == 0) Command->knd = N;
+		else if (strcmp(command, "E") == 0) Command->knd = E;
+		else if (strcmp(command, "M") == 0) Command->knd = M;
+		else if (strcmp(command, "LEVELHOLD") == 0) Command->knd = Levelhold;
+		else if (strcmp(command, "BMSCROLl") == 0) Command->knd = Bmscroll;
+		else if (strcmp(command, "HBSCROLL") == 0) Command->knd = Hbscroll;
+		else if (strcmp(command, "BARLINEOFF") == 0) Command->knd = Barlineoff;
+		else if (strcmp(command, "BARLINEON") == 0) Command->knd = Barlineon;
+		else Command->knd = -1;
+
+	}
+
+	else {
+
+		Command->knd = -1;
+	}
 }
