@@ -15,6 +15,7 @@ static C2D_SpriteSheet spriteSheet;
 C2D_TextBuf g_dynamicBuf;
 char buf_main[160];
 C2D_Text dynText;
+TJA_HEADER_T Tja_Header;
 
 void debug_draw(float x, float y, const char *text) {
 
@@ -32,7 +33,7 @@ void main_init() {
 	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
 	C2D_Prepare();
 	init_main_music();
-	notes_init();
+	notes_init(Tja_Header);
 }
 
 void main_exit() {
@@ -68,17 +69,19 @@ int main() {
 	C2D_SpriteSetPos(&sprites[0], TOP_WIDTH / 2, TOP_HEIGHT / 2);
 	C2D_SpriteSetPos(&sprites[1], BOTTOM_WIDTH / 2, BOTTOM_HEIGHT / 2);
 
-
-
-	int cnt = 0, notes_cnt = 0;
-	bool isNotesStart = false, isMusicStart = false;
-	double FirstSecTime = 9999.0, offset, bpm, NowTime; int measure = 4; 
-	double *p_offset = &offset, *p_bpm = &bpm; int *p_measure = &measure;
-
-	tja_head_load(p_offset, p_bpm, p_measure);
+	tja_head_load();
 	tja_notes_load();
 	music_load();
 	init_main_music();
+	get_head(&Tja_Header);
+	notes_init(Tja_Header);
+
+	int cnt = 0, notes_cnt = 0;
+	bool isNotesStart = false, isMusicStart = false;
+	double FirstSecTime = 9999.0,
+		offset = Tja_Header.offset,
+		bpm = Tja_Header.bpm, NowTime;
+	int measure = 4;
 
 	while (aptMainLoop()) {
 
@@ -106,15 +109,6 @@ int main() {
 
 		draw_fps();
 
-		snprintf(buf_main, sizeof(buf_main), "NowTime1:%.2f", NowTime);
-		debug_draw(0, 0, buf_main);
-		snprintf(buf_main, sizeof(buf_main), "cnt :%d", cnt);
-		debug_draw(150, 0, buf_main);
-		snprintf(buf_main, sizeof(buf_main), "firstsec :%.2f", FirstSecTime);
-		debug_draw(0, 20, buf_main);
-		snprintf(buf_main, sizeof(buf_main), "offset :%.2f", offset);
-		debug_draw(100, 20, buf_main);
-		snprintf(buf_main, sizeof(buf_main), "bpm :%.1f", bpm);
 		debug_draw(200, 20, buf_main);
 		debug_draw(50, 200, "日本語テスト");
 		
