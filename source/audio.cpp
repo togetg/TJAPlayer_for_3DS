@@ -25,6 +25,7 @@ Music music[3];
 ndspWaveBuf waveBuf[3];
 
 void music_load() {
+
 	ndspInit();
 	ndspSetOutputMode(NDSP_OUTPUT_STEREO);
 	ndspSetOutputCount(1);
@@ -77,7 +78,7 @@ void music_load() {
 		int eof = 0;
 		int currentSection;
 		while (!eof) {
-			long ret = ov_read(&music[i].ovf, &music[i].data[offset], 4096, &currentSection);
+			long ret = ov_read(&music[i].ovf, &music[i].data[offset], BUFFER_SIZE, &currentSection);
 			if (ret == 0) {
 				eof = 1;
 			}
