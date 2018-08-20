@@ -2,57 +2,56 @@
 #include "notes.h"
 #include "tja.h"
 
-char *tja_title, *tja_subtitle, *tja_level, *tja_bpm, *tja_wave, *tja_offset, *tja_balloon, *tja_songvol, *tja_sevol, *tja_scoreinit, *tja_scorediff, *tja_course, *tja_style, *tja_game, *tja_life, *tja_demostart, *tja_side, *tja_scoremode;
-double bpm = -1;
+
 char tja_notes[2048][Max_Notes_Section];
 int tja_cnt = 0;
 char buf_tja[160];
+TJA_HEADER_T Current_Header;
 
-void tja_head_load(double *p_offset, double *p_bpm,int *p_measure){
+void tja_head_load(){
 	
 	FILE *fp; 
 	char buf[128];
 
-	char default_title[9] = "No title", 
-		 default_subtitle[1] = "",
-		 default_level[2] = "0",
-		 default_bpm[3] = "60", 
-		 default_wave[9] = "test.wav", 
-		 default_offset[2] = "0", 
-		 default_balloon[2] = "5", 
-		 default_songvol[4] = "100", 
-		 default_sevol[4] = "100", 
-		 default_scoreinit[3] = "-1", 
-		 default_scorediff[3] = "-1",
-		 default_course[4] = "oni",
-		 default_style[2] = "1", 
-		 default_game[6] = "taiko", 
-		 default_life[3] = "-1", 
-		 default_demostart[2] = "0", 
-		 default_side[2] = "3",
-		 default_scoremode[2]="1";
+	char default_title[] = "No title", 
+		 default_subtitle[] = "",
+		 default_level[] = "0",
+		 default_bpm[] = "60", 
+		 default_wave[] = "test.wav", 
+		 default_offset[] = "0", 
+		 default_balloon[] = "5", 
+		 default_songvol[] = "100", 
+		 default_sevol[] = "100", 
+		 default_scoreinit[] = "-1", 
+		 default_scorediff[] = "-1",
+		 default_course[] = "oni",
+		 default_style[] = "1", 
+		 default_life[] = "-1", 
+		 default_demostart[] = "0", 
+		 default_side[] = "3",
+		 default_scoremode[] = "1";
 	
 	if ((fp = fopen("sdmc:/tjafiles/" File_Name "/" File_Name ".tja", "r")) != NULL) {
+		
+		Current_Header.title = default_title;
+		Current_Header.subtitle = default_subtitle;
+		Current_Header.level = atoi(default_level);
+		Current_Header.bpm = atof(default_bpm);
+		Current_Header.wave = default_wave;
+		Current_Header.offset = atof(default_offset);
+		Current_Header.balloon[0] = atoi(default_balloon);
+		Current_Header.songvol = atoi(default_songvol);
+		Current_Header.sevol = atoi(default_sevol);
+		Current_Header.scoreinit = atoi(default_scoreinit);
+		Current_Header.scorediff = atoi(default_scorediff);
+		Current_Header.course = atoi(default_course);
+		Current_Header.style = atoi(default_style);
+		Current_Header.life = atoi(default_life);
+		Current_Header.demostart = atof(default_demostart);
+		Current_Header.side = atoi(default_side);
+		Current_Header.scoremode = atoi(default_scoremode);
 
-		tja_title = &(default_title[0]);
-		tja_subtitle = &(default_subtitle[0]);
-		tja_level = &(default_level[0]);
-		tja_bpm = &(default_bpm[0]);
-		tja_wave = &(default_wave[0]);
-		tja_offset = &(default_offset[0]);
-		tja_balloon = &(default_balloon[0]);
-		tja_songvol = &(default_songvol[0]);
-		tja_sevol = &(default_sevol[0]);
-		tja_scoreinit = &(default_scoreinit[0]);
-		tja_scorediff = &(default_scorediff[0]);
-		tja_course = &(default_course[0]);
-		tja_style = &(default_style[0]);
-		tja_game = &(default_game[0]);
-		tja_life = &(default_life[0]);
-		tja_demostart = &(default_demostart[0]);
-		tja_side = &(default_side[0]);
-		tja_scoremode = &(default_scoremode[0]);
-
+		char* temp;
 		while (fgets(buf, 128, fp) != NULL) {
 
 			if (strstr(buf, "#START") != NULL) {
@@ -60,118 +59,125 @@ void tja_head_load(double *p_offset, double *p_bpm,int *p_measure){
 			}
 
 			if ((strstr(buf, "TITLE:") != NULL) && (strstr(buf, "SUBTITLE:") == NULL)) {
-				tja_title = (char *)malloc((strlen(buf)+1));
-				strcpy(tja_title, buf + 6);
+				temp = (char *)malloc((strlen(buf)+1));
+				strcpy(temp, buf + 6);
+				Current_Header.title = temp;
 				continue;
 			}
 
 			if ((strstr(buf, "SUBTITLE:") != NULL)) {
-				tja_subtitle = (char *)malloc((strlen(buf) + 1));
-				strcpy(tja_subtitle, buf + 9);
+				temp = (char *)malloc((strlen(buf) + 1));
+				strcpy(temp, buf + 9);
+				Current_Header.subtitle = temp;
 				continue;
 			}
 
 			if ((strstr(buf, "LEVEL:") != NULL)) {
-				tja_level = (char *)malloc((strlen(buf) + 1));
-				strcpy(tja_level, buf + 6);
+				temp = (char *)malloc((strlen(buf) + 1));
+				strcpy(temp, buf + 6);
+				Current_Header.level = atoi(temp);
 				continue;
 			}
 			
 			if ((strstr(buf, "BPM:") != NULL)) {
-				tja_bpm = (char *)malloc((strlen(buf) + 1));
-				strcpy(tja_bpm, buf + 4);
+				temp = (char *)malloc((strlen(buf) + 1));
+				strcpy(temp, buf + 4);
+				Current_Header.bpm = atof(temp);
 				continue;
 			}
 
 			if ((strstr(buf, "WAVE:") != NULL)) {
-				tja_wave = (char *)malloc((strlen(buf) + 1));
-				strcpy(tja_wave, buf + 5);
+				temp = (char *)malloc((strlen(buf) + 1));
+				strcpy(temp, buf + 5);
+				Current_Header.wave = temp;
 				continue;
 			}
 
 			if ((strstr(buf, "OFFSET:") != NULL)) {
-				tja_offset = (char *)malloc((strlen(buf) + 1));
-				strcpy(tja_offset, buf + 7);
+				temp = (char *)malloc((strlen(buf) + 1));
+				strcpy(temp, buf + 7);
+				Current_Header.offset = atof(temp);
 				continue;
 			}
 
 			if ((strstr(buf, "BALLOON:") != NULL)) {
-				tja_balloon = (char *)malloc((strlen(buf) + 1));
-				strcpy(tja_balloon, buf + 8);
+				temp = (char *)malloc((strlen(buf) + 1));
+				strcpy(temp, buf + 8);
+				//Current_Header.balloon = temp;
 				continue;
 			}
 
 			if ((strstr(buf, "SONGVOL:") != NULL)) {
-				tja_songvol = (char *)malloc((strlen(buf) + 1));
-				strcpy(tja_songvol, buf + 8);
+				temp = (char *)malloc((strlen(buf) + 1));
+				strcpy(temp, buf + 8);
+				Current_Header.songvol = atoi(temp);
 				continue;
 			}
 
 			if ((strstr(buf, "SEVOL:") != NULL)) {
-				tja_sevol = (char *)malloc((strlen(buf) + 1));
-				strcpy(tja_sevol, buf + 6);
+				temp = (char *)malloc((strlen(buf) + 1));
+				strcpy(temp, buf + 6);
+				Current_Header.sevol = atoi(temp);
 				continue;
 			}
 
 			if ((strstr(buf, "SCOREINIT:") != NULL)) {
-				tja_scoreinit = (char *)malloc((strlen(buf) + 1));
-				strcpy(tja_scoreinit, buf + 10);
+				temp = (char *)malloc((strlen(buf) + 1));
+				strcpy(temp, buf + 10);
 				continue;
 			}
 
 			if ((strstr(buf, "SCOREDIFF:") != NULL)) {
-				tja_scorediff = (char *)malloc((strlen(buf) + 1));
-				strcpy(tja_scorediff, buf + 10);
+				temp = (char *)malloc((strlen(buf) + 1));
+				strcpy(temp, buf + 10);
+				Current_Header.scorediff = atoi(temp);
 				continue;}
 
 
 			if ((strstr(buf, "COURSE:") != NULL)) {
-				tja_course = (char *)malloc((strlen(buf) + 1));
-				strcpy(tja_course, buf + 7);
+				temp = (char *)malloc((strlen(buf) + 1));
+				strcpy(temp, buf + 7);
+				Current_Header.course = atoi(temp);
 				continue;}
 
 			if ((strstr(buf, "STYLE:") != NULL)) {
-				tja_style = (char *)malloc((strlen(buf) + 1));
-				strcpy(tja_style, buf + 6);
-				continue;
-			}
-
-			if ((strstr(buf, "GAME:") != NULL)) {
-				tja_game = (char *)malloc((strlen(buf) + 1));
-				strcpy(tja_game, buf + 5);
+				temp = (char *)malloc((strlen(buf) + 1));
+				strcpy(temp, buf + 6);
+				Current_Header.style = atoi(temp);
 				continue;
 			}
 
 			if ((strstr(buf, "LIFE:") != NULL)) {
-				tja_life = (char *)malloc((strlen(buf) + 1));
-				strcpy(tja_life, buf + 5);
+				temp = (char *)malloc((strlen(buf) + 1));
+				strcpy(temp, buf + 5);
+				Current_Header.life = atoi(temp);
 				continue;
 			}
 
 			if ((strstr(buf, "DEMOSTART:") != NULL)) {
-				tja_demostart = (char *)malloc((strlen(buf) + 1));
-				strcpy(tja_demostart, buf + 10);
+				temp = (char *)malloc((strlen(buf) + 1));
+				strcpy(temp, buf + 10);
+				Current_Header.demostart = atof(temp);
 				continue;
 			}
 
 			if ((strstr(buf, "SIDE:") != NULL)) {
-				tja_side = (char *)malloc((strlen(buf) + 1));
-				strcpy(tja_side, buf + 5);
+				temp = (char *)malloc((strlen(buf) + 1));
+				strcpy(temp, buf + 5);
+				Current_Header.side = atoi(temp);
 				continue;
 			}
 
 			if ((strstr(buf, "SCOREMODE:") != NULL)) {
-				tja_scoremode = (char *)malloc((strlen(buf) + 1));
-				strcpy(tja_scoremode, buf + 10);
+				temp = (char *)malloc((strlen(buf) + 1));
+				strcpy(temp, buf + 10);
+				Current_Header.scoremode= atoi(temp);
 				continue;
 			}
 
 		}
 
-		fclose(fp);
-		*p_offset = atof(tja_offset);
-		*p_bpm = atof(tja_bpm);
-		
+		fclose(fp);		
 
 	}else {
 		//tjaファイルが開けなかった時
@@ -225,16 +231,22 @@ void tja_notes_load() {
 		fclose(fp);
 	}
 }
+
+void get_head(TJA_HEADER_T *Tja_Header) {
+
+	*Tja_Header = Current_Header;
+}
+
 void tja_to_notes(bool isDnon,bool isKa,int count, C2D_Sprite sprites[12]) {
 	
-	notes_main(isDnon, isKa, tja_notes,count,tja_title,tja_subtitle,tja_level,tja_bpm,tja_wave,tja_offset,tja_balloon,tja_songvol,tja_sevol,tja_scoreinit,tja_scorediff,tja_course,tja_style,tja_game,tja_life,tja_demostart,tja_side,tja_scoremode,sprites);
+	notes_main(isDnon, isKa, tja_notes,count,sprites);
 
 }
 
 
 char* str_concat(char *str1, const char *str2) {
 
-	char *top = str1;
+	//char *top = str1;
 
 	while (*(str1++) != '\0');
 
@@ -277,7 +289,7 @@ void str_replace(const char *src, const char *target, const char *replace, char 
 		return;
 	}
 
-	char *top = temp;
+	//char *top = temp;
 
 	char *work = (char*)malloc(sizeof(char) * strlen(src));
 	strcpy(work, src);
@@ -302,7 +314,6 @@ void str_replace(const char *src, const char *target, const char *replace, char 
 void get_command_value(char* buf,COMMAND_T *Command) {	//コマンドと値を取り出す
 
 	int comment, space, length;
-	double val;
 
 	if (buf[0] == '#') {
 
