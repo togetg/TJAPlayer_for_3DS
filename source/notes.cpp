@@ -1,7 +1,10 @@
+#include <limits.h>
 #include "header.h"
 #include "main.h"
 #include "time.h"
 #include "audio.h"
+#include "tja.h"
+#include "notes.h"
 
 #define Notes_Area 400.0
 #define Notes_Judge 93
@@ -9,39 +12,11 @@
 
 char buf_notes[160];
 
-enum Notes_Kind {
-	Rest,		//休符
-	Don,		//ドン
-	Ka,			//カツ
-	BigDon,		//ドン(大)
-	BigKa,		//カツ(大)
-	Renda,		//連打開始
-	BigRenda,	//連打(大)開始
-	Balloon,	//風船開始
-	RendaEnd,	//連打終了
-	Potato,		//お芋音符開始
-};
-
-enum Sprite_Notes_Kind {	//スプライト用
-	dOn = 2,
-	kA,
-	bIg_don,
-	bIg_ka,
-	rEnda,
-	rEnda_fini,
-	bIg_renda,
-	bIg_renda_fini,
-	bAlloon,
-	jUdge_ryou,
-	jUdge_ka,
-	jUdge_fuka,
-};
-
 int notes_id_check(); 
 void notes_calc(bool isDon, bool isKa,double bpm, double tempo, double NowTime, int cnt, C2D_Sprite sprites[12]);
 
 typedef struct {
-	int notes_number, notes_max;
+	int num, notes_max;
 	double x_ini, x, create_time,judge_time,bpm;
 	int kind;
 	bool flag=false;
@@ -49,13 +24,15 @@ typedef struct {
 	C2D_Sprite spr;
 } NOTES_T;
 NOTES_T Notes[512];
+COMMAND_T Command;
 
 int bpm_count = 0;
 int bpm_count2 = 1;	//次のbpmの時間計測用
 int sec_count = 0;
 int notes_main_count = 0;
 int renda_flag = 0;
-int notes_count;
+int notes_count;	
+int notes_number = 0;	//何番目のノーツか　要初期化
 double bar_x;
 double speed;
 double bpm_time;
@@ -81,7 +58,14 @@ int ctoi(char c) {
 	}
 }
 
-void notes_main(bool isDon,bool isKa, char tja_notes[2048][128], int cnt, char *tja_title, char *tja_subtitle, char *tja_level, char *tja_bpm, char *tja_wave, char *tja_offset, char *tja_balloon, char *tja_songvol, char *tja_sevol, char *tja_scoreinit, char *tja_scorediff, char *tja_course, char *tja_style, char *tja_game, char *tja_life, char *tja_demostart, char *tja_side, char *tja_scoremode, C2D_Sprite  sprites[12]) {
+
+void notes_init() {
+	Command.data[0] = 0; Command.data[1] = 0; Command.data[2] = 0;
+	Command.knd = 0;
+	Command.val = 0;
+}
+
+void notes_main(bool isDon,bool isKa, char tja_notes[2048][Max_Notes_Section], int cnt, char *tja_title, char *tja_subtitle, char *tja_level, char *tja_bpm, char *tja_wave, char *tja_offset, char *tja_balloon, char *tja_songvol, char *tja_sevol, char *tja_scoreinit, char *tja_scorediff, char *tja_course, char *tja_style, char *tja_game, char *tja_life, char *tja_demostart, char *tja_side, char *tja_scoremode, C2D_Sprite  sprites[12]) {
 
 	double bpm = atof(tja_bpm);
 	double tempo = 4;
@@ -92,7 +76,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][128], int cnt, char *
 
 	//sftd_draw_textf(font, 100, 20, RGBA8(0, 255, 0, 255), 10, "BpmTime:%f", bpm_time);
 	//sftd_draw_textf(font, 100, 30, RGBA8(0, 255, 0, 255), 10, "BpmCount2:%d", bpm_count2);
-	
+
 	if (bpm_time <= NowTime && cnt >= 0 && notes_load_flag == true) {
 		
 		bpm_count2++;
@@ -117,15 +101,35 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][128], int cnt, char *
 			bpm_tempo_flag = true;
 			tempo_time[0] = NowTime;
 			notes_count = 0;
+
 			if (sec_count == 0) sec_time = NowTime;
+			
 			while (tja_notes[sec_count][notes_count] != ',') {
+
+				//命令
 				if (notes_count == 0 && tja_notes[sec_count][0] == '#') {
-					if (tja_notes[sec_count][1] == 'E' &&
-						tja_notes[sec_count][2] == 'N' &&
-						tja_notes[sec_count][3] == 'D') {
-						notes_load_flag = false;
+
+					bool isEnd = false;
+					get_command_value(tja_notes[sec_count],&Command);
+					Command.notes = tja_notes[sec_count];
+
+					switch (Command.knd) {
+					case End:
+						notes_load_flag = false;						
+						isEnd = true;
 						break;
+
+					case Bpmchange:
+						break;
+
+					default:
+						break;
+
 					}
+
+					if (isEnd == true) break;
+
+
 					notes_count = 0;
 					sec_count++;
 					continue;
@@ -150,7 +154,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][128], int cnt, char *
 
 						Notes[id].flag = true;
 						Notes[id].notes_max = notes_count;	//用途不明
-						Notes[id].notes_number = i;
+						Notes[id].num = notes_number;
 						Notes[id].x_ini = (Notes_Area / notes_count)*i + 400.0;
 						Notes[id].x = Notes[id].x_ini;
 						Notes[id].bpm = bpm;
@@ -180,6 +184,8 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][128], int cnt, char *
 							renda_flag = 0;
 							break;
 						}
+
+						notes_number++;
 					}
 				}
 			}
@@ -188,6 +194,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][128], int cnt, char *
 		}
 		bpm_count++;
 	}
+
 	notes_main_count++;
 
 	if (bpm_tempo_flag == true) bar_x = Notes_Area - Notes_Area * (NowTime - tempo_time[0]) / (60.0*tempo / bpm);
@@ -199,6 +206,18 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][128], int cnt, char *
 	snprintf(buf_notes, sizeof(buf_notes), "%s", tja_notes[sec_count - 1]);
 	debug_draw(0, 40, tja_notes[sec_count - 1]);
 
+
+	snprintf(buf_notes, sizeof(buf_notes), "knd:%d", Command.knd);
+	debug_draw(0, 170, buf_notes);
+	snprintf(buf_notes, sizeof(buf_notes), "val:%.2f", Command.val);
+	debug_draw(100, 170, buf_notes);
+	snprintf(buf_notes, sizeof(buf_notes), "Com:%s", Command.command);
+	debug_draw(200, 170, buf_notes);
+	snprintf(buf_notes, sizeof(buf_notes), "VAL:%s", Command.value);
+	debug_draw(200, 180, buf_notes);
+	snprintf(buf_notes, sizeof(buf_notes), "%s", Command.notes);
+	debug_draw(0, 180, buf_notes);
+	
 	snprintf(buf_notes, sizeof(buf_notes), "notes_cnt:%d", notes_count);
 	debug_draw(300, 30, buf_notes);
 	snprintf(buf_notes, sizeof(buf_notes), "speed:%.2f", Notes_Area / (3600 / bpm * tempo));
@@ -355,13 +374,29 @@ void notes_judge(double NowTime, bool isDon, bool isKa) {
 
 }
 
+int cmp(const void *p, const void *q) {	//比較用
+
+	int pp = ((NOTES_T*)p)->num;
+	int qq = ((NOTES_T*)q)->num;
+
+	if (((NOTES_T*)p)->flag == false) pp = INT_MAX;
+	if (((NOTES_T*)p)->flag == false) qq = INT_MAX;
+
+	return qq - pp;
+}
+
+void noted_sort() {	//ノーツを出現順にソート
+
+	int n = sizeof Notes / sizeof(NOTES_T);
+	qsort(Notes, n, sizeof(NOTES_T), cmp);
+}
 
 void notes_calc(bool isDon,bool isKa,double bpm, double tempo, double NowTime, int cnt, C2D_Sprite sprites[12]) {
 	
 	//int small_y = 95, big_y = 90;
 	int notes_y = 108;
 	
-	for (int i = Notes_Max-1; i >= 0; i--) {
+	for (int i = 0; i < Notes_Max; i++) {	//計算
 		
 		if (Notes[i].flag == true) {
 			
@@ -370,7 +405,17 @@ void notes_calc(bool isDon,bool isKa,double bpm, double tempo, double NowTime, i
 			snprintf(buf_notes, sizeof(buf_notes), "%d", i);
 			debug_draw(Notes[i].x, notes_y+23, buf_notes);
 
+		}
 			
+		if (Notes[i].x <= 40 ) Notes[i].flag = false;
+	}
+
+	noted_sort();	//ソート
+
+	for (int i = 0; i < Notes_Max; i++) {	//描画
+
+		if (Notes[i].flag == true) {
+
 			switch (Notes[i].kind) {
 			case Don:
 				C2D_SpriteSetPos(&sprites[dOn], Notes[i].x, notes_y);
@@ -411,9 +456,6 @@ void notes_calc(bool isDon,bool isKa,double bpm, double tempo, double NowTime, i
 			default:
 				break;
 			}
-			
-			//sftd_draw_textf(font, Notes[i].x, 132, RGBA8(0, 255, 0, 255), 10, "%d", i);
-			if (Notes[i].x <= 40 ) Notes[i].flag = false;
 		}
 	}
 	notes_judge(NowTime, isDon, isKa);
