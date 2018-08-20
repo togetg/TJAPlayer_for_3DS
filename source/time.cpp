@@ -1,5 +1,7 @@
 #include "header.h"
+#include "main.h"
 #include <sys/time.h>
+char buf_time[160];
 
 enum msec_status {
 	InIT,
@@ -45,4 +47,23 @@ void time_ini() {
 		cnt[i] = 0;
 
 	}
+}
+
+#define Fps_Sample 60
+double fps_time[2],fps_cnt,fps_sum,fps;	//óvèâä˙âª
+void draw_fps() {
+	
+	fps_time[0] = fps_time[1];
+	fps_time[1] = time_now(2);
+
+	fps_sum += (fps_time[1] - fps_time[0]);
+	fps_cnt++;
+
+	if (fps_cnt == Fps_Sample) {
+		fps_cnt = 0;
+		fps = Fps_Sample / fps_sum;
+		fps_sum = 0;
+	}
+	snprintf(buf_time, sizeof(buf_time), "%.1ffps", fps);
+	debug_draw(300, 0, buf_time);
 }
