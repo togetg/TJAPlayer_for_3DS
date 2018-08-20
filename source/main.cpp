@@ -32,6 +32,7 @@ void main_init() {
 	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
 	C2D_Prepare();
 	init_main_music();
+	notes_init();
 }
 
 void main_exit() {
@@ -102,6 +103,8 @@ int main() {
 			FirstSecTime = (60.0 / bpm * measure)*(307.0 / 400.0) + 60.0 / bpm;
 			play_main_music(p_isPlayMain);
 		}
+
+		draw_fps();
 
 		snprintf(buf_main, sizeof(buf_main), "NowTime1:%.2f", NowTime);
 		debug_draw(0, 0, buf_main);
