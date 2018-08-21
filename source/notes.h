@@ -5,7 +5,7 @@
 void notes_main(
 	bool isDon,
 	bool isKa,
-	char tja_notes[2048][Max_Notes_Section],
+	char tja_notes[2048][Max_Notes_Measure],
 	int cnt,
 	C2D_Sprite  sprites[12]);
 

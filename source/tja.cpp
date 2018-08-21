@@ -3,7 +3,7 @@
 #include "tja.h"
 
 
-char tja_notes[2048][Max_Notes_Section];
+char tja_notes[2048][Max_Notes_Measure];
 int tja_cnt = 0;
 char buf_tja[160];
 TJA_HEADER_T Current_Header;
@@ -208,7 +208,7 @@ void tja_notes_load() {
 
 	if ((fp = fopen("sdmc:/tjafiles/" File_Name  "/" File_Name ".tja", "r")) != NULL) {
 
-		while (fgets(tja_notes[tja_cnt], Max_Notes_Section, fp) != NULL) {
+		while (fgets(tja_notes[tja_cnt], Max_Notes_Measure, fp) != NULL) {
 
 			if (strstr(tja_notes[tja_cnt], "#START") != NULL) {
 
