@@ -394,7 +394,7 @@ void notes_judge(double NowTime, bool isDon, bool isKa) {
 void notes_calc(bool isDon,bool isKa,double bpm, double tempo, double NowTime, int cnt, C2D_Sprite sprites[12]) {
 	
 	//int small_y = 95, big_y = 90;
-	int notes_y = 108;
+	int notes_y = 109;
 	
 	for (int i = 0; i < Notes_Max; i++) {	//ŒvŽZ
 		
