@@ -1,5 +1,6 @@
 #pragma once
 #include <citro2d.h>
+#include "header.h"
 
 typedef struct {
 
@@ -16,6 +17,12 @@ typedef struct {
 	double bpm, offset, demostart;
 
 }TJA_HEADER_T;
+
+typedef struct {
+	double judge_time, create_time, bpm, tempo, speed;
+	int notes;
+	bool flag;
+} MEASURE_T;
 
 void tja_head_load();
 void tja_notes_load();
