@@ -6,8 +6,6 @@
 #include "tja.h"
 #include "notes.h"
 
-#define Notes_Area 400.0
-#define Notes_Judge 93
 #define Notes_Max 512
 
 char buf_notes[160];
@@ -16,7 +14,7 @@ int notes_id_check();
 void notes_calc(bool isDon, bool isKa,double bpm, double tempo, double NowTime, int cnt, C2D_Sprite sprites[12]);
 
 
-NOTES_T Notes[512];
+NOTES_T Notes[Notes_Max];
 COMMAND_T Command;
 
 int bpm_count = 0;
@@ -27,10 +25,7 @@ int renda_flag = 0;
 int notes_count;	
 int notes_number = 0;	//何番目のノーツか
 double bar_x,
-speed,
 bpm_time,
-NextMeasureTime,
-PreMeasureTime,
 PreBpmTime;
 double tempo_time[2], sec_time;
 double SecTime[4] = { 0,0,0,0 };	//デバッグ用
@@ -68,14 +63,15 @@ int cmp(const void *p, const void *q) {	//比較用
 	return qq - pp;
 }
 
-void noted_sort() {	//ノーツを出現順にソート
+void notes_sort() {	//ノーツを出現順にソート
 
 	int n = sizeof Notes / sizeof(NOTES_T);
 	qsort(Notes, n, sizeof(NOTES_T), cmp);
 }
 
 void notes_init(TJA_HEADER_T Tja_Header) {
-
+	
+	tja_notes_load();
 	Command.data[0] = 0; Command.data[1] = 0; Command.data[2] = 0;
 	Command.knd = 0;
 	Command.val = 0;
@@ -84,10 +80,11 @@ void notes_init(TJA_HEADER_T Tja_Header) {
 	tempo = 4;
 	PreBpmTime = 0;
 	notes_number = 0;
+	sec_count = 0;
 
 }
 
-void notes_main(bool isDon,bool isKa, char tja_notes[2048][Max_Notes_Measure], int cnt, C2D_Sprite  sprites[12]) {
+void notes_main(bool isDon,bool isKa, char tja_notes[2048][Max_Notes_Measure],MEASURE_T Measure[Measure_Max], int cnt, C2D_Sprite  sprites[12]) {
 
 	double NowTime = time_now(0);
 
@@ -98,59 +95,37 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][Max_Notes_Measure], i
 
 		bpm_time = 60.0 / bpm;
 		PreBpmTime = bpm_time;
-		NextMeasureTime = 60.0 / bpm;
-		PreMeasureTime = NextMeasureTime;
 	}
 
-	//sftd_draw_textf(font, 100, 20, RGBA8(0, 255, 0, 255), 10, "BpmTime:%f", bpm_time);
-	//sftd_draw_textf(font, 100, 30, RGBA8(0, 255, 0, 255), 10, "BpmCount2:%d", bpm_count2);
+	bool isEnd = false;
 
 	if ( cnt >= 0 && notes_load_flag == true) {
 		
 
-		if (NextMeasureTime <= NowTime) {
+		if (Measure[sec_count].create_time <= NowTime) {
 
-			PreMeasureTime = NextMeasureTime;
-			NextMeasureTime = 60.0 / bpm * tempo + PreMeasureTime;
-
-			switch (sec_count) {
-			case 0:
-				SecTime[0] = NowTime;
-				break;
-			case 1:
-				SecTime[1] = NowTime;
-				break;
-			case 2:
-				SecTime[2] = NowTime;
-				break;
-			case 3:
-				SecTime[3] = NowTime;
-				break;
-			}
 			bpm_tempo_flag = true;
 			tempo_time[0] = NowTime;
 			notes_count = 0;
 
 			if (sec_count == 0) sec_time = NowTime;
 			
-			while (tja_notes[sec_count][notes_count] != ',') {
+			while (tja_notes[Measure[sec_count].notes][notes_count] != ',') {
 
 				//命令
-				if (notes_count == 0 && tja_notes[sec_count][0] == '#') {
+				if (notes_count == 0 && tja_notes[Measure[sec_count].notes][0] == '#') {
 
-					bool isEnd = false,isBpmChange= false;
-					get_command_value(tja_notes[sec_count],&Command);
-					Command.notes = tja_notes[sec_count];
+					get_command_value(tja_notes[Measure[sec_count].notes],&Command);
+					Command.notes = tja_notes[Measure[sec_count].notes];
 
 					switch (Command.knd) {
-					case End:
+					case ENd:
 						notes_load_flag = false;						
 						isEnd = true;
 						break;
 
-					case Bpmchange:
+					case BPmchange:
 						//bpm = Command.val;
-						isBpmChange = true;
 						break;
 
 					default:
@@ -159,13 +134,12 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][Max_Notes_Measure], i
 					}
 
 					if (isEnd == true) break;
-					//if (isBpmChange == true) break;
 
 					notes_count = 0;
 					sec_count++;
 					continue;
 				}
-				if (notes_count == 0 && strstr(tja_notes[sec_count], ",") == NULL) {
+				if (notes_count == 0 && strstr(tja_notes[Measure[sec_count].notes], ",") == NULL) {
 					notes_count = 0;
 					sec_count++;
 					continue;
@@ -177,22 +151,20 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][Max_Notes_Measure], i
 
 				int id = notes_id_check();
 				
-				if (id != -1 && tja_notes[sec_count][i] != '0') {
+				if (id != -1 && tja_notes[Measure[sec_count].notes][i] != '0') {
 
-					speed = Notes_Area / (3600 / bpm * tempo);
-
-					if (renda_flag == 0 || tja_notes[sec_count][i] == '8') {
+					if (renda_flag == 0 || tja_notes[Measure[sec_count].notes][i] == '8') {
 
 						Notes[id].flag = true;
 						Notes[id].notes_max = notes_count;	//用途不明
 						Notes[id].num = notes_number;
 						Notes[id].x_ini = (Notes_Area / notes_count)*i + 400.0;
 						Notes[id].x = Notes[id].x_ini;
-						Notes[id].bpm = bpm;
-						Notes[id].kind = ctoi(tja_notes[sec_count][i]);
-						Notes[id].sec = sec_count;
+						Notes[id].bpm = Measure[sec_count].bpm;
+						Notes[id].kind = ctoi(tja_notes[Measure[sec_count].notes][i]);
+						//Notes[id].sec = sec_count;
 						Notes[id].create_time = NowTime;
-						Notes[id].judge_time = Notes[id].create_time + (Notes[id].x_ini - Notes_Judge) / (Notes_Area / (60 / bpm * tempo));
+						Notes[id].judge_time = Notes[id].create_time + (Notes[id].x_ini - Notes_Judge) / (Notes_Area / (60 / Notes[id].bpm * tempo));
 
 						switch (Notes[id].kind) {
 
@@ -222,10 +194,9 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][Max_Notes_Measure], i
 			bar_x = 400.0;
 			sec_count++;
 
-			noted_sort();	//ソート
+			notes_sort();	//ソート
 		}
 
-		//bpm_count++;
 	}
 
 	notes_main_count++;
@@ -236,24 +207,20 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][Max_Notes_Measure], i
 	C2D_DrawRectangle(bar_x,86,0,1,46, C2D_Color32f(1,1,1,1), C2D_Color32f(1,1,1,1), C2D_Color32f(1,1,1,1), C2D_Color32f(1,1,1,1));
 	notes_calc(isDon,isKa,bpm, tempo, NowTime, cnt, sprites);
 	C2D_DrawRectangle(0 ,86, 0, 62, 58, C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1));
-	snprintf(buf_notes, sizeof(buf_notes), "%s", tja_notes[sec_count - 1]);
-	debug_draw(0, 40, tja_notes[sec_count - 1]);
+	debug_draw(0, 40, tja_notes[Measure[sec_count].notes - 1]);
 
 
 	snprintf(buf_notes, sizeof(buf_notes), "NowTime1:%.2f", NowTime);
 	debug_draw(0, 0, buf_notes);
 	snprintf(buf_notes, sizeof(buf_notes), "cnt :%d", cnt);
 	debug_draw(150, 0, buf_notes);
-	//snprintf(buf_notes, sizeof(buf_notes), "firstsec :%.2f", FirstSecTime);
-	//debug_draw(0, 20, buf_notes);
-	snprintf(buf_notes, sizeof(buf_notes), "offset :%.2f", offset);
-	debug_draw(100, 20, buf_notes);
-	snprintf(buf_notes, sizeof(buf_notes), "bpm :%.1f", bpm);
-	debug_draw(0, 20, buf_notes);
-	snprintf(buf_notes, sizeof(buf_notes), "nextmes :%.2f", NextMeasureTime);
-	debug_draw(200, 20, buf_notes);
-	snprintf(buf_notes, sizeof(buf_notes), "Diff :%.2f", NextMeasureTime - PreMeasureTime);
-	debug_draw(330, 20, buf_notes);
+
+	snprintf(buf_notes, sizeof(buf_notes), "judge :%.1f", Measure[sec_count].judge_time);
+	debug_draw(100, 30, buf_notes);
+	snprintf(buf_notes, sizeof(buf_notes), "bpm :%.1f", Measure[sec_count].bpm);
+	debug_draw(0, 30, buf_notes);
+	snprintf(buf_notes, sizeof(buf_notes), "create :%.1f", Measure[sec_count].create_time);
+	debug_draw(200, 30, buf_notes);
 
 	snprintf(buf_notes, sizeof(buf_notes), "knd:%d", Command.knd);
 	debug_draw(0, 170, buf_notes);
@@ -265,11 +232,12 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][Max_Notes_Measure], i
 	debug_draw(200, 180, buf_notes);
 	snprintf(buf_notes, sizeof(buf_notes), "%s", Command.notes);
 	debug_draw(0, 180, buf_notes);
+
+	snprintf(buf_notes, sizeof(buf_notes), "creT:%f", Measure[0].create_time);
+	debug_draw(0, 190, buf_notes);
 	
-	snprintf(buf_notes, sizeof(buf_notes), "notes_cnt:%d", notes_count);
+	snprintf(buf_notes, sizeof(buf_notes), "END%d sec_cnt:%d",isEnd, sec_count);
 	debug_draw(300, 30, buf_notes);
-	snprintf(buf_notes, sizeof(buf_notes), "speed:%.2f", Notes_Area / (3600 / bpm * tempo));
-	debug_draw(300, 50, buf_notes);
 }
 
 int notes_id_check() {

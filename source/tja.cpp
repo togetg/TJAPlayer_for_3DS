@@ -3,10 +3,13 @@
 #include "tja.h"
 
 
-char tja_notes[2048][Max_Notes_Measure];
+char tja_notes[Measure_Max][Max_Notes_Measure];
 int tja_cnt = 0;
-char buf_tja[160];
+
 TJA_HEADER_T Current_Header;
+MEASURE_T Measure[Measure_Max];
+
+void get_command_value(char* buf, COMMAND_T *Command);
 
 void tja_head_load(){
 	
@@ -203,28 +206,82 @@ void tja_draw(int cnt) {
 
 void tja_notes_load() {
 
-	bool start_flag = false;
+	bool isStart = false,isEnd = false;
 	FILE *fp;
+	COMMAND_T Command;
+
+	double bpm = Current_Header.bpm,
+		tempo = 4, 
+		NextBpm = bpm;
+
 
 	if ((fp = fopen("sdmc:/tjafiles/" File_Name  "/" File_Name ".tja", "r")) != NULL) {
 
-		while (fgets(tja_notes[tja_cnt], Max_Notes_Measure, fp) != NULL) {
+		tja_cnt = 0;
+		int measure_cnt = 0;
+		double PreJudge=0,FirstMeasureTime = 0;
 
-			if (strstr(tja_notes[tja_cnt], "#START") != NULL) {
 
-				start_flag = true;
+		FirstMeasureTime = (60.0 / bpm * tempo)*(Notes_Judge_Range / Notes_Area) - 60.0 / bpm * tempo;
+		PreJudge = FirstMeasureTime;
+
+
+		while (fgets(tja_notes[tja_cnt], Max_Notes_Measure, fp) != NULL ||
+			tja_cnt < Measure_Max) {
+
+			if (isStart == false && strstr(tja_notes[tja_cnt], "#START") == tja_notes[tja_cnt]) {
+
+				isStart = true;
 				continue;
-
 			}
-			if (start_flag == true) {
 
-				if (strstr(tja_notes[tja_cnt], "#END") != NULL) {
+			if (isStart == true) {
+				
+				if (
+					(strstr(tja_notes[tja_cnt], "//") == tja_notes[tja_cnt] || 
+					strstr(tja_notes[tja_cnt], ",") == NULL ||
+						(
+							strstr(tja_notes[tja_cnt], ",") != NULL &&
+							strstr(tja_notes[tja_cnt], "//") != NULL &&
+							strstr(tja_notes[tja_cnt], ",") > strstr(tja_notes[tja_cnt], "//")
+						)
+					) &&
+					tja_notes[tja_cnt][0] != '#'
+					) {
 
-					break;
-
+					tja_cnt++;
+					continue;
 				}
 
+				if (tja_notes[tja_cnt][0] == '#') {
+
+					get_command_value(tja_notes[tja_cnt], &Command);
+					switch (Command.knd) {
+					case BPmchange:
+						NextBpm = Command.val;
+						break;
+					case ENd:
+						isEnd = true;
+					default:
+						break;
+					}
+				}
+				
+				Measure[measure_cnt].notes = tja_cnt;
+				Measure[measure_cnt].bpm = NextBpm;
+				Measure[measure_cnt].tempo = tempo;
+				Measure[measure_cnt].judge_time = 60.0 / bpm * tempo + PreJudge;
+				Measure[measure_cnt].create_time = Measure[measure_cnt].judge_time - (60.0 / Measure[measure_cnt].bpm * tempo)*(Notes_Judge_Range / Notes_Area);
+				
+				if (tja_notes[tja_cnt][0] != '#') {
+					PreJudge = Measure[measure_cnt].judge_time;
+					bpm = NextBpm;
+				}
+
+				if (isEnd == true) break;
+
 				tja_cnt++;
+				measure_cnt++;
 			}
 		}
 
@@ -239,7 +296,7 @@ void get_head(TJA_HEADER_T *Tja_Header) {
 
 void tja_to_notes(bool isDnon,bool isKa,int count, C2D_Sprite sprites[12]) {
 	
-	notes_main(isDnon, isKa, tja_notes,count,sprites);
+	notes_main(isDnon, isKa, tja_notes,Measure,count,sprites);
 
 }
 
@@ -347,29 +404,29 @@ void get_command_value(char* buf,COMMAND_T *Command) {	//コマンドと値を取り出す
 		Command->value = value;
 		
 
-		     if (strcmp(command, "START") == 0) Command->knd = Start;
-		else if (strcmp(command, "END") == 0) Command->knd = End;
+		     if (strcmp(command, "START") == 0) Command->knd = STart;
+		else if (strcmp(command, "END") == 0) Command->knd = ENd;
 		else if (strcmp(command, "BPMCHANGE") == 0) {
 
-				 Command->knd = Bpmchange;
+				 Command->knd = BPmchange;
 				 Command->val = strtod(value, NULL);
 			 }
-		else if (strcmp(command, "GOGOSTART") == 0) Command->knd = Gogostart;
-		else if (strcmp(command, "GOGOEND") == 0) Command->knd = Gogoend;
-		else if (strcmp(command, "MEASURE") == 0) Command->knd = Measure;
-		else if (strcmp(command, "SCROLL") == 0) Command->knd = Scroll;
-		else if (strcmp(command, "DELAY") == 0) Command->knd = Delay;
-		else if (strcmp(command, "SECTION") == 0) Command->knd = Section;
-		else if (strcmp(command, "BRANCHSTART") == 0) Command->knd = Branchstart;
-		else if (strcmp(command, "BRANCHEND") == 0) Command->knd = Branchend;
+		else if (strcmp(command, "GOGOSTART") == 0) Command->knd = GOgostart;
+		else if (strcmp(command, "GOGOEND") == 0) Command->knd = GOgoend;
+		else if (strcmp(command, "MEASURE") == 0) Command->knd = MEasure;
+		else if (strcmp(command, "SCROLL") == 0) Command->knd = SCroll;
+		else if (strcmp(command, "DELAY") == 0) Command->knd = DElay;
+		else if (strcmp(command, "SECTION") == 0) Command->knd = SEction;
+		else if (strcmp(command, "BRANCHSTART") == 0) Command->knd = BRanchstart;
+		else if (strcmp(command, "BRANCHEND") == 0) Command->knd = BRanchend;
 		else if (strcmp(command, "N") == 0) Command->knd = N;
 		else if (strcmp(command, "E") == 0) Command->knd = E;
 		else if (strcmp(command, "M") == 0) Command->knd = M;
-		else if (strcmp(command, "LEVELHOLD") == 0) Command->knd = Levelhold;
-		else if (strcmp(command, "BMSCROLl") == 0) Command->knd = Bmscroll;
-		else if (strcmp(command, "HBSCROLL") == 0) Command->knd = Hbscroll;
-		else if (strcmp(command, "BARLINEOFF") == 0) Command->knd = Barlineoff;
-		else if (strcmp(command, "BARLINEON") == 0) Command->knd = Barlineon;
+		else if (strcmp(command, "LEVELHOLD") == 0) Command->knd = LEvelhold;
+		else if (strcmp(command, "BMSCROLl") == 0) Command->knd = BMscroll;
+		else if (strcmp(command, "HBSCROLL") == 0) Command->knd = HBscroll;
+		else if (strcmp(command, "BARLINEOFF") == 0) Command->knd = BArlineoff;
+		else if (strcmp(command, "BARLINEON") == 0) Command->knd = BArlineon;
 		else Command->knd = -1;
 
 	}

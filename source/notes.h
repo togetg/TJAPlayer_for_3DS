@@ -5,7 +5,8 @@
 void notes_main(
 	bool isDon,
 	bool isKa,
-	char tja_notes[2048][Max_Notes_Measure],
+	char tja_notes[Measure_Max][Max_Notes_Measure],
+	MEASURE_T Measure[Measure_Max],
 	int cnt,
 	C2D_Sprite  sprites[12]);
 
@@ -41,25 +42,25 @@ enum Sprite_Notes_Kind {	//スプライト用
 };
 
 enum Command_Kind {
-	Start = 1,
-	End,
-	Bpmchange,
-	Gogostart,
-	Gogoend,
-	Measure,
-	Scroll,
-	Delay,
-	Section,
-	Branchstart,
-	Branchend,
+	STart = 1,
+	ENd,
+	BPmchange,
+	GOgostart,
+	GOgoend,
+	MEasure,
+	SCroll,
+	DElay,
+	SEction,
+	BRanchstart,
+	BRanchend,
 	N,
 	E,
 	M,
-	Levelhold,
-	Bmscroll,
-	Hbscroll,
-	Barlineoff,
-	Barlineon,
+	LEvelhold,
+	BMscroll,
+	HBscroll,
+	BArlineoff,
+	BArlineon,
 
 };
 
@@ -70,4 +71,5 @@ typedef struct {
 	bool flag = false;
 	int sec;
 	C2D_Sprite spr;
+
 } NOTES_T;
