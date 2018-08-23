@@ -73,3 +73,10 @@ typedef struct {
 	C2D_Sprite spr;
 
 } NOTES_T;
+
+typedef struct {
+	int measure;
+	double x;
+	bool flag;
+
+} LINE_T;
