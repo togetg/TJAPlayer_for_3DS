@@ -70,7 +70,6 @@ int main() {
 	C2D_SpriteSetPos(&sprites[1], BOTTOM_WIDTH / 2, BOTTOM_HEIGHT / 2);
 
 	tja_head_load();
-	tja_notes_load();
 	music_load();
 	init_main_music();
 	get_head(&Tja_Header);
@@ -103,7 +102,7 @@ int main() {
 
 		if (cnt == 0) {
 
-			FirstSecTime = (60.0 / bpm * measure)*(307.0 / 400.0) + 60.0 / bpm;
+			FirstSecTime = (60.0 / bpm * measure)*((Notes_Area-Notes_Judge) / Notes_Area);
 			play_main_music(p_isPlayMain);
 		}
 
@@ -123,8 +122,8 @@ int main() {
 
 		//音が先
 		else if (offset < 0 && (isNotesStart == false || isMusicStart == false)) {
-			//if (cnt == 0) first_time = NowTime;
-			if (NowTime >= FirstSecTime) {
+
+			if (NowTime >= FirstSecTime && isPlayMain == false) {
 				isPlayMain = true;
 				isMusicStart = true;
 			}
