@@ -30,8 +30,8 @@ void music_load() {
 	ndspSetOutputMode(NDSP_OUTPUT_STEREO);
 	ndspSetOutputCount(1);
 	char sound_address[MUSIC_NUMBER][30] = {
-		"sdmc:/tjafiles/don.ogg",
-		"sdmc:/tjafiles/ka.ogg"
+		"romfs:/don.ogg",
+		"romfs:/ka.ogg"
 	};
 
 	for (int i = 0; i < MUSIC_NUMBER; i++) {
