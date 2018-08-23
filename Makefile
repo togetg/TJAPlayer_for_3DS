@@ -43,7 +43,7 @@ GFXBUILD	:= $(ROMFS)/gfx
 RESOURCES   := resources
 OUT         := 
 
-APP_TITLE = TJAplayer_on_3DS
+APP_TITLE = TJAPlayer_on_3DS
 APP_DESCRIPTION = Music games like Taiko no Tatsujin
 APP_AUTHOR = Togetoge
 
@@ -190,7 +190,7 @@ endif
 
 #---------------------------------------------------------------------------------
 clean:
-	@echo お片付け ...
+	@echo clean...
 	@rm -fr $(BUILD) $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf $(GFXBUILD)
 
 #---------------------------------------------------------------------------------
