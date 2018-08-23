@@ -54,125 +54,110 @@ void tja_head_load(){
 		Current_Header.side = atoi(default_side);
 		Current_Header.scoremode = atoi(default_scoremode);
 
-		char* temp;
+		char* temp = NULL;
 		while (fgets(buf, 128, fp) != NULL) {
 
-			if (strstr(buf, "#START") != NULL) {
+			temp = (char *)malloc((strlen(buf) + 1));
+
+			if (strstr(buf, "#START") == buf) {
 				break;
 			}
 
-			if ((strstr(buf, "TITLE:") != NULL) && (strstr(buf, "SUBTITLE:") == NULL)) {
-				temp = (char *)malloc((strlen(buf)+1));
+			if (strstr(buf, "TITLE:") == buf) {
 				strcpy(temp, buf + 6);
 				Current_Header.title = temp;
 				continue;
 			}
 
-			if ((strstr(buf, "SUBTITLE:") != NULL)) {
-				temp = (char *)malloc((strlen(buf) + 1));
+			if (strstr(buf, "SUBTITLE:") == buf) {
 				strcpy(temp, buf + 9);
 				Current_Header.subtitle = temp;
 				continue;
 			}
 
-			if ((strstr(buf, "LEVEL:") != NULL)) {
-				temp = (char *)malloc((strlen(buf) + 1));
+			if (strstr(buf, "LEVEL:") == buf) {
 				strcpy(temp, buf + 6);
 				Current_Header.level = atoi(temp);
 				continue;
 			}
 			
-			if ((strstr(buf, "BPM:") != NULL)) {
-				temp = (char *)malloc((strlen(buf) + 1));
+			if (strstr(buf, "BPM:") == buf) {
 				strcpy(temp, buf + 4);
 				Current_Header.bpm = atof(temp);
 				continue;
 			}
 
-			if ((strstr(buf, "WAVE:") != NULL)) {
-				temp = (char *)malloc((strlen(buf) + 1));
+			if (strstr(buf, "WAVE:") == buf) {
 				strcpy(temp, buf + 5);
 				Current_Header.wave = temp;
 				continue;
 			}
 
-			if ((strstr(buf, "OFFSET:") != NULL)) {
-				temp = (char *)malloc((strlen(buf) + 1));
+			if (strstr(buf, "OFFSET:") == buf) {
 				strcpy(temp, buf + 7);
 				Current_Header.offset = atof(temp);
 				continue;
 			}
 
-			if ((strstr(buf, "BALLOON:") != NULL)) {
-				temp = (char *)malloc((strlen(buf) + 1));
+			if (strstr(buf, "BALLOON:") == buf) {
 				strcpy(temp, buf + 8);
 				//Current_Header.balloon = temp;
 				continue;
 			}
 
-			if ((strstr(buf, "SONGVOL:") != NULL)) {
-				temp = (char *)malloc((strlen(buf) + 1));
+			if (strstr(buf, "SONGVOL:") == buf) {
 				strcpy(temp, buf + 8);
 				Current_Header.songvol = atoi(temp);
 				continue;
 			}
 
-			if ((strstr(buf, "SEVOL:") != NULL)) {
-				temp = (char *)malloc((strlen(buf) + 1));
+			if (strstr(buf, "SEVOL:") == buf) {
 				strcpy(temp, buf + 6);
 				Current_Header.sevol = atoi(temp);
 				continue;
 			}
 
-			if ((strstr(buf, "SCOREINIT:") != NULL)) {
-				temp = (char *)malloc((strlen(buf) + 1));
+			if (strstr(buf, "SCOREINIT:") == buf) {
 				strcpy(temp, buf + 10);
 				continue;
 			}
 
-			if ((strstr(buf, "SCOREDIFF:") != NULL)) {
-				temp = (char *)malloc((strlen(buf) + 1));
+			if (strstr(buf, "SCOREDIFF:") == buf) {
 				strcpy(temp, buf + 10);
 				Current_Header.scorediff = atoi(temp);
 				continue;}
 
 
-			if ((strstr(buf, "COURSE:") != NULL)) {
-				temp = (char *)malloc((strlen(buf) + 1));
+			if (strstr(buf, "COURSE:") == buf) {
 				strcpy(temp, buf + 7);
 				Current_Header.course = atoi(temp);
 				continue;}
 
-			if ((strstr(buf, "STYLE:") != NULL)) {
-				temp = (char *)malloc((strlen(buf) + 1));
+			if (strstr(buf, "STYLE:") == buf) {
 				strcpy(temp, buf + 6);
 				Current_Header.style = atoi(temp);
 				continue;
 			}
 
-			if ((strstr(buf, "LIFE:") != NULL)) {
-				temp = (char *)malloc((strlen(buf) + 1));
+			if (strstr(buf, "LIFE:") == buf) {
 				strcpy(temp, buf + 5);
 				Current_Header.life = atoi(temp);
 				continue;
 			}
 
-			if ((strstr(buf, "DEMOSTART:") != NULL)) {
-				temp = (char *)malloc((strlen(buf) + 1));
+			if (strstr(buf, "DEMOSTART:") == buf) {
 				strcpy(temp, buf + 10);
 				Current_Header.demostart = atof(temp);
 				continue;
 			}
 
-			if ((strstr(buf, "SIDE:") != NULL)) {
-				temp = (char *)malloc((strlen(buf) + 1));
+			if (strstr(buf, "SIDE:") == buf) {
 				strcpy(temp, buf + 5);
 				Current_Header.side = atoi(temp);
 				continue;
 			}
 
-			if ((strstr(buf, "SCOREMODE:") != NULL)) {
-				temp = (char *)malloc((strlen(buf) + 1));
+			if (strstr(buf, "SCOREMODE:") == buf) {
 				strcpy(temp, buf + 10);
 				Current_Header.scoremode= atoi(temp);
 				continue;
@@ -181,6 +166,7 @@ void tja_head_load(){
 		}
 
 		fclose(fp);		
+		free(temp);
 
 	}else {
 		//tjaファイルが開けなかった時
