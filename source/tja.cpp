@@ -248,6 +248,7 @@ void tja_notes_load() {
 						break;
 					case ENd:
 						isEnd = true;
+						break;
 					default:
 						break;
 					}
@@ -356,12 +357,13 @@ void str_replace(const char *src, const char *target, const char *replace, char 
 
 void get_command_value(char* buf,COMMAND_T *Command) {	//コマンドと値を取り出す
 
+	bool isComment = false;
 	int comment, space, length;
 
 	if (buf[0] == '#') {
 
 		length = strlen(buf);
-		comment = length-3;
+		comment = length - 3;
 
 		char* command = (char *)malloc((strlen(buf) + 1));
 		char* value = (char *)malloc((strlen(buf) + 1));
@@ -369,26 +371,34 @@ void get_command_value(char* buf,COMMAND_T *Command) {	//コマンドと値を取り出す
 		if (strstr(buf, "//") != NULL) {	//コメント処理
 
 			comment = strstr(buf, "//") - buf - 1;
-			strncpy(command, buf + 1, comment);
+			strlcpy(command, buf + 1, comment);
+			isComment = true;
 		}
 
 		if (strstr(buf, " ") != NULL) {		//値処理
 
 			space = strstr(buf, " ") - buf;
 
-			if (space < comment) {
+			if (space < comment && isComment == true) {	//値&コメントあり
 
-				strncpy(command, buf + 1, space - 1);
-				strncpy(value, buf + strlen(command) + 1, comment - strlen(command) );
+				strlcpy(command, buf + 1, space);
+				strlcpy(value, buf + 1 + strlen(command), comment - strlen(command) + 1);
 
-			}else strncpy(command, buf + 1, comment);
+			}
+			else {	//値ありコメントなし
+				strlcpy(command, buf + 1, space);
+				strlcpy(value, buf + 1 + strlen(command), length - strlen(command));
+			}
 		}
-		else strncpy(command, buf + 1, comment);
-		
+		else {	//値無し
+			strlcpy(command, buf + 1, comment+1);
+			strlcpy(value, "0", 1);
+		}
+
 
 		Command->command = command;
 		Command->value = value;
-		
+		Command->val = 0;
 
 		     if (strcmp(command, "START") == 0) Command->knd = STart;
 		else if (strcmp(command, "END") == 0) Command->knd = ENd;
