@@ -212,8 +212,10 @@ void tja_notes_load() {
 		PreJudge = FirstMeasureTime;
 
 
-		while (fgets(tja_notes[tja_cnt], Max_Notes_Measure, fp) != NULL ||
-			tja_cnt < Measure_Max) {
+		while (
+			(fgets(tja_notes[tja_cnt], Max_Notes_Measure, fp) != NULL ||
+			tja_cnt < Measure_Max) &&
+			isEnd == false) {
 
 			if (isStart == false && strstr(tja_notes[tja_cnt], "#START") == tja_notes[tja_cnt]) {
 
@@ -363,7 +365,7 @@ void get_command_value(char* buf,COMMAND_T *Command) {	//コマンドと値を取り出す
 	if (buf[0] == '#') {
 
 		length = strlen(buf);
-		comment = length - 3;
+		comment = 0;
 
 		char* command = (char *)malloc((strlen(buf) + 1));
 		char* value = (char *)malloc((strlen(buf) + 1));
@@ -379,7 +381,7 @@ void get_command_value(char* buf,COMMAND_T *Command) {	//コマンドと値を取り出す
 
 			space = strstr(buf, " ") - buf;
 
-			if (space < comment && isComment == true) {	//値&コメントあり
+			if (space < comment && isComment == true) {	//値ありコメントあり
 
 				strlcpy(command, buf + 1, space);
 				strlcpy(value, buf + 1 + strlen(command), comment - strlen(command) + 1);
@@ -391,7 +393,12 @@ void get_command_value(char* buf,COMMAND_T *Command) {	//コマンドと値を取り出す
 			}
 		}
 		else {	//値無し
-			strlcpy(command, buf + 1, comment+1);
+
+			//コメントあり
+			if (isComment == true) strlcpy(command, buf + 1, comment + 1);
+			//コメントなし
+			else  strlcpy(command, buf + 1, length-2);
+			
 			strlcpy(value, "0", 1);
 		}
 
