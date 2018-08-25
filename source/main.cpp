@@ -72,12 +72,12 @@ int main() {
 	tja_head_load();
 	music_load();
 	init_main_music();
-	get_head(&Tja_Header);
 	notes_init(Tja_Header);
+	get_head(&Tja_Header);
 
 	int cnt = 0, notes_cnt = 0;
 	bool isNotesStart = false, isMusicStart = false;
-	double FirstSecTime = 9999.0,
+	double FirstMeasureTime = INT_MAX,
 		offset = Tja_Header.offset,
 		bpm = Tja_Header.bpm, NowTime;
 	int measure = 4;
@@ -98,12 +98,11 @@ int main() {
 
 		NowTime = time_now(1);
 		bool isPlayMain;
-		bool* p_isPlayMain = &isPlayMain;
 
 		if (cnt == 0) {
 
-			FirstSecTime = (60.0 / bpm * measure)*((Notes_Area-Notes_Judge) / Notes_Area);
-			play_main_music(p_isPlayMain);
+			FirstMeasureTime = (60.0 / bpm * measure)*((Notes_Area-Notes_Judge) / Notes_Area);
+			play_main_music(&isPlayMain);
 		}
 
 		draw_fps();
@@ -112,18 +111,18 @@ int main() {
 		debug_draw(50, 200, "日本語テスト");
 		
 		//譜面が先
-		if (offset >= 0 && (isNotesStart == false || isMusicStart == false)) {
-			if (cnt == 0 && isNotesStart == false) isNotesStart = true;
-			if (cnt == (int)(offset * 60)) {
+		if (offset > 0 && (isNotesStart == false || isMusicStart == false)) {
+			if (NowTime >= 0 && isNotesStart == false) isNotesStart = true;
+			if (NowTime >= offset + FirstMeasureTime && isMusicStart == false) {
 				isPlayMain = true;
 				isMusicStart = true;
 			}
 		}
 
 		//音が先
-		else if (offset < 0 && (isNotesStart == false || isMusicStart == false)) {
+		else if (offset <= 0 && (isNotesStart == false || isMusicStart == false)) {
 
-			if (NowTime >= FirstSecTime && isPlayMain == false) {
+			if (NowTime >= FirstMeasureTime && isPlayMain == false) {
 				isPlayMain = true;
 				isMusicStart = true;
 			}
