@@ -6,7 +6,7 @@ typedef struct {
 
 	int knd, data[3],test;
 	double val;
-	char* command,*notes,*value;
+	char* command_s,*notes,*value_s;
 } COMMAND_T;
 
 typedef struct {
@@ -19,14 +19,13 @@ typedef struct {
 }TJA_HEADER_T;
 
 typedef struct {
-	double judge_time, create_time, bpm, tempo, speed;
+	double judge_time, create_time, bpm, speed,measure;
 	int notes;
-	bool flag;
+	bool flag,isDispBarLine;
 } MEASURE_T;
 
 void tja_head_load();
 void tja_notes_load();
-void tja_draw(int);
 void tja_to_notes(bool isDnon, bool isKa, int count, C2D_Sprite sprites[12]);
 void get_command_value(char* buf, COMMAND_T *Command);
 void get_head(TJA_HEADER_T *Tja_Header);
