@@ -76,7 +76,7 @@ typedef struct {
 
 typedef struct {
 	int measure;
-	double x;
-	bool flag;
+	double x,create_time;
+	bool flag,isDisp;
 
-} LINE_T;
+} BARLINE_T;
