@@ -4,7 +4,7 @@
 
 
 char tja_notes[Measure_Max][Max_Notes_Measure];
-int tja_cnt = 0;
+int tja_cnt = 0,MeasureMaxNumber=0;
 
 TJA_HEADER_T Current_Header;
 MEASURE_T Measure[Measure_Max];
@@ -20,7 +20,7 @@ void tja_head_load(){
 		 default_subtitle[] = "",
 		 default_level[] = "0",
 		 default_bpm[] = "60", 
-		 default_wave[] = "test.wav", 
+		 default_wave[] = "test.ogg", 
 		 default_offset[] = "0", 
 		 default_balloon[] = "5", 
 		 default_songvol[] = "100", 
@@ -173,42 +173,43 @@ void tja_head_load(){
 	}
 }
 
-void tja_draw(int cnt) {
+int measure_cmp(const void *p, const void *q) {	//比較用
 
-	int cnt3 = 0;
+	int pp = ((MEASURE_T*)p)->create_time;
+	int qq = ((MEASURE_T*)q)->create_time;
 
-	for (int i = 0; i < tja_cnt; i++) { 
+	if (((MEASURE_T*)p)->flag == false) pp = INT_MAX;
+	if (((MEASURE_T*)p)->flag == false) qq = INT_MAX;
 
-		cnt3 = 0;
+	return qq - pp;
+}
 
-		while (tja_notes[cnt/60][cnt3] !='\0') {
+void measure_sort() {	//ノーツを出現順にソート
 
-			//sftd_draw_textf(font, 0, 0, RGBA8(255, 0, 0, 255), 10, "%c", tja_notes[cnt/60][cnt3]);
-			cnt3++;
-
-		}
-	}
+	int n = sizeof Measure / sizeof(Measure_Max);
+	qsort(Measure, n, sizeof(MEASURE_T), measure_cmp);
 }
 
 void tja_notes_load() {
 
-	bool isStart = false,isEnd = false;
+	bool isStart = false,isEnd = false,isDispBarLine = true;
 	FILE *fp;
 	COMMAND_T Command;
 
 	double bpm = Current_Header.bpm,
-		tempo = 4, 
-		NextBpm = bpm;
+		NextBpm = bpm,
+		measure = 1,
+		NextMeasure = 1;
 
 
 	if ((fp = fopen("sdmc:/tjafiles/" File_Name  "/" File_Name ".tja", "r")) != NULL) {
 
 		tja_cnt = 0;
-		int measure_cnt = 0;
+		int MeasureCount = 0;
 		double PreJudge=0,FirstMeasureTime = 0;
 
 
-		FirstMeasureTime = (60.0 / bpm * tempo)*(Notes_Judge_Range / Notes_Area) - 60.0 / bpm * tempo;
+		FirstMeasureTime = (60.0 / bpm * 4*measure)*(Notes_Judge_Range / Notes_Area) - 60.0 / bpm * 4*measure;
 		PreJudge = FirstMeasureTime;
 
 
@@ -248,6 +249,15 @@ void tja_notes_load() {
 					case BPmchange:
 						NextBpm = Command.val;
 						break;
+					case MEasure:
+						NextMeasure = Command.val;
+						break;
+					case BArlineon:
+						isDispBarLine = true;
+						break;
+					case BArlineoff:
+						isDispBarLine = false;
+						break;
 					case ENd:
 						isEnd = true;
 						break;
@@ -256,24 +266,27 @@ void tja_notes_load() {
 					}
 				}
 				
-				Measure[measure_cnt].notes = tja_cnt;
-				Measure[measure_cnt].bpm = NextBpm;
-				Measure[measure_cnt].tempo = tempo;
-				Measure[measure_cnt].judge_time = 60.0 / bpm * tempo + PreJudge;
-				Measure[measure_cnt].create_time = Measure[measure_cnt].judge_time - (60.0 / Measure[measure_cnt].bpm * tempo)*(Notes_Judge_Range / Notes_Area);
-				
+				Measure[MeasureCount].notes = tja_cnt;
+				Measure[MeasureCount].bpm = NextBpm;
+				Measure[MeasureCount].measure = NextMeasure;
+				Measure[MeasureCount].judge_time = 60.0 / bpm * 4*measure + PreJudge;
+				Measure[MeasureCount].create_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4 )*(Notes_Judge_Range / Notes_Area);
+				Measure[MeasureCount].isDispBarLine = isDispBarLine;
+
 				if (tja_notes[tja_cnt][0] != '#') {
-					PreJudge = Measure[measure_cnt].judge_time;
+					PreJudge = Measure[MeasureCount].judge_time;
 					bpm = NextBpm;
+					measure = NextMeasure;
 				}
 
 				if (isEnd == true) break;
 
 				tja_cnt++;
-				measure_cnt++;
+				MeasureCount++;
 			}
 		}
-
+		MeasureMaxNumber = tja_cnt;
+		//measure_sort();
 		fclose(fp);
 	}
 }
@@ -290,74 +303,8 @@ void tja_to_notes(bool isDnon,bool isKa,int count, C2D_Sprite sprites[12]) {
 }
 
 
-char* str_concat(char *str1, const char *str2) {
-
-	//char *top = str1;
-
-	while (*(str1++) != '\0');
-
-	str1 -= 1;
-
-	do {
-		*(str1++) = *str2;
-	} while (*(str2++) != '\0');
-
-	return str1;
-}
-
-char* str_concat2(const char *str1, const char *str2, char **result) {
-
-	size_t size = sizeof(char) * (strlen(str1) + strlen(str2) + 1);
-	char *work = (char*)malloc(size);
-	if (work == NULL) {
-		printf("Cannot allocate memory.\n");
-		return NULL;
-	}
-
-	char *top = work;
-
-	strcpy(work, str1);
-
-	work += strlen(str1);
-
-	strcpy(work, str2);
-
-	*result = top;
-
-	return top;
-}
-
-void str_replace(const char *src, const char *target, const char *replace, char **result) {
-
-	char *temp = (char*)malloc(sizeof(char) * 1000);
-	if (temp == NULL) {
-		printf("Cannot allocate memory.\n");
-		return;
-	}
-
-	//char *top = temp;
-
-	char *work = (char*)malloc(sizeof(char) * strlen(src));
-	strcpy(work, src);
-
-	char *p;
-	while ((p = strstr(work, target)) != NULL) {
-
-		*p = '\0';
-		p += strlen(target);
-
-		strcpy(temp, p);
-
-		str_concat(work, replace);
-		str_concat(work, temp);
-	}
-
-	free(temp);
-
-	*result = work;
-}
-
-void get_command_value(char* buf,COMMAND_T *Command) {	//コマンドと値を取り出す
+//コマンドと値を取り出す
+void get_command_value(char* buf, COMMAND_T *Command) {
 
 	bool isComment = false;
 	int comment, space, length;
@@ -369,6 +316,8 @@ void get_command_value(char* buf,COMMAND_T *Command) {	//コマンドと値を取り出す
 
 		char* command = (char *)malloc((strlen(buf) + 1));
 		char* value = (char *)malloc((strlen(buf) + 1));
+
+		Command->notes = buf;
 
 		if (strstr(buf, "//") != NULL) {	//コメント処理
 
@@ -392,31 +341,46 @@ void get_command_value(char* buf,COMMAND_T *Command) {	//コマンドと値を取り出す
 				strlcpy(value, buf + 1 + strlen(command), length - strlen(command));
 			}
 		}
-		else {	//値無し
+		else {	//値なし
 
 			//コメントあり
 			if (isComment == true) strlcpy(command, buf + 1, comment + 1);
 			//コメントなし
-			else  strlcpy(command, buf + 1, length-2);
-			
+			else  strlcpy(command, buf + 1, length - 2);
+
 			strlcpy(value, "0", 1);
 		}
 
 
-		Command->command = command;
-		Command->value = value;
+		Command->command_s = command;
+		Command->value_s = value;
 		Command->val = 0;
 
-		     if (strcmp(command, "START") == 0) Command->knd = STart;
+		if (strcmp(command, "START") == 0) Command->knd = STart;
 		else if (strcmp(command, "END") == 0) Command->knd = ENd;
 		else if (strcmp(command, "BPMCHANGE") == 0) {
-
-				 Command->knd = BPmchange;
-				 Command->val = strtod(value, NULL);
-			 }
+			Command->knd = BPmchange;
+			Command->val = strtod(value, NULL);
+		}
 		else if (strcmp(command, "GOGOSTART") == 0) Command->knd = GOgostart;
 		else if (strcmp(command, "GOGOEND") == 0) Command->knd = GOgoend;
-		else if (strcmp(command, "MEASURE") == 0) Command->knd = MEasure;
+
+		else if (strcmp(command, "MEASURE") == 0) {
+			Command->knd = MEasure;
+			if (strstr(value, "/") != NULL) {
+
+				int srash = strstr(value, "/") - value;
+				char *denominator = (char *)malloc((strlen(buf) + 1)),
+					*molecule = (char *)malloc((strlen(buf) + 1));
+				strlcpy(molecule, value + 1, srash);
+				strlcpy(denominator, value + srash + 1, strlen(buf) - srash);
+				Command->val = strtod(molecule, NULL) / strtod(denominator, NULL);
+			}
+			else {
+				if(strtod(value, NULL) != 0) Command->val = strtod(value, NULL);
+				else Command->val = 1.0;
+			}
+		}
 		else if (strcmp(command, "SCROLL") == 0) Command->knd = SCroll;
 		else if (strcmp(command, "DELAY") == 0) Command->knd = DElay;
 		else if (strcmp(command, "SECTION") == 0) Command->knd = SEction;
@@ -434,8 +398,5 @@ void get_command_value(char* buf,COMMAND_T *Command) {	//コマンドと値を取り出す
 
 	}
 
-	else {
-
-		Command->knd = -1;
-	}
+	else Command->knd = -1;
 }
