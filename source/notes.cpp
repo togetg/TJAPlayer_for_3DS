@@ -160,18 +160,21 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][Max_Notes_Measure],ME
 						switch (Notes[id].kind) {
 
 						case Renda:
-							RendaState = 1;
+							RendaState = Renda;
 							break;
 						case BigRenda:
-							RendaState = 2;
+							RendaState = BigRenda;
 							break;
 						case RendaEnd:
 							switch (RendaState) {
-							case 1:
-								Notes[id].kind = 8;
+							case Renda:
+								Notes[id].kind = RendaEnd;
 								break;
-							case 2:
-								Notes[id].kind = 9;
+							case BigRendaEnd:
+								Notes[id].kind = BigRendaEnd;
+								break;
+							default:
+								Notes[id].flag = false;
 								break;
 							}
 							RendaState = 0;
@@ -438,14 +441,14 @@ void notes_calc(bool isDon,bool isKa,double bpm, double NowTime, int cnt, C2D_Sp
 				C2D_DrawSprite(&sprites[bIg_renda]);
 				break;
 			case Balloon:
-				C2D_SpriteSetPos(&sprites[bIg_renda_fini], Notes[i].x, notes_y);
-				C2D_DrawSprite(&sprites[bIg_renda_fini]);
+				C2D_SpriteSetPos(&sprites[bAlloon], Notes[i].x, notes_y);
+				C2D_DrawSprite(&sprites[bAlloon]);
 				break;
-			case RendaEnd:		//8:連打終了 9:大連打終了
+			case RendaEnd:
 				C2D_SpriteSetPos(&sprites[rEnda_fini], Notes[i].x, notes_y);
 				C2D_DrawSprite(&sprites[rEnda_fini]);
 				break;
-			case RendaEnd + 1:
+			case BigRendaEnd:
 				C2D_SpriteSetPos(&sprites[bIg_renda_fini], Notes[i].x, notes_y);
 				C2D_DrawSprite(&sprites[bIg_renda_fini]);
 				break;
