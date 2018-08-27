@@ -14,7 +14,7 @@ void notes_main(
 void notes_init(TJA_HEADER_T Tja_Header);
 
 enum Notes_Kind {
-	Rest,		//休符
+	Rest = 0,	//休符
 	Don,		//ドン
 	Ka,			//カツ
 	BigDon,		//ドン(大)
@@ -24,6 +24,7 @@ enum Notes_Kind {
 	Balloon,	//風船開始
 	RendaEnd,	//連打終了
 	Potato,		//お芋音符開始
+	BigRendaEnd,//大連打終了
 };
 
 enum Sprite_Notes_Kind {	//スプライト用
