@@ -67,17 +67,16 @@ enum Command_Kind {
 
 typedef struct {
 	int num, notes_max;
-	double x_ini, x, create_time, judge_time, bpm;
+	double x_ini, x, create_time, judge_time, pop_time,bpm,scroll;
 	int kind;
 	bool flag = false;
-	int sec;
 	C2D_Sprite spr;
 
 } NOTES_T;
 
 typedef struct {
 	int measure;
-	double x,create_time;
+	double x,x_ini,create_time,scroll;
 	bool flag,isDisp;
 
 } BARLINE_T;
