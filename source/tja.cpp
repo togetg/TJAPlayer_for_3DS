@@ -199,6 +199,7 @@ void tja_notes_load() {
 	double bpm = Current_Header.bpm,
 		NextBpm = bpm,
 		measure = 1,
+		scroll = 1,
 		NextMeasure = 1;
 
 
@@ -252,6 +253,9 @@ void tja_notes_load() {
 					case MEasure:
 						NextMeasure = Command.val;
 						break;
+					case SCroll:
+						scroll = Command.val;
+						break;
 					case BArlineon:
 						isDispBarLine = true;
 						break;
@@ -269,8 +273,10 @@ void tja_notes_load() {
 				Measure[MeasureCount].notes = tja_cnt;
 				Measure[MeasureCount].bpm = NextBpm;
 				Measure[MeasureCount].measure = NextMeasure;
+				Measure[MeasureCount].scroll = scroll;
 				Measure[MeasureCount].judge_time = 60.0 / bpm * 4*measure + PreJudge;
-				Measure[MeasureCount].create_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4 )*(Notes_Judge_Range / Notes_Area);
+				Measure[MeasureCount].pop_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4)*(Notes_Judge_Range / Notes_Area);
+				Measure[MeasureCount].create_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4)*(Notes_Judge_Range / (Notes_Area*scroll));
 				Measure[MeasureCount].isDispBarLine = isDispBarLine;
 
 				if (tja_notes[tja_cnt][0] != '#') {
@@ -381,7 +387,10 @@ void get_command_value(char* buf, COMMAND_T *Command) {
 				else Command->val = 1.0;
 			}
 		}
-		else if (strcmp(command, "SCROLL") == 0) Command->knd = SCroll;
+		else if (strcmp(command, "SCROLL") == 0) {
+			Command->knd = SCroll;
+			Command->val = strtod(value, NULL);
+		}
 		else if (strcmp(command, "DELAY") == 0) Command->knd = DElay;
 		else if (strcmp(command, "SECTION") == 0) Command->knd = SEction;
 		else if (strcmp(command, "BRANCHSTART") == 0) Command->knd = BRanchstart;
