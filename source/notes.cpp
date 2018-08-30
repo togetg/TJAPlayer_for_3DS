@@ -91,7 +91,10 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][Max_Notes_Measure],ME
 			int BarLineId = find_line_id();
 			if (BarLineId != -1) {
 				BarLine[BarLineId].flag = true;
-				BarLine[BarLineId].x = 400;
+				BarLine[BarLineId].scroll = Measure[MeasureCount].scroll;
+				BarLine[BarLineId].x_ini = 
+					Notes_Judge_Range*BarLine[BarLineId].scroll + Notes_Judge;
+				BarLine[BarLineId].x = BarLine[BarLineId].x_ini;
 				BarLine[BarLineId].measure = MeasureCount;
 				BarLine[BarLineId].create_time = NowTime;
 				BarLine[BarLineId].isDisp = Measure[MeasureCount].isDispBarLine;
@@ -149,14 +152,14 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][Max_Notes_Measure],ME
 						Notes[id].flag = true;
 						Notes[id].notes_max = NotesCount;	//—p“r•s–¾
 						Notes[id].num = NotesNumber;
-						Notes[id].x_ini = (Notes_Area*measure / NotesCount)*i + Notes_Area;
+						Notes[id].scroll = Measure[MeasureCount].scroll;
+						Notes[id].x_ini = ((Notes_Area*Measure[MeasureCount].measure / NotesCount)*i + Notes_Judge_Range)*Notes[id].scroll+ Notes_Judge;
 						Notes[id].x = Notes[id].x_ini;
 						Notes[id].bpm = Measure[MeasureCount].bpm;
 						Notes[id].kind = ctoi(tja_notes[Measure[MeasureCount].notes][i]);
-						//Notes[id].sec = MeasureCount;
-						Notes[id].create_time = NowTime;
-						Notes[id].judge_time = Notes[id].create_time + (Notes[id].x_ini - Notes_Judge) / (Notes_Area / (60 / Notes[id].bpm * 4));
-
+						//Notes[id].create_time = NowTime;
+						Notes[id].pop_time = Measure[MeasureCount].pop_time;
+						Notes[id].judge_time = Measure[MeasureCount].judge_time + 60.0 / Measure[MeasureCount].bpm * 4 * Measure[MeasureCount].measure * i / NotesCount;
 						switch (Notes[id].kind) {
 
 						case Renda:
@@ -197,13 +200,14 @@ void notes_main(bool isDon,bool isKa, char tja_notes[2048][Max_Notes_Measure],ME
 
 		if (BarLine[i].flag == true) {
 
-			BarLine[i].x = Notes_Area - Notes_Area * (NowTime - BarLine[i].create_time) / (60.0*4 /Measure[BarLine[i].measure].bpm);
+			BarLine[i].x = BarLine[i].x_ini -
+				Notes_Area * BarLine[i].scroll * (NowTime - Measure[BarLine[i].measure].pop_time) / (60 / Measure[BarLine[i].measure].bpm * 4);
 			if (BarLine[i].isDisp == true)
 				C2D_DrawRectangle(BarLine[i].x, 86, 0, 1, 46, C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1));
 			
 			if (BarLine[i].x < 62) BarLine[i].flag = false;
-			snprintf(buf_notes, sizeof(buf_notes), "%d", i);
-			debug_draw(BarLine[i].x, 133, buf_notes);
+			//snprintf(buf_notes, sizeof(buf_notes), "%d", i);
+			//debug_draw(BarLine[i].x, 133, buf_notes);
 		}
 	}
 
@@ -401,14 +405,13 @@ void notes_calc(bool isDon,bool isKa,double bpm, double NowTime, int cnt, C2D_Sp
 		
 		if (Notes[i].flag == true) {
 			
-			Notes[i].x = Notes[i].x_ini - Notes_Area * (NowTime - Notes[i].create_time) / (60 /Notes[i].bpm * 4);
+			Notes[i].x = Notes[i].x_ini -
+				Notes_Area* Notes[i].scroll * (NowTime - Notes[i].pop_time) / (60 / Notes[i].bpm * 4);
 
-			//snprintf(buf_notes, sizeof(buf_notes), "%d", i);
-			//debug_draw(Notes[i].x, notes_y+23, buf_notes);
 
 		}
 			
-		if (Notes[i].x <= 40 ) Notes[i].flag = false;
+		if (Notes[i].x <= 40) Notes[i].flag = false;
 	}
 
 	for (int i = 0; i < Notes_Max; i++) {	//•`‰æ
