@@ -19,7 +19,7 @@ typedef struct {
 }TJA_HEADER_T;
 
 typedef struct {
-	double judge_time, create_time, bpm, speed,measure;
+	double judge_time, create_time,pop_time, bpm, speed,measure,scroll;
 	int notes;
 	bool flag,isDispBarLine;
 } MEASURE_T;
