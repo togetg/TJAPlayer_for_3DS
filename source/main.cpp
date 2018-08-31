@@ -5,11 +5,6 @@
 #include "audio.h"
 #include "playback.h"
 
-#define TOP_WIDTH  400
-#define TOP_HEIGHT 240
-#define BOTTOM_WIDTH  320
-#define BOTTOM_HEIGHT 240
-
 C2D_Sprite sprites[12];			//画像用
 static C2D_SpriteSheet spriteSheet;
 C2D_TextBuf g_dynamicBuf;
@@ -69,6 +64,7 @@ int main() {
 	C2D_SpriteSetPos(&sprites[0], TOP_WIDTH / 2, TOP_HEIGHT / 2);
 	C2D_SpriteSetPos(&sprites[1], BOTTOM_WIDTH / 2, BOTTOM_HEIGHT / 2);
 
+	tja_init();
 	tja_head_load();
 	music_load();
 	init_main_music();
@@ -79,8 +75,7 @@ int main() {
 	bool isNotesStart = false, isMusicStart = false;
 	double FirstMeasureTime = INT_MAX,
 		offset = Tja_Header.offset,
-		bpm = Tja_Header.bpm, NowTime;
-	int measure = 4;
+		NowTime;
 
 	while (aptMainLoop()) {
 
@@ -101,7 +96,7 @@ int main() {
 
 		if (cnt == 0) {
 
-			FirstMeasureTime = (60.0 / bpm * measure)*((Notes_Area-Notes_Judge) / Notes_Area);
+			FirstMeasureTime = get_FirstMeasureTime();
 			play_main_music(&isPlayMain);
 		}
 
