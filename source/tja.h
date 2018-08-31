@@ -29,3 +29,5 @@ void tja_notes_load();
 void tja_to_notes(bool isDnon, bool isKa, int count, C2D_Sprite sprites[12]);
 void get_command_value(char* buf, COMMAND_T *Command);
 void get_head(TJA_HEADER_T *Tja_Header);
+void tja_init();
+double get_FirstMeasureTime();

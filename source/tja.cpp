@@ -5,11 +5,32 @@
 
 char tja_notes[Measure_Max][Max_Notes_Measure];
 int tja_cnt = 0,MeasureMaxNumber=0;
+double MainFirstMeasureTime;
+
 
 TJA_HEADER_T Current_Header;
 MEASURE_T Measure[Measure_Max];
 
 void get_command_value(char* buf, COMMAND_T *Command);
+
+void measure_structure_init() {
+
+	for (int i = 0; i < Measure_Max; i++) {
+
+		Measure[i].create_time = INT_MAX;
+		Measure[i].judge_time = INT_MAX;
+		Measure[i].pop_time = INT_MAX;
+		Measure[i].bpm = 0;
+		Measure[i].scroll = 0;
+		Measure[i].notes = 0;
+		Measure[i].flag = false;
+		Measure[i].isDispBarLine = true;
+	}
+}
+
+void tja_init() {
+	//measure_structure_init();
+}
 
 void tja_head_load(){
 	
@@ -175,13 +196,13 @@ void tja_head_load(){
 
 int measure_cmp(const void *p, const void *q) {	//比較用
 
-	int pp = ((MEASURE_T*)p)->create_time;
-	int qq = ((MEASURE_T*)q)->create_time;
+	double pp = ((MEASURE_T*)p)->create_time;
+	double qq = ((MEASURE_T*)q)->create_time;
 
 	if (((MEASURE_T*)p)->flag == false) pp = INT_MAX;
 	if (((MEASURE_T*)p)->flag == false) qq = INT_MAX;
 
-	return qq - pp;
+	return (qq - pp)*1;
 }
 
 void measure_sort() {	//ノーツを出現順にソート
@@ -195,13 +216,12 @@ void tja_notes_load() {
 	bool isStart = false,isEnd = false,isDispBarLine = true;
 	FILE *fp;
 	COMMAND_T Command;
-
 	double bpm = Current_Header.bpm,
 		NextBpm = bpm,
 		measure = 1,
 		scroll = 1,
-		NextMeasure = 1;
-
+		NextMeasure = 1,
+		delay = 0;
 
 	if ((fp = fopen("sdmc:/tjafiles/" File_Name  "/" File_Name ".tja", "r")) != NULL) {
 
@@ -209,6 +229,8 @@ void tja_notes_load() {
 		int MeasureCount = 0;
 		double PreJudge=0,FirstMeasureTime = 0;
 
+
+		//MainFirstMeasureTime = (60.0 / bpm * measure*4)*((Notes_Area - Notes_Judge) / Notes_Area);
 
 		FirstMeasureTime = (60.0 / bpm * 4*measure)*(Notes_Judge_Range / Notes_Area) - 60.0 / bpm * 4*measure;
 		PreJudge = FirstMeasureTime;
@@ -256,6 +278,9 @@ void tja_notes_load() {
 					case SCroll:
 						scroll = Command.val;
 						break;
+					case DElay:
+						delay = Command.val;
+						break;
 					case BArlineon:
 						isDispBarLine = true;
 						break;
@@ -274,7 +299,7 @@ void tja_notes_load() {
 				Measure[MeasureCount].bpm = NextBpm;
 				Measure[MeasureCount].measure = NextMeasure;
 				Measure[MeasureCount].scroll = scroll;
-				Measure[MeasureCount].judge_time = 60.0 / bpm * 4*measure + PreJudge;
+				Measure[MeasureCount].judge_time = 60.0 / bpm * 4*measure + PreJudge + delay;
 				Measure[MeasureCount].pop_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4)*(Notes_Judge_Range / Notes_Area);
 				Measure[MeasureCount].create_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4)*(Notes_Judge_Range / (Notes_Area*scroll));
 				Measure[MeasureCount].isDispBarLine = isDispBarLine;
@@ -283,6 +308,7 @@ void tja_notes_load() {
 					PreJudge = Measure[MeasureCount].judge_time;
 					bpm = NextBpm;
 					measure = NextMeasure;
+					delay = 0;
 				}
 
 				if (isEnd == true) break;
@@ -292,8 +318,9 @@ void tja_notes_load() {
 			}
 		}
 		MeasureMaxNumber = tja_cnt;
-		//measure_sort();
 		fclose(fp);
+		//measure_sort();
+		MainFirstMeasureTime = Measure[0].judge_time - Measure[0].create_time;
 	}
 }
 
@@ -391,7 +418,10 @@ void get_command_value(char* buf, COMMAND_T *Command) {
 			Command->knd = SCroll;
 			Command->val = strtod(value, NULL);
 		}
-		else if (strcmp(command, "DELAY") == 0) Command->knd = DElay;
+		else if (strcmp(command, "DELAY") == 0) {
+			Command->knd = DElay;
+			Command->val = strtod(value, NULL);
+		}
 		else if (strcmp(command, "SECTION") == 0) Command->knd = SEction;
 		else if (strcmp(command, "BRANCHSTART") == 0) Command->knd = BRanchstart;
 		else if (strcmp(command, "BRANCHEND") == 0) Command->knd = BRanchend;
@@ -408,4 +438,8 @@ void get_command_value(char* buf, COMMAND_T *Command) {
 	}
 
 	else Command->knd = -1;
+}
+
+double get_FirstMeasureTime() {
+	return MainFirstMeasureTime;
 }
