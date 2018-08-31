@@ -13,7 +13,7 @@ void notes_main(
 
 void notes_init(TJA_HEADER_T Tja_Header);
 
-enum Notes_Kind {
+enum Notes_knd {
 	Rest = 0,	//休符
 	Don,		//ドン
 	Ka,			//カツ
@@ -27,7 +27,7 @@ enum Notes_Kind {
 	BigRendaEnd,//大連打終了
 };
 
-enum Sprite_Notes_Kind {	//スプライト用
+enum Sprite_Notes_knd {	//スプライト用
 	dOn = 2,
 	kA,
 	bIg_don,
@@ -42,7 +42,7 @@ enum Sprite_Notes_Kind {	//スプライト用
 	jUdge_fuka,
 };
 
-enum Command_Kind {
+enum Command_knd {
 	STart = 1,
 	ENd,
 	BPmchange,
@@ -66,10 +66,9 @@ enum Command_Kind {
 };
 
 typedef struct {
-	int num, notes_max;
+	int num, notes_max,knd;
 	double x_ini, x, create_time, judge_time, pop_time,bpm,scroll;
-	int kind;
-	bool flag = false;
+	bool flag;
 	C2D_Sprite spr;
 
 } NOTES_T;
