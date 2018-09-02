@@ -23,7 +23,7 @@ int MeasureCount = 0;
 int RendaState = 0;
 int NotesCount;	
 int NotesNumber = 0;	//何番目のノーツか
-bool  isNotesLoad= true;
+bool isNotesLoad= true;
 
 
 int ctoi(char c) {
@@ -43,21 +43,38 @@ int ctoi(char c) {
 	}
 }
 
-int notes_cmp(const void *p, const void *q) {	//比較用
+void notes_q_sort(NOTES_T numbers[], int left, int right){
 
-	int pp = ((NOTES_T*)p)->num;
-	int qq = ((NOTES_T*)q)->num;
+	int l_hold, r_hold,pivot;
 
-	if (((NOTES_T*)p)->flag == false) pp = INT_MAX;
-	if (((NOTES_T*)p)->flag == false) qq = INT_MAX;
-
-	return qq - pp;
-}
-
-void notes_sort() {	//ノーツを出現順にソート
-
-	int n = sizeof Notes / sizeof(NOTES_T);
-	qsort(Notes, n, sizeof(NOTES_T), notes_cmp);
+	l_hold = left;
+	r_hold = right;
+	pivot = numbers[left].num;
+	while (left < right)
+	{
+		while ((numbers[right].num >= pivot) && (left < right))
+			right--;
+		if (left != right)
+		{
+			numbers[left].num = numbers[right].num;
+			left++;
+		}
+		while ((numbers[left].num <= pivot) && (left < right))
+			left++;
+		if (left != right)
+		{
+			numbers[right].num = numbers[left].num;
+			right--;
+		}
+	}
+	numbers[left].num = pivot;
+	pivot = left;
+	left = l_hold;
+	right = r_hold;
+	if (left < pivot)
+		notes_q_sort(numbers, left, pivot - 1);
+	if (right > pivot)
+		notes_q_sort(numbers, pivot + 1, right);
 }
 
 void notes_structure_init() {
@@ -201,7 +218,8 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 			}
 			MeasureCount++;
 
-			notes_sort();	//ソート
+			notes_q_sort(Notes, 0, Notes_Max - 1);
+			//notes_sort();	//ソート
 		}
 
 	}
@@ -217,8 +235,8 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 				C2D_DrawRectangle(BarLine[i].x, 86, 0, 1, 46, C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1));
 			
 			if (BarLine[i].x < 62) BarLine[i].flag = false;
-			snprintf(buf_notes, sizeof(buf_notes), "%.1f", Measure[BarLine[i].measure].create_time);
-			debug_draw(BarLine[i].x-10, 133, buf_notes);
+			//snprintf(buf_notes, sizeof(buf_notes), "%.1f", Measure[BarLine[i].measure].judge_time);
+			//debug_draw(BarLine[i].x-10, 133, buf_notes);
 		}
 	}
 
@@ -247,8 +265,6 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 	debug_draw(200, 170, buf_notes);
 	snprintf(buf_notes, sizeof(buf_notes), "VAL:%s", Command.value_s);
 	debug_draw(200, 180, buf_notes);
-	snprintf(buf_notes, sizeof(buf_notes), "499:%f", Measure[500].create_time);
-	debug_draw(0, 190, buf_notes);
 	snprintf(buf_notes, sizeof(buf_notes), "%s", Command.notes);
 	debug_draw(0, 180, buf_notes);
 }
@@ -264,7 +280,7 @@ int find_notes_id() {
 
 int find_line_id() {
 
-	for (int i = 0; i < (BarLine_Max - 1); i++) {
+	for (int i = 0; i < BarLine_Max - 1; i++) {
 
 		if (BarLine[i].flag == false) return i;
 	}
@@ -471,8 +487,8 @@ void notes_calc(bool isDon,bool isKa,double bpm, double NowTime, int cnt, C2D_Sp
 			default:
 				break;
 			}
-			//snprintf(buf_notes, sizeof(buf_notes), "%d", i);
-			//debug_draw(Notes[i].x, 133, buf_notes);
+			snprintf(buf_notes, sizeof(buf_notes), "%d:%d",i,(Notes[i].flag == true && Notes[i].judge_time <= NowTime));
+			debug_draw(Notes[i].x-5, 132, buf_notes);
 		}
 	}
 	notes_judge(NowTime, isDon, isKa);
