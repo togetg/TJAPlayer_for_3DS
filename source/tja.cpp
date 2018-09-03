@@ -316,12 +316,15 @@ void tja_notes_load() {
 					delay = 0;
 				}
 
-				if (isEnd == true) break;
+				if (isEnd == true) {
+					break;
+				}
 
 				tja_cnt++;
 				MeasureCount++;
 			}
 		}
+
 		MeasureMaxNumber = tja_cnt;
 		fclose(fp);
 		MeasureInsertionSort(Measure,Measure_Max);
@@ -383,8 +386,10 @@ void get_command_value(char* buf, COMMAND_T *Command) {
 
 			//コメントあり
 			if (isComment == true) strlcpy(command, buf + 1, comment + 1);
-			//コメントなし
-			else  strlcpy(command, buf + 1, length - 2);
+			//コメントなし 改行あり
+			else if (strstr(buf, "\n") != NULL) strlcpy(command, buf + 1, length - 2);
+			//コメントなし　改行なし
+			else strlcpy(command, buf + 1, length);
 
 			strlcpy(value, "0", 1);
 		}
