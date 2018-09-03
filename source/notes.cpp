@@ -26,6 +26,9 @@ int NotesNumber = 0;	//何番目のノーツか
 bool  isNotesLoad= true;
 
 
+bool isSort;
+
+
 int ctoi(char c) {
 
 	switch (c) {
@@ -45,8 +48,8 @@ int ctoi(char c) {
 
 int notes_cmp(const void *p, const void *q) {	//比較用
 
-	int pp = ((NOTES_T*)p)->num;
-	int qq = ((NOTES_T*)q)->num;
+	int pp = ((NOTES_T*)p)->judge_time*10000;
+	int qq = ((NOTES_T*)q)->judge_time*10000;
 
 	if (((NOTES_T*)p)->flag == false) pp = INT_MAX;
 	if (((NOTES_T*)p)->flag == false) qq = INT_MAX;
@@ -55,7 +58,7 @@ int notes_cmp(const void *p, const void *q) {	//比較用
 }
 
 void notes_sort() {	//ノーツを出現順にソート
-
+	isSort = true;
 	int n = sizeof Notes / sizeof(NOTES_T);
 	qsort(Notes, n, sizeof(NOTES_T), notes_cmp);
 }
@@ -99,7 +102,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 	snprintf(buf_notes, sizeof(buf_notes), "time0:%.2f", NowTime);
 	debug_draw(0, 10, buf_notes);
 
-	bool isEnd = false;
+	isSort = false;
 
 	if ( cnt >= 0 && isNotesLoad== true) {
 
@@ -109,8 +112,8 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 			if (BarLineId != -1) {
 				BarLine[BarLineId].flag = true;
 				BarLine[BarLineId].scroll = Measure[MeasureCount].scroll;
-				BarLine[BarLineId].x_ini = 
-					Notes_Judge_Range*BarLine[BarLineId].scroll + Notes_Judge;
+				BarLine[BarLineId].x_ini =
+					Notes_Judge_Range * BarLine[BarLineId].scroll + Notes_Judge;
 				BarLine[BarLineId].x = BarLine[BarLineId].x_ini;
 				BarLine[BarLineId].measure = MeasureCount;
 				BarLine[BarLineId].create_time = NowTime;
@@ -118,27 +121,24 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 			}
 
 			NotesCount = 0;
-			
-			while (tja_notes[Measure[MeasureCount].notes][NotesCount] != ',') {
+
+			while (isNotesLoad == true && tja_notes[Measure[MeasureCount].notes][NotesCount] != ',') {
 
 				//命令
 				if (NotesCount == 0 && tja_notes[Measure[MeasureCount].notes][0] == '#') {
 
-					get_command_value(tja_notes[Measure[MeasureCount].notes],&Command);
+					get_command_value(tja_notes[Measure[MeasureCount].notes], &Command);
 					Command.notes = tja_notes[Measure[MeasureCount].notes];
 
 					switch (Command.knd) {
 					case ENd:
-						isNotesLoad= false;						
-						isEnd = true;
+						isNotesLoad = false;
 						break;
 
 					default:
 						break;
 
 					}
-
-					if (isEnd == true) break;
 
 					NotesCount = 0;
 					MeasureCount++;
@@ -155,7 +155,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 			for (int i = 0; i < NotesCount; i++) {
 
 				int id = find_notes_id();
-				
+
 				if (id != -1 && tja_notes[Measure[MeasureCount].notes][i] != '0') {
 
 					if (RendaState == 0 || tja_notes[Measure[MeasureCount].notes][i] == '8') {
@@ -164,7 +164,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 						Notes[id].notes_max = NotesCount;	//用途不明
 						Notes[id].num = NotesNumber;
 						Notes[id].scroll = Measure[MeasureCount].scroll;
-						Notes[id].x_ini = ((Notes_Area*Measure[MeasureCount].measure / NotesCount)*i + Notes_Judge_Range)*Notes[id].scroll+ Notes_Judge;
+						Notes[id].x_ini = ((Notes_Area*Measure[MeasureCount].measure / NotesCount)*i + Notes_Judge_Range)*Notes[id].scroll + Notes_Judge;
 						Notes[id].x = Notes[id].x_ini;
 						Notes[id].bpm = Measure[MeasureCount].bpm;
 						Notes[id].knd = ctoi(tja_notes[Measure[MeasureCount].notes][i]);
@@ -199,8 +199,8 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 					}
 				}
 			}
-			MeasureCount++;
 
+			MeasureCount++;
 			notes_sort();	//ソート
 		}
 
@@ -217,15 +217,16 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 				C2D_DrawRectangle(BarLine[i].x, 86, 0, 1, 46, C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1));
 			
 			if (BarLine[i].x < 62) BarLine[i].flag = false;
-			snprintf(buf_notes, sizeof(buf_notes), "%.1f", Measure[BarLine[i].measure].create_time);
-			debug_draw(BarLine[i].x-10, 133, buf_notes);
+			//snprintf(buf_notes, sizeof(buf_notes), "%.1f", Measure[BarLine[i].measure].create_time);
+			//debug_draw(BarLine[i].x-10, 133, buf_notes);
 		}
 	}
 
 	notes_calc(isDon,isKa,bpm, NowTime, cnt, sprites);
 	C2D_DrawRectangle(0 ,86, 0, 62, 58, C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1));
-	debug_draw(0, 40, tja_notes[Measure[MeasureCount].notes - 1]);
-
+	debug_draw(0, 40, tja_notes[Measure[MeasureCount-1].notes]);
+	snprintf(buf_notes, sizeof(buf_notes), "%d",MeasureCount-1);
+	debug_draw(0, 50, buf_notes);
 
 	snprintf(buf_notes, sizeof(buf_notes), "time1:%.2f", NowTime);
 	debug_draw(0, 0, buf_notes);
@@ -247,7 +248,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 	debug_draw(200, 170, buf_notes);
 	snprintf(buf_notes, sizeof(buf_notes), "VAL:%s", Command.value_s);
 	debug_draw(200, 180, buf_notes);
-	snprintf(buf_notes, sizeof(buf_notes), "499:%f", Measure[500].create_time);
+	snprintf(buf_notes, sizeof(buf_notes), "0:%f:%d", Notes[0].judge_time,Notes[0].flag);
 	debug_draw(0, 190, buf_notes);
 	snprintf(buf_notes, sizeof(buf_notes), "%s", Command.notes);
 	debug_draw(0, 180, buf_notes);
@@ -471,8 +472,8 @@ void notes_calc(bool isDon,bool isKa,double bpm, double NowTime, int cnt, C2D_Sp
 			default:
 				break;
 			}
-			//snprintf(buf_notes, sizeof(buf_notes), "%d", i);
-			//debug_draw(Notes[i].x, 133, buf_notes);
+			snprintf(buf_notes, sizeof(buf_notes), "%d", i);
+			debug_draw(Notes[i].x, 132, buf_notes);
 		}
 	}
 	notes_judge(NowTime, isDon, isKa);
