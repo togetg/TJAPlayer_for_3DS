@@ -29,7 +29,7 @@ void measure_structure_init() {
 }
 
 void tja_init() {
-	measure_structure_init();
+	//measure_structure_init();
 }
 
 void tja_head_load(){
@@ -194,21 +194,21 @@ void tja_head_load(){
 	}
 }
 
-void MeasureInsertionSort(MEASURE_T t[], int array_size) {
+int measure_cmp(const void *p, const void *q) {	//比較用
 
-	for (int i = 1; i < array_size; i++) {
+	double pp = ((MEASURE_T*)p)->create_time;
+	double qq = ((MEASURE_T*)q)->create_time;
 
-		MEASURE_T temp = t[i];
-		if (t[i - 1].create_time > temp.create_time) {
+	if (((MEASURE_T*)p)->flag == false) pp = INT_MAX;
+	if (((MEASURE_T*)p)->flag == false) qq = INT_MAX;
 
-			int j = i;
-			do {
-				t[j] = t[j - 1];
-				--j;
-			} while (j > 0 && t[j - 1].create_time > temp.create_time);
-			t[j] = temp;
-		}
-	}
+	return (qq - pp)*1;
+}
+
+void measure_sort() {	//ノーツを出現順にソート
+
+	int n = sizeof Measure / sizeof(Measure_Max);
+	qsort(Measure, n, sizeof(MEASURE_T), measure_cmp);
 }
 
 void tja_notes_load() {
@@ -302,11 +302,6 @@ void tja_notes_load() {
 				Measure[MeasureCount].judge_time = 60.0 / bpm * 4*measure + PreJudge + delay;
 				Measure[MeasureCount].pop_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4)*(Notes_Judge_Range / Notes_Area);
 				Measure[MeasureCount].create_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4)*(Notes_Judge_Range / (Notes_Area*scroll));
-				Measure[MeasureCount].create_time_cmp = Measure[MeasureCount].create_time;
-				if (MeasureCount != 0 &&
-					Measure[MeasureCount].create_time_cmp == Measure[MeasureCount - 1].create_time_cmp) {
-					Measure[MeasureCount].create_time_cmp += 0.0001;
-				}
 				Measure[MeasureCount].isDispBarLine = isDispBarLine;
 
 				if (tja_notes[tja_cnt][0] != '#') {
@@ -324,7 +319,7 @@ void tja_notes_load() {
 		}
 		MeasureMaxNumber = tja_cnt;
 		fclose(fp);
-		MeasureInsertionSort(Measure,Measure_Max);
+		//measure_sort();
 		MainFirstMeasureTime = Measure[0].judge_time - Measure[0].create_time;
 	}
 }
