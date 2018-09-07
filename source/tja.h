@@ -19,14 +19,15 @@ typedef struct {
 }TJA_HEADER_T;
 
 typedef struct {
-	double judge_time, create_time,pop_time, bpm, speed,measure,scroll;
+	double judge_time, create_time,create_time_cmp,pop_time,
+		bpm, speed,measure,scroll;
 	int notes;
 	bool flag,isDispBarLine;
 } MEASURE_T;
 
 void tja_head_load();
 void tja_notes_load();
-void tja_to_notes(bool isDnon, bool isKa, int count, C2D_Sprite sprites[12]);
+void tja_to_notes(bool isDnon, bool isKa, int count, C2D_Sprite sprites[Sprite_Number]);
 void get_command_value(char* buf, COMMAND_T *Command);
 void get_head(TJA_HEADER_T *Tja_Header);
 void tja_init();
