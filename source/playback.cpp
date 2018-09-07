@@ -24,6 +24,7 @@ bool isPlaying(void){
 }
 
 int getFileType(const char *file){
+
 	FILE* ftest = fopen(file, "rb");
 	uint32_t fileSig;
 	enum file_types file_type = FILE_TYPE_ERROR;
@@ -35,8 +36,8 @@ int getFileType(const char *file){
 	if(fread(&fileSig, 4, 1, ftest) == 0)
 		goto err;
 
-	switch(fileSig)
-	{
+	switch(fileSig){
+
 		// "RIFF"
 		case 0x46464952:
 			if(fseek(ftest, 4, SEEK_CUR) != 0)
