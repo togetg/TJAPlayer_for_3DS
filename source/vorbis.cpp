@@ -9,7 +9,7 @@
 static OggVorbis_File	vorbisFile;
 static vorbis_info		*vi;
 static FILE				*f;
-static const size_t		buffSize = 8000;// 8 * 4096; ‹°‚ç‚­2*4096‚ªÅ“K
+static const size_t		buffSize = 8000;// 8 * 4096;
 
 void setVorbis(struct decoder_fn* decoder){
 	decoder->init = &initVorbis;
