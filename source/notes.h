@@ -36,7 +36,8 @@ enum Sprite_Notes_knd {	//スプライト用
 	rEnda_start,
 	rEnda_int,
 	rEnda_fini,
-	bIg_renda,
+	bIg_renda_start,
+	bIg_renda_int,
 	bIg_renda_fini,
 	bAlloon,
 	jUdge_ryou,
@@ -82,7 +83,7 @@ typedef struct {
 } BARLINE_T;
 
 typedef struct {
-	int id,start_id,finish_id;
+	int id,start_id,finish_id,knd;
 	double start_x, finish_x;
 	bool flag;
 }RENDA_T;
