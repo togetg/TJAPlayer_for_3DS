@@ -18,13 +18,10 @@ COMMAND_T Command;
 BARLINE_T BarLine[BarLine_Max];
 RENDA_T RendaNotes[Renda_Max];
 
-int MeasureCount = 0;
-int RendaState = 0;
-int NotesCount;	
-int NotesNumber = 0;	//何番目のノーツか
+int MeasureCount,RendaState,NotesCount,JudgeDispknd,JudgeRendaState,
+NotesNumber;	//何番目のノーツか
 bool  isNotesLoad= true,isAuto = true,isJudgeDisp = false;	//要初期化
 double JudgeMakeTime, JudgeY;
-int JudgeDispknd;
 
 
 int ctoi(char c) {
@@ -65,7 +62,9 @@ void delete_renda(int i) {
 	if (i >= 0 && i <= Renda_Max) {
 		RendaNotes[i].id = -1;
 		RendaNotes[i].start_x = -1;
+		RendaNotes[i].start_id = -1;
 		RendaNotes[i].finish_x = -1;
+		RendaNotes[i].finish_id = -1;
 		RendaNotes[i].flag = false;
 	}
 }
@@ -86,13 +85,14 @@ int find_renda_id() {
 	return -1;
 }
 
-int make_renda_start(double x) {
+int make_renda_start(int NotesId) {
 
 	int id = find_renda_id();
 	if (id != -1) {
 
 		RendaNotes[id].id = id;
-		RendaNotes[id].start_x = x;
+		RendaNotes[id].start_x = Notes[NotesId].x;
+		RendaNotes[id].knd = Notes[NotesId].knd;
 		RendaNotes[id].finish_x = -1;
 		RendaNotes[id].flag = true;
 		return id;
@@ -111,12 +111,12 @@ int find_renda_finish_id() {	//startの値だけ入ってる連打idを返す
 	return -1;
 }
 
-int make_renda_finish(double x) {
+int make_renda_finish(int NotesId) {
 
 	int id = find_renda_finish_id();
 	if (id != -1) {
 
-		RendaNotes[id].finish_x = x;
+		RendaNotes[id].finish_x = Notes[NotesId].x;
 		return id;
 	}
 	else return -1;
@@ -168,12 +168,15 @@ void notes_init(TJA_HEADER_T Tja_Header) {
 	bpm = Tja_Header.bpm;
 	offset = Tja_Header.offset;
 	NotesNumber = 0;
+	NotesCount = 0;
+	RendaState = 0;
 	MeasureCount = 0;
 	isNotesLoad = true;
 	isJudgeDisp = false;
 	JudgeMakeTime = 0;
 	JudgeDispknd = -1;
 	JudgeY = 70;
+	JudgeRendaState = -1;
 	isAuto = true;	//要変更
 }
 
@@ -258,19 +261,21 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 
 					case Renda:
 						RendaState = Renda;
-						renda_id = make_renda_start(Notes[id].x);
+						renda_id = make_renda_start(id);
 						Notes[id].renda_id = renda_id;
 						break;
 
 					case BigRenda:
 						RendaState = BigRenda;
+						renda_id = make_renda_start(id);
+						Notes[id].renda_id = renda_id;
 						break;
 
 					case RendaEnd:
 
 						switch (RendaState) {
 						case Renda:
-							renda_id = make_renda_finish(Notes[id].x);
+							renda_id = make_renda_finish(id);
 							Notes[id].renda_id = renda_id;
 							Notes[id].knd = RendaEnd;
 							RendaState = 0;
@@ -278,7 +283,10 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 							break;
 
 						case BigRenda:
+							renda_id = make_renda_finish(id);
+							Notes[id].renda_id = renda_id;
 							Notes[id].knd = BigRendaEnd;
+							RendaState = 0;
 							break;
 
 						default:
@@ -336,6 +344,8 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 	debug_draw(0, 30, buf_notes);
 	snprintf(buf_notes, sizeof(buf_notes), "create :%.1f", Measure[MeasureCount].create_time);
 	debug_draw(200, 30, buf_notes);
+	snprintf(buf_notes, sizeof(buf_notes), "Renda :%d", JudgeRendaState);
+	debug_draw(300, 30, buf_notes);
 }
 
 int find_notes_id() {
@@ -367,6 +377,7 @@ void calc_judge(double NowTime, C2D_Sprite sprites[Sprite_Number]) {
 
 	if (isJudgeDisp == true) {
 
+		//アニメーション
 		if (NowTime - JudgeMakeTime < 0.05)  JudgeY = 73+(NowTime - JudgeMakeTime)*140;
 		if (JudgeY >= 80) JudgeY = 80;
 
@@ -394,11 +405,21 @@ void calc_judge(double NowTime, C2D_Sprite sprites[Sprite_Number]) {
 	}
 }
 
-void notes_judge(double NowTime, bool isDon, bool isKa) {
+void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 	
 	int CurrentJudgeNotes[2] = { -1,-1 };		//現在判定すべきノーツ ドン,カツ
 	double CurrentJudgeNotesLag[2] = { -1,-1 };	//判定すべきノーツの誤差(s)
 
+	JudgeRendaState = -1;
+	//連打の状態
+	for (int i = 0; i < Renda_Max; i++) {
+
+		if (RendaNotes[i].flag == true && 
+			Notes[RendaNotes[i].start_id].judge_time < NowTime &&
+			(RendaNotes[i].finish_id == -1 || Notes[RendaNotes[i].finish_id].judge_time > NowTime)) JudgeRendaState = RendaNotes[i].knd;
+	}
+
+	//判定すべきノーツを検索
 	for (int i = 0; i < Notes_Max-1; i++) {
 
 		if (Notes[i].flag == true) {
@@ -468,6 +489,11 @@ void notes_judge(double NowTime, bool isDon, bool isKa) {
 				delete_notes(i);
 			}
 		}
+
+		if (JudgeRendaState != -1) {	//連打
+
+			if(cnt % 7 == 0) music_play(0);
+		}
 	}
 
 	else if (isAuto == false) {			//手動
@@ -532,15 +558,29 @@ void notes_calc(bool isDon,bool isKa,double bpm, double NowTime, int cnt, C2D_Sp
 				}
 				break;
 
+			case BigRenda:
+				if (Notes[i].renda_id != -1) {
+					RendaNotes[Notes[i].renda_id].start_x = Notes[i].x;
+					RendaNotes[Notes[i].renda_id].start_id = i;
+				}
+				break;
+
+			case BigRendaEnd:
+				if (Notes[i].renda_id != -1) {
+					RendaNotes[Notes[i].renda_id].finish_x = Notes[i].x;
+					RendaNotes[Notes[i].renda_id].finish_id = i;
+				}
+				break;
+
 			default:
 				break;
 			}
 		}
 			
-		if (Notes[i].x <= 40 && 
+		if (Notes[i].x <= 20 && 
 			Notes[i].knd != Renda && Notes[i].knd != BigRenda) delete_notes(i);
 	}
-	notes_judge(NowTime, isDon, isKa);
+	notes_judge(NowTime, isDon, isKa ,cnt);
 	calc_judge(NowTime, sprites);
 }
 
@@ -570,7 +610,12 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 				C2D_DrawSprite(&sprites[bIg_ka]);
 				break;
 			case Renda: {
-				for (int n = 0; n < (RendaNotes[Notes[i].renda_id].finish_x - RendaNotes[Notes[i].renda_id].start_x) / 9.0; n++) {
+
+				double finish_x;
+				if (RendaNotes[Notes[i].renda_id].finish_id == -1) finish_x = TOP_WIDTH;
+				else finish_x = RendaNotes[Notes[i].renda_id].finish_x;
+				
+				for (int n = 0; n < (finish_x - RendaNotes[Notes[i].renda_id].start_x) / 9.0; n++) {
 					C2D_SpriteSetPos(&sprites[rEnda_int], Notes[i].x + 9 * n, notes_y);
 					C2D_DrawSprite(&sprites[rEnda_int]);
 				}
@@ -578,10 +623,21 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 				C2D_DrawSprite(&sprites[rEnda_start]);
 				break;
 			}
-			case BigRenda:
-				C2D_SpriteSetPos(&sprites[bIg_renda], Notes[i].x, notes_y);
-				C2D_DrawSprite(&sprites[bIg_renda]);
+			case BigRenda: {
+
+				double finish_x;
+				if (RendaNotes[Notes[i].renda_id].finish_id == -1) finish_x = TOP_WIDTH;
+				else finish_x = RendaNotes[Notes[i].renda_id].finish_x;
+
+				for (int n = 0; n < (finish_x - RendaNotes[Notes[i].renda_id].start_x) / 9.0; n++) {
+					C2D_SpriteSetPos(&sprites[bIg_renda_int], Notes[i].x + 9 * n, notes_y);
+					C2D_DrawSprite(&sprites[bIg_renda_int]);
+				}
+
+				C2D_SpriteSetPos(&sprites[bIg_renda_start], Notes[i].x, notes_y);
+				C2D_DrawSprite(&sprites[bIg_renda_start]);
 				break;
+			}
 			case Balloon:
 				C2D_SpriteSetPos(&sprites[bAlloon], Notes[i].x, notes_y);
 				C2D_DrawSprite(&sprites[bAlloon]);
@@ -597,8 +653,8 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 			default:
 				break;
 			}
-			snprintf(buf_notes, sizeof(buf_notes), "%d",i);
-			debug_draw(Notes[i].x, 132, buf_notes);
+			//snprintf(buf_notes, sizeof(buf_notes), "%d",i);
+			//debug_draw(Notes[i].x, 132, buf_notes);
 		}
 	}
 
