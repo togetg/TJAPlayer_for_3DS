@@ -8,7 +8,8 @@ void notes_main(
 	char tja_notes[Measure_Max][Max_Notes_Measure],
 	MEASURE_T Measure[Measure_Max],
 	int cnt,
-	C2D_Sprite  sprites[12]);
+	C2D_Sprite  sprites[Sprite_Number]);
+void toggle_auto();
 
 
 void notes_init(TJA_HEADER_T Tja_Header);
@@ -32,7 +33,8 @@ enum Sprite_Notes_knd {	//スプライト用
 	kA,
 	bIg_don,
 	bIg_ka,
-	rEnda,
+	rEnda_start,
+	rEnda_int,
 	rEnda_fini,
 	bIg_renda,
 	bIg_renda_fini,
@@ -62,11 +64,10 @@ enum Command_knd {
 	HBscroll,
 	BArlineoff,
 	BArlineon,
-
 };
 
 typedef struct {
-	int num, notes_max,knd;
+	int num, notes_max, knd, renda_id;
 	double x_ini, x, create_time, judge_time, pop_time,bpm,scroll;
 	bool flag;
 	C2D_Sprite spr;
@@ -79,3 +80,9 @@ typedef struct {
 	bool flag,isDisp;
 
 } BARLINE_T;
+
+typedef struct {
+	int id,start_id,finish_id;
+	double start_x, finish_x;
+	bool flag;
+}RENDA_T;
