@@ -5,7 +5,7 @@
 #include "audio.h"
 #include "playback.h"
 
-C2D_Sprite sprites[12];			//画像用
+C2D_Sprite sprites[Sprite_Number];			//画像用
 static C2D_SpriteSheet spriteSheet;
 C2D_TextBuf g_dynamicBuf;
 char buf_main[160];
@@ -56,7 +56,7 @@ int main() {
 	spriteSheet = C2D_SpriteSheetLoad("romfs:/gfx/sprites.t3x");
 	if (!spriteSheet) svcBreak(USERBREAK_PANIC);
 
-	for (int i = 0; i < 12; i++) {
+	for (int i = 0; i < Sprite_Number; i++) {
 		C2D_SpriteFromSheet(&sprites[i], spriteSheet, i);
 		C2D_SpriteSetCenter(&sprites[i], 0.5f, 0.5f);
 	}
@@ -150,6 +150,8 @@ int main() {
 		key & KEY_ZL) {//カツ
 		isKa = true;
 		}
+
+		if (key & KEY_SELECT) toggle_auto();
 
 		if (isNotesStart == true) {
 			tja_to_notes(isDon, isKa, notes_cnt,sprites);
