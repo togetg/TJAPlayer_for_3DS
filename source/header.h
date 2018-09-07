@@ -5,7 +5,7 @@
 #include <citro2d.h>
 #include <limits.h>
 
-#define File_Name "senbonzakura"
+#define File_Name "Test"
 
 #define Max_Notes_Measure 130	//ˆê¬ß‚ÌÅ‘åƒm[ƒc”+1
 #define Measure_Max 2048
@@ -17,3 +17,9 @@
 #define TOP_HEIGHT 240
 #define BOTTOM_WIDTH  320
 #define BOTTOM_HEIGHT 240
+
+#define Sprite_Number 15
+
+#define Notes_Max 512
+#define BarLine_Max 64
+#define Renda_Max 64
