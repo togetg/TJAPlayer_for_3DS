@@ -337,7 +337,7 @@ void get_head(TJA_HEADER_T *Tja_Header) {
 	*Tja_Header = Current_Header;
 }
 
-void tja_to_notes(bool isDnon,bool isKa,int count, C2D_Sprite sprites[12]) {
+void tja_to_notes(bool isDnon,bool isKa,int count, C2D_Sprite sprites[Sprite_Number]) {
 	
 	notes_main(isDnon, isKa, tja_notes,Measure,count,sprites);
 
@@ -444,7 +444,6 @@ void get_command_value(char* buf, COMMAND_T *Command) {
 		else if (strcmp(command, "BARLINEOFF") == 0) Command->knd = BArlineoff;
 		else if (strcmp(command, "BARLINEON") == 0) Command->knd = BArlineon;
 		else Command->knd = -1;
-
 	}
 
 	else Command->knd = -1;
