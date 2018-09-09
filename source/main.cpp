@@ -28,7 +28,6 @@ void main_init() {
 	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
 	C2D_Prepare();
 	init_main_music();
-	notes_init(Tja_Header);
 }
 
 void main_exit() {
@@ -61,6 +60,12 @@ int main() {
 		C2D_SpriteSetCenter(&sprites[i], 0.5f, 0.5f);
 	}
 	C2D_SpriteSetCenterRaw(&sprites[bAlloon], 13, 13);
+	C2D_SpriteSetCenterRaw(&sprites[bAlloon_1], 8.5, 12);
+	C2D_SpriteSetCenterRaw(&sprites[bAlloon_2], 9, 26);
+	C2D_SpriteSetCenterRaw(&sprites[bAlloon_3], 9, 31);
+	C2D_SpriteSetCenterRaw(&sprites[bAlloon_4], 9, 45);
+	C2D_SpriteSetCenterRaw(&sprites[bAlloon_5], 9, 51);
+	C2D_SpriteSetCenterRaw(&sprites[bAlloon_6], 9, 59);
 
 	C2D_SpriteSetPos(&sprites[0], TOP_WIDTH / 2, TOP_HEIGHT / 2);
 	C2D_SpriteSetPos(&sprites[1], BOTTOM_WIDTH / 2, BOTTOM_HEIGHT / 2);
@@ -69,8 +74,8 @@ int main() {
 	tja_head_load();
 	music_load();
 	init_main_music();
-	notes_init(Tja_Header);
 	get_head(&Tja_Header);
+	notes_init(Tja_Header);
 
 	int cnt = 0, notes_cnt = 0;
 	bool isNotesStart = false, isMusicStart = false;
