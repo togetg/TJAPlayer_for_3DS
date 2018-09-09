@@ -6,7 +6,7 @@
 #define MUSIC_CHANNEL 1
 #define BUFFER_SIZE 4096
 #define STACKSIZE (4 * 1024)
-#define MUSIC_NUMBER 2
+#define MUSIC_NUMBER 3
 
 typedef struct {
 	float rate;
@@ -31,7 +31,8 @@ void music_load() {
 	ndspSetOutputCount(1);
 	char sound_address[MUSIC_NUMBER][30] = {
 		"romfs:/don.ogg",
-		"romfs:/ka.ogg"
+		"romfs:/ka.ogg",
+		"romfs:/balloonbreak.ogg",
 	};
 
 	for (int i = 0; i < MUSIC_NUMBER; i++) {
