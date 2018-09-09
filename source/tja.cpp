@@ -85,105 +85,112 @@ void tja_head_load(){
 			}
 
 			if (strstr(buf, "TITLE:") == buf) {
-				strcpy(temp, buf + 6);
+				strlcpy(temp, buf + 6, 128);
 				Current_Header.title = temp;
 				continue;
 			}
 
 			if (strstr(buf, "SUBTITLE:") == buf) {
-				strcpy(temp, buf + 9);
+				strlcpy(temp, buf +9, 128);
 				Current_Header.subtitle = temp;
 				continue;
 			}
 
 			if (strstr(buf, "LEVEL:") == buf) {
-				strcpy(temp, buf + 6);
+				strlcpy(temp, buf + 6, 128);
 				Current_Header.level = atoi(temp);
 				continue;
 			}
 			
 			if (strstr(buf, "BPM:") == buf) {
-				strcpy(temp, buf + 4);
+				strlcpy(temp, buf + 4, 128);
 				Current_Header.bpm = atof(temp);
 				continue;
 			}
 
 			if (strstr(buf, "WAVE:") == buf) {
-				strcpy(temp, buf + 5);
+				strlcpy(temp, buf + 5, 128);
 				Current_Header.wave = temp;
 				continue;
 			}
 
 			if (strstr(buf, "OFFSET:") == buf) {
-				strcpy(temp, buf + 7);
+				strlcpy(temp, buf + 7, 128);
 				Current_Header.offset = atof(temp);
 				continue;
 			}
 
 			if (strstr(buf, "BALLOON:") == buf) {
-				strcpy(temp, buf + 8);
-				//Current_Header.balloon = temp;
+				strlcpy(temp, buf + 8, 128);
+				char *tp = strtok(temp, ",");
+				Current_Header.balloon[0] = atoi(tp);
+				int cnt = 1;
+				while ((tp = strtok(NULL, ","))) {
+					Current_Header.balloon[cnt] = atoi(tp);
+					cnt++;
+				}
 				continue;
 			}
 
 			if (strstr(buf, "SONGVOL:") == buf) {
-				strcpy(temp, buf + 8);
+				strlcpy(temp, buf + 8, 128);
 				Current_Header.songvol = atoi(temp);
 				continue;
 			}
 
 			if (strstr(buf, "SEVOL:") == buf) {
-				strcpy(temp, buf + 6);
+				strlcpy(temp, buf + 6, 128);
 				Current_Header.sevol = atoi(temp);
 				continue;
 			}
 
 			if (strstr(buf, "SCOREINIT:") == buf) {
-				strcpy(temp, buf + 10);
+				strlcpy(temp, buf + 10, 128);
 				continue;
 			}
 
 			if (strstr(buf, "SCOREDIFF:") == buf) {
-				strcpy(temp, buf + 10);
+				strlcpy(temp, buf + 10, 128);
 				Current_Header.scorediff = atoi(temp);
 				continue;}
 
 
 			if (strstr(buf, "COURSE:") == buf) {
-				strcpy(temp, buf + 7);
+				strlcpy(temp, buf + 7, 128);
 				Current_Header.course = atoi(temp);
 				continue;}
 
 			if (strstr(buf, "STYLE:") == buf) {
-				strcpy(temp, buf + 6);
+				strlcpy(temp, buf + 6, 128);
 				Current_Header.style = atoi(temp);
 				continue;
 			}
 
 			if (strstr(buf, "LIFE:") == buf) {
-				strcpy(temp, buf + 5);
+				strlcpy(temp, buf + 5, 128);
 				Current_Header.life = atoi(temp);
 				continue;
 			}
 
 			if (strstr(buf, "DEMOSTART:") == buf) {
-				strcpy(temp, buf + 10);
+				strlcpy(temp, buf + 10, 128);
 				Current_Header.demostart = atof(temp);
 				continue;
 			}
 
 			if (strstr(buf, "SIDE:") == buf) {
-				strcpy(temp, buf + 5);
+				strlcpy(temp, buf + 5, 128);
 				Current_Header.side = atoi(temp);
 				continue;
 			}
 
 			if (strstr(buf, "SCOREMODE:") == buf) {
-				strcpy(temp, buf + 10);
+				strlcpy(temp, buf + 10, 128);
 				Current_Header.scoremode= atoi(temp);
 				continue;
 			}
 
+			free(temp);
 		}
 
 		fclose(fp);		
@@ -343,7 +350,6 @@ void tja_to_notes(bool isDnon,bool isKa,int count, C2D_Sprite sprites[Sprite_Num
 
 }
 
-
 //コマンドと値を取り出す
 void get_command_value(char* buf, COMMAND_T *Command) {
 
@@ -418,6 +424,8 @@ void get_command_value(char* buf, COMMAND_T *Command) {
 				strlcpy(molecule, value + 1, srash);
 				strlcpy(denominator, value + srash + 1, strlen(buf) - srash);
 				Command->val = strtod(molecule, NULL) / strtod(denominator, NULL);
+				free(denominator);
+				free(molecule);
 			}
 			else {
 				if(strtod(value, NULL) != 0) Command->val = strtod(value, NULL);
@@ -444,6 +452,9 @@ void get_command_value(char* buf, COMMAND_T *Command) {
 		else if (strcmp(command, "BARLINEOFF") == 0) Command->knd = BArlineoff;
 		else if (strcmp(command, "BARLINEON") == 0) Command->knd = BArlineon;
 		else Command->knd = -1;
+
+		free(command);
+		free(value);
 	}
 
 	else Command->knd = -1;
