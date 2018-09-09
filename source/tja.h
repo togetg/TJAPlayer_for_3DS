@@ -12,7 +12,7 @@ typedef struct {
 typedef struct {
 
 	char *title, *subtitle,*wave;
-	int level,balloon[100],songvol,sevol,scoreinit,scorediff,
+	int level,balloon[256],songvol,sevol,scoreinit,scorediff,
 		course,style,life,side,scoremode,total;
 	double bpm, offset, demostart;
 
