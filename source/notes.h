@@ -26,6 +26,7 @@ enum Notes_knd {
 	RendaEnd,	//連打終了
 	Potato,		//お芋音符開始
 	BigRendaEnd,//大連打終了
+	BalloonEnd,	//風船終了
 };
 
 enum Sprite_Notes_knd {	//スプライト用
@@ -40,6 +41,12 @@ enum Sprite_Notes_knd {	//スプライト用
 	bIg_renda_int,
 	bIg_renda_fini,
 	bAlloon,
+	bAlloon_1,
+	bAlloon_2,
+	bAlloon_3,
+	bAlloon_4,
+	bAlloon_5,
+	bAlloon_6,
 	jUdge_ryou,
 	jUdge_ka,
 	jUdge_fuka,
@@ -87,3 +94,9 @@ typedef struct {
 	double start_x, finish_x;
 	bool flag;
 }RENDA_T;
+
+typedef struct {
+	int id, start_id, finish_id,
+		need_hit,current_hit;
+	bool flag;
+}BALLOON_T;
