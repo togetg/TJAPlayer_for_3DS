@@ -1,4 +1,4 @@
-#include "header.h"
+ï»¿#include "header.h"
 #include "main.h"
 #include <sys/time.h>
 char buf_time[160];
@@ -50,7 +50,7 @@ void time_ini() {
 }
 
 #define Fps_Sample 60
-double fps_time[2],fps_cnt,fps_sum,fps;	//—v‰Šú‰»
+double fps_time[2],fps_cnt,fps_sum,fps;	//è¦åˆæœŸåŒ–
 void draw_fps() {
 	
 	fps_time[0] = fps_time[1];

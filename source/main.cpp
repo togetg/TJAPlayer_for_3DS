@@ -1,4 +1,4 @@
-#include "header.h"
+﻿#include "header.h"
 #include "time.h"
 #include "notes.h"
 #include "tja.h"

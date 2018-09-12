@@ -1,4 +1,4 @@
-#include "header.h"
+ï»¿#include "header.h"
 #include "main.h"
 #include "time.h"
 #include "audio.h"
@@ -21,13 +21,13 @@ RENDA_T RendaNotes[Renda_Max];
 BALLOON_T BalloonNotes[Balloon_Max];
 
 int MeasureCount, RendaState, NotesCount, JudgeDispknd, JudgeRendaState, BalloonBreakCount,
-NotesNumber;	//‰½”Ô–Ú‚Ìƒm[ƒc‚©
-bool  isNotesLoad= true,isAuto = true,isJudgeDisp = false,isBalloonBreakDisp = false;	//—v‰Šú‰»
+NotesNumber;	//ä½•ç•ªç›®ã®ãƒãƒ¼ãƒ„ã‹
+bool  isNotesLoad= true,isAuto = true,isJudgeDisp = false,isBalloonBreakDisp = false;	//è¦åˆæœŸåŒ–
 double JudgeMakeTime, JudgeY;
 
 void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Measure],MEASURE_T Measure[Measure_Max], int cnt, C2D_Sprite  sprites[Sprite_Number]) {
 
-	//Å‰‚Ì¬ß‚Ìcreate_time‚ªƒ}ƒCƒiƒX‚¾‚Á‚½—p‚É’²®
+	//æœ€åˆã®å°ç¯€ã®create_timeãŒãƒã‚¤ãƒŠã‚¹ã ã£ãŸæ™‚ç”¨ã«èª¿æ•´
 	double NowTime = time_now(0) + Measure[0].create_time;
 
 	snprintf(buf_notes, sizeof(buf_notes), "time0:%.2f", NowTime);
@@ -53,7 +53,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 
 			while (isNotesLoad == true && tja_notes[Measure[MeasureCount].notes][NotesCount] != ',') {
 
-				//–½—ß
+				//å‘½ä»¤
 				if (NotesCount == 0 && tja_notes[Measure[MeasureCount].notes][0] == '#') {
 
 					get_command_value(tja_notes[Measure[MeasureCount].notes], &Command);
@@ -88,7 +88,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 				if (id != -1 && tja_notes[Measure[MeasureCount].notes][i] != '0') {
 
 					Notes[id].flag = true;
-					Notes[id].notes_max = NotesCount;	//—p“r•s–¾
+					Notes[id].notes_max = NotesCount;	//ç”¨é€”ä¸æ˜
 					Notes[id].num = NotesNumber;
 					Notes[id].scroll = Measure[MeasureCount].scroll;
 					Notes[id].x_ini = ((Notes_Area*Measure[MeasureCount].measure / NotesCount)*i + Notes_Judge_Range)*Notes[id].scroll + Notes_Judge;
@@ -190,7 +190,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 			}
 
 			MeasureCount++;
-			notes_sort();	//ƒ\[ƒg
+			notes_sort();	//ã‚½ãƒ¼ãƒˆ
 		}
 
 	}
@@ -265,23 +265,23 @@ void calc_judge(double NowTime, C2D_Sprite sprites[Sprite_Number]) {
 
 	if (isJudgeDisp == true) {
 
-		//ƒAƒjƒ[ƒVƒ‡ƒ“
+		//ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³
 		if (NowTime - JudgeMakeTime < 0.05)  JudgeY = 73+(NowTime - JudgeMakeTime)*140;
 		if (JudgeY >= 80) JudgeY = 80;
 
 		switch (JudgeDispknd) {
 
-		case 0:		//—Ç
+		case 0:		//è‰¯
 			C2D_SpriteSetPos(&sprites[jUdge_ryou], 92, JudgeY );
 			C2D_DrawSprite(&sprites[jUdge_ryou]);
 			break;
 
-		case 1:		//‰Â
+		case 1:		//å¯
 			C2D_SpriteSetPos(&sprites[jUdge_ka], 92, JudgeY );
 			C2D_DrawSprite(&sprites[jUdge_ka]);
 			break;
 
-		case 2:		//•s‰Â
+		case 2:		//ä¸å¯
 			C2D_SpriteSetPos(&sprites[jUdge_fuka], 92, JudgeY );
 			C2D_DrawSprite(&sprites[jUdge_fuka]);
 			break;
@@ -295,12 +295,12 @@ void calc_judge(double NowTime, C2D_Sprite sprites[Sprite_Number]) {
 
 void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 	
-	int CurrentJudgeNotes[2] = { -1,-1 };		//Œ»İ”»’è‚·‚×‚«ƒm[ƒc ƒhƒ“,ƒJƒc
-	double CurrentJudgeNotesLag[2] = { -1,-1 };	//”»’è‚·‚×‚«ƒm[ƒc‚ÌŒë·(s)
+	int CurrentJudgeNotes[2] = { -1,-1 };		//ç¾åœ¨åˆ¤å®šã™ã¹ããƒãƒ¼ãƒ„ ãƒ‰ãƒ³,ã‚«ãƒ„
+	double CurrentJudgeNotesLag[2] = { -1,-1 };	//åˆ¤å®šã™ã¹ããƒãƒ¼ãƒ„ã®èª¤å·®(s)
 	
 	JudgeRendaState = -1;
 
-	//˜A‘Å‚Ìó‘Ô
+	//é€£æ‰“ã®çŠ¶æ…‹
 	for (int i = 0; i < Renda_Max; i++) {
 
 		if (RendaNotes[i].flag == true && 
@@ -309,7 +309,7 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 	}
 
 	int JudgeBalloonState = -1;
-	//•—‘D‚Ìˆ—
+	//é¢¨èˆ¹ã®å‡¦ç†
 	for (int i = 0; i < Balloon_Max; i++) {
 
 		if (BalloonNotes[i].flag == true && Notes[BalloonNotes[i].start_id].judge_time <= NowTime) {
@@ -318,14 +318,14 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 		}
 	}
 
-	//”»’è‚·‚×‚«ƒm[ƒc‚ğŒŸõ
+	//åˆ¤å®šã™ã¹ããƒãƒ¼ãƒ„ã‚’æ¤œç´¢
 	for (int i = 0; i < Notes_Max-1; i++) {
 
 		if (Notes[i].flag == true) {
 
 			if (Notes[i].knd == Don ||
 				Notes[i].knd == BigDon ||
-				Notes[i].knd == Potato) {	//ƒhƒ“
+				Notes[i].knd == Potato) {	//ãƒ‰ãƒ³
 
 				if (CurrentJudgeNotesLag[0] > fabs(Notes[i].judge_time - NowTime) ||
 					CurrentJudgeNotesLag[0] == -1) {
@@ -336,7 +336,7 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 			}
 			else if (
 				Notes[i].knd == Ka ||
-				Notes[i].knd == BigKa) {	//ƒJƒc
+				Notes[i].knd == BigKa) {	//ã‚«ãƒ„
 
 				if (CurrentJudgeNotesLag[1] > fabs(Notes[i].judge_time - NowTime) ||
 					CurrentJudgeNotesLag[1] == -1) {
@@ -348,7 +348,7 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 		}
 	}
 
-	if (isAuto == true) {	//ƒI[ƒg
+	if (isAuto == true) {	//ã‚ªãƒ¼ãƒˆ
 
 		bool isSe[2];
 
@@ -381,12 +381,12 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 			}
 		}
 
-		if (JudgeRendaState != -1) {	//˜A‘Å
+		if (JudgeRendaState != -1) {	//é€£æ‰“
 
 			if(cnt % 5 == 0) music_play(0);
 		}
 
-		if (JudgeBalloonState != -1) {	//•—‘D
+		if (JudgeBalloonState != -1) {	//é¢¨èˆ¹
 
 			if (cnt % 4 == 0) {
 				music_play(0);
@@ -395,47 +395,47 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 		}
 	}
 
-	else if (isAuto == false) {			//è“®
+	else if (isAuto == false) {			//æ‰‹å‹•
 		
-		if (isDon == true && CurrentJudgeNotes[0] != -1) {	//ƒhƒ“
+		if (isDon == true && CurrentJudgeNotes[0] != -1) {	//ãƒ‰ãƒ³
 
-			if (CurrentJudgeNotesLag[0] <= 0.034) {			//—Ç
+			if (CurrentJudgeNotesLag[0] <= 0.034) {			//è‰¯
 				make_judge(0,NowTime);
 				delete_notes(CurrentJudgeNotes[0]);
 			}
-			else if (CurrentJudgeNotesLag[0] <= 0.117) {	//‰Â
+			else if (CurrentJudgeNotesLag[0] <= 0.117) {	//å¯
 				make_judge(1, NowTime);
 				delete_notes(CurrentJudgeNotes[0]);
 			}
-			else if (CurrentJudgeNotesLag[0] <= 0.150) {	//•s‰Â
+			else if (CurrentJudgeNotesLag[0] <= 0.150) {	//ä¸å¯
 				make_judge(2, NowTime);
 				delete_notes(CurrentJudgeNotes[0]);
 			}
 		}
 
-		if (isKa == true && CurrentJudgeNotes[1] != -1) {	//ƒJƒc
+		if (isKa == true && CurrentJudgeNotes[1] != -1) {	//ã‚«ãƒ„
 
-			if (CurrentJudgeNotesLag[1] <= 0.034) {			//—Ç
+			if (CurrentJudgeNotesLag[1] <= 0.034) {			//è‰¯
 				make_judge(0, NowTime);
 				delete_notes(CurrentJudgeNotes[1]);
 			}
-			else if (CurrentJudgeNotesLag[1] <= 0.117) {	//‰Â
+			else if (CurrentJudgeNotesLag[1] <= 0.117) {	//å¯
 				make_judge(1, NowTime);
 				delete_notes(CurrentJudgeNotes[1]);
 			}
-			else if (CurrentJudgeNotesLag[1] <= 0.150) {	//•s‰Â
+			else if (CurrentJudgeNotesLag[1] <= 0.150) {	//ä¸å¯
 				make_judge(2, NowTime);
 				delete_notes(CurrentJudgeNotes[1]);
 			}
 		}
 
-		if (JudgeBalloonState != -1 && isDon == true) {	//•—‘D
+		if (JudgeBalloonState != -1 && isDon == true) {	//é¢¨èˆ¹
 
 			BalloonNotes[JudgeBalloonState].current_hit++;
 		}
 	}
 
-	//•—‘D‚ÌÁ‹ˆ—
+	//é¢¨èˆ¹ã®æ¶ˆå»å‡¦ç†
 	if (JudgeBalloonState != -1 && BalloonNotes[JudgeBalloonState].current_hit >= BalloonNotes[JudgeBalloonState].need_hit) {
 
 		if (BalloonNotes[JudgeBalloonState].finish_id != -1) delete_notes(BalloonNotes[JudgeBalloonState].finish_id);
@@ -448,7 +448,7 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 
 void notes_calc(bool isDon,bool isKa,double bpm, double NowTime, int cnt, C2D_Sprite sprites[Sprite_Number]) {
 		
-	for (int i = 0; i < Notes_Max; i++) {	//ŒvZ
+	for (int i = 0; i < Notes_Max; i++) {	//è¨ˆç®—
 		
 		if (Notes[i].flag == true) {
 			
@@ -518,7 +518,7 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 
 	int notes_y = 109;
 
-	for (int i = 0; i < Notes_Max; i++) {	//•`‰æ
+	for (int i = 0; i < Notes_Max; i++) {	//æç”»
 
 		if (Notes[i].flag == true) {
 
@@ -619,7 +619,7 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 		}
 	}
 
-	//Š„‚ê‚½•—‘D
+	//å‰²ã‚ŒãŸé¢¨èˆ¹
 	if (isBalloonBreakDisp == true) {
 		BalloonBreakCount--;
 		C2D_ImageTint Tint;
@@ -655,7 +655,7 @@ int ctoi(char c) {
 	}
 }
 
-int notes_cmp(const void *p, const void *q) {	//”äŠr—p
+int notes_cmp(const void *p, const void *q) {	//æ¯”è¼ƒç”¨
 
 	int pp = ((NOTES_T*)p)->judge_time * 10000;
 	int qq = ((NOTES_T*)q)->judge_time * 10000;
@@ -666,7 +666,7 @@ int notes_cmp(const void *p, const void *q) {	//”äŠr—p
 	return qq - pp;
 }
 
-void notes_sort() {	//ƒm[ƒc‚ğoŒ»‡‚Éƒ\[ƒg
+void notes_sort() {	//ãƒãƒ¼ãƒ„ã‚’å‡ºç¾é †ã«ã‚½ãƒ¼ãƒˆ
 	int n = sizeof Notes / sizeof(NOTES_T);
 	qsort(Notes, n, sizeof(NOTES_T), notes_cmp);
 }
@@ -714,7 +714,7 @@ int make_renda_start(int NotesId) {
 	else return -1;
 }
 
-int find_renda_finish_id() {	//start‚Ì’l‚¾‚¯“ü‚Á‚Ä‚é˜A‘Åid‚ğ•Ô‚·
+int find_renda_finish_id() {	//startã®å€¤ã ã‘å…¥ã£ã¦ã‚‹é€£æ‰“idã‚’è¿”ã™
 
 	for (int i = 0; i < Renda_Max - 1; i++) {
 
@@ -788,7 +788,7 @@ int make_balloon_start(int NotesId) {
 	else return -1;
 }
 
-int find_balloon_finish_id() {	//start‚Ì’l‚¾‚¯“ü‚Á‚Ä‚é˜A‘Åid‚ğ•Ô‚·
+int find_balloon_finish_id() {	//startã®å€¤ã ã‘å…¥ã£ã¦ã‚‹é€£æ‰“idã‚’è¿”ã™
 
 	for (int i = 0; i < Balloon_Max - 1; i++) {
 
@@ -811,7 +811,7 @@ void delete_notes(int i) {
 	if (i >= 0 &&
 		Notes[i].renda_id != -1 &&
 		RendaNotes[Notes[i].renda_id].flag == true &&
-		(Notes[i].knd == RendaEnd || Notes[i].knd == BigRendaEnd)) {	//˜A‘Åíœ
+		(Notes[i].knd == RendaEnd || Notes[i].knd == BigRendaEnd)) {	//é€£æ‰“å‰Šé™¤
 
 		delete_notes(RendaNotes[Notes[i].renda_id].start_id);
 		delete_renda(Notes[i].renda_id);
@@ -819,7 +819,7 @@ void delete_notes(int i) {
 
 	if (i >= 0 &&
 		Notes[i].renda_id != -1 &&
-		BalloonNotes[Notes[i].renda_id].flag == true) {					//•—‘Díœ
+		BalloonNotes[Notes[i].renda_id].flag == true) {					//é¢¨èˆ¹å‰Šé™¤
 
 		if (Notes[i].knd == BalloonEnd) {
 
@@ -884,7 +884,7 @@ void notes_init(TJA_HEADER_T Tja_Header) {
 	JudgeDispknd = -1;
 	JudgeY = 70;
 	JudgeRendaState = -1;
-	isAuto = true;	//—v•ÏX
+	isAuto = true;	//è¦å¤‰æ›´
 	BalloonCount = 0;
 	BalloonBreakCount = 0;
 	isBalloonBreakDisp = false;

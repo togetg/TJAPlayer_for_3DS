@@ -1,13 +1,13 @@
-#include <string.h>
+﻿#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <3ds.h>
 #include <citro2d.h>
 #include <limits.h>
 
-#define File_Name "Test"
+#define File_Name "そつおめしき"
 
-#define Max_Notes_Measure 130	//�ꏬ�߂̍ő�m�[�c��+1
+#define Max_Notes_Measure 130	//一小節の最大ノーツ数+1
 #define Measure_Max 2048
 #define Notes_Area 400.0
 #define Notes_Judge 93

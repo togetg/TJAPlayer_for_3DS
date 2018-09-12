@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "tja.h"
 #include <citro2d.h>
 
@@ -15,21 +15,21 @@ void toggle_auto();
 void notes_init(TJA_HEADER_T Tja_Header);
 
 enum Notes_knd {
-	Rest = 0,	//‹x•„
-	Don,		//ƒhƒ“
-	Ka,			//ƒJƒc
-	BigDon,		//ƒhƒ“(‘å)
-	BigKa,		//ƒJƒc(‘å)
-	Renda,		//˜A‘ÅŠJn
-	BigRenda,	//˜A‘Å(‘å)ŠJn
-	Balloon,	//•—‘DŠJn
-	RendaEnd,	//˜A‘ÅI—¹
-	Potato,		//‚¨ˆğ‰¹•„ŠJn
-	BigRendaEnd,//‘å˜A‘ÅI—¹
-	BalloonEnd,	//•—‘DI—¹
+	Rest = 0,	//ä¼‘ç¬¦
+	Don,		//ãƒ‰ãƒ³
+	Ka,			//ã‚«ãƒ„
+	BigDon,		//ãƒ‰ãƒ³(å¤§)
+	BigKa,		//ã‚«ãƒ„(å¤§)
+	Renda,		//é€£æ‰“é–‹å§‹
+	BigRenda,	//é€£æ‰“(å¤§)é–‹å§‹
+	Balloon,	//é¢¨èˆ¹é–‹å§‹
+	RendaEnd,	//é€£æ‰“çµ‚äº†
+	Potato,		//ãŠèŠ‹éŸ³ç¬¦é–‹å§‹
+	BigRendaEnd,//å¤§é€£æ‰“çµ‚äº†
+	BalloonEnd,	//é¢¨èˆ¹çµ‚äº†
 };
 
-enum Sprite_Notes_knd {	//ƒXƒvƒ‰ƒCƒg—p
+enum Sprite_Notes_knd {	//ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç”¨
 	dOn = 2,
 	kA,
 	bIg_don,

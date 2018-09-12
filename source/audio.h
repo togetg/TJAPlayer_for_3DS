@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 void music_load();
 int music_play(int id);
 void music_exit();

@@ -1,4 +1,4 @@
-#include "header.h"
+ï»¿#include "header.h"
 #include "notes.h"
 #include "tja.h"
 
@@ -197,7 +197,7 @@ void tja_head_load(){
 		free(temp);
 
 	}else {
-		//tjaƒtƒ@ƒCƒ‹‚ªŠJ‚¯‚È‚©‚Á‚½
+		//tjaãƒ•ã‚¡ã‚¤ãƒ«ãŒé–‹ã‘ãªã‹ã£ãŸæ™‚
 	}
 }
 
@@ -350,7 +350,7 @@ void tja_to_notes(bool isDnon,bool isKa,int count, C2D_Sprite sprites[Sprite_Num
 
 }
 
-//ƒRƒ}ƒ“ƒh‚Æ’l‚ğæ‚èo‚·
+//ã‚³ãƒãƒ³ãƒ‰ã¨å€¤ã‚’å–ã‚Šå‡ºã™
 void get_command_value(char* buf, COMMAND_T *Command) {
 
 	bool isComment = false;
@@ -366,35 +366,35 @@ void get_command_value(char* buf, COMMAND_T *Command) {
 
 		Command->notes = buf;
 
-		if (strstr(buf, "//") != NULL) {	//ƒRƒƒ“ƒgˆ—
+		if (strstr(buf, "//") != NULL) {	//ã‚³ãƒ¡ãƒ³ãƒˆå‡¦ç†
 
 			comment = strstr(buf, "//") - buf - 1;
 			strlcpy(command, buf + 1, comment);
 			isComment = true;
 		}
 
-		if (strstr(buf, " ") != NULL) {		//’lˆ—
+		if (strstr(buf, " ") != NULL) {		//å€¤å‡¦ç†
 
 			space = strstr(buf, " ") - buf;
 
-			if (space < comment && isComment == true) {	//’l‚ ‚èƒRƒƒ“ƒg‚ ‚è
+			if (space < comment && isComment == true) {	//å€¤ã‚ã‚Šã‚³ãƒ¡ãƒ³ãƒˆã‚ã‚Š
 
 				strlcpy(command, buf + 1, space);
 				strlcpy(value, buf + 1 + strlen(command), comment - strlen(command) + 1);
 
 			}
-			else {	//’l‚ ‚èƒRƒƒ“ƒg‚È‚µ
+			else {	//å€¤ã‚ã‚Šã‚³ãƒ¡ãƒ³ãƒˆãªã—
 				strlcpy(command, buf + 1, space);
 				strlcpy(value, buf + 1 + strlen(command), length - strlen(command));
 			}
 		}
-		else {	//’l‚È‚µ
+		else {	//å€¤ãªã—
 
-			//ƒRƒƒ“ƒg‚ ‚è
+			//ã‚³ãƒ¡ãƒ³ãƒˆã‚ã‚Š
 			if (isComment == true) strlcpy(command, buf + 1, comment + 1);
-			//ƒRƒƒ“ƒg‚È‚µ ‰üs‚ ‚è
+			//ã‚³ãƒ¡ãƒ³ãƒˆãªã— æ”¹è¡Œã‚ã‚Š
 			else if (strstr(buf, "\n") != NULL) strlcpy(command, buf + 1, length - 2);
-			//ƒRƒƒ“ƒg‚È‚µ@‰üs‚È‚µ
+			//ã‚³ãƒ¡ãƒ³ãƒˆãªã—ã€€æ”¹è¡Œãªã—
 			else strlcpy(command, buf + 1, length);
 
 			strlcpy(value, "0", 1);
