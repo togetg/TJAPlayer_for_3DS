@@ -8,6 +8,6 @@ uint32_t rateVorbis(void);
 uint8_t channelVorbis(void);
 uint64_t decodeVorbis(void* buffer);
 void exitVorbis(void);
-int playVorbis(const char* in, bool *p_isPlayMain);
+//int playVorbis(const char* in, bool *p_isPlayMain);
 uint64_t fillVorbisBuffer(char* bufferOut);
 int isVorbis(const char* in);
