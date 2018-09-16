@@ -22,11 +22,11 @@ BALLOON_T BalloonNotes[Balloon_Max];
 
 int MeasureCount, RendaState, NotesCount, JudgeDispknd, JudgeRendaState, BalloonBreakCount,
 NotesNumber;	//何番目のノーツか
-bool  isNotesLoad= true,isAuto = true,isJudgeDisp = false,isBalloonBreakDisp = false;	//要初期化
+bool  isNotesLoad= true,isAuto = false,isJudgeDisp = false,isBalloonBreakDisp = false;	//要初期化
 double JudgeMakeTime, JudgeY;
 
 void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Measure],MEASURE_T Measure[Measure_Max], int cnt, C2D_Sprite  sprites[Sprite_Number]) {
-
+	
 	//最初の小節のcreate_timeがマイナスだった時用に調整
 	double NowTime = time_now(0) + Measure[0].create_time;
 
@@ -35,7 +35,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 
 	if ( cnt >= 0 && isNotesLoad== true) {
 
-		if (Measure[MeasureCount].create_time <= NowTime) {
+		while (Measure[MeasureCount].create_time <= NowTime) {
 
 			int BarLineId = find_line_id();
 			if (BarLineId != -1) {
@@ -51,7 +51,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 
 			NotesCount = 0;
 
-			while (isNotesLoad == true && tja_notes[Measure[MeasureCount].notes][NotesCount] != ',') {
+			while (isNotesLoad == true && tja_notes[Measure[MeasureCount].notes][NotesCount] != ',' && tja_notes[Measure[MeasureCount].notes][NotesCount] != '\n') {
 
 				//命令
 				if (NotesCount == 0 && tja_notes[Measure[MeasureCount].notes][0] == '#') {
@@ -73,31 +73,40 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 					MeasureCount++;
 					continue;
 				}
-				if (NotesCount == 0 && strstr(tja_notes[Measure[MeasureCount].notes], ",") == NULL) {
-					NotesCount = 0;
-					MeasureCount++;
-					continue;
-				}
+
 				NotesCount++;
+			}
+
+			int NotesCountStart,NotesCountMax;
+
+			if (Measure[MeasureCount].firstmeasure != -1) {
+
+				NotesCountStart = Measure[MeasureCount].start_measure_count;
+				NotesCountMax = Measure[Measure[MeasureCount].firstmeasure].max_notes;
+			}
+			else {
+
+				NotesCountStart = 0;
+				NotesCountMax = NotesCount;
 			}
 
 			for (int i = 0; i < NotesCount; i++) {
 
 				int id = find_notes_id();
 
-				if (id != -1 && tja_notes[Measure[MeasureCount].notes][i] != '0') {
+				if (id != -1 && ctoi(tja_notes[Measure[MeasureCount].notes][i]) != 0) {
 
 					Notes[id].flag = true;
 					Notes[id].notes_max = NotesCount;	//用途不明
 					Notes[id].num = NotesNumber;
 					Notes[id].scroll = Measure[MeasureCount].scroll;
-					Notes[id].x_ini = ((Notes_Area*Measure[MeasureCount].measure / NotesCount)*i + Notes_Judge_Range)*Notes[id].scroll + Notes_Judge;
+					Notes[id].x_ini = ((Notes_Area*Measure[MeasureCount].measure / NotesCountMax)*(i+NotesCountStart) + Notes_Judge_Range)*Notes[id].scroll + Notes_Judge;
 					Notes[id].x = Notes[id].x_ini;
 					Notes[id].bpm = Measure[MeasureCount].bpm;
 					Notes[id].knd = ctoi(tja_notes[Measure[MeasureCount].notes][i]);
 					//Notes[id].create_time = NowTime;
 					Notes[id].pop_time = Measure[MeasureCount].pop_time;
-					Notes[id].judge_time = Measure[MeasureCount].judge_time + 60.0 / Measure[MeasureCount].bpm * 4 * Measure[MeasureCount].measure * i / NotesCount;
+					Notes[id].judge_time = Measure[MeasureCount].judge_time + 60.0 / Measure[MeasureCount].bpm * 4 * Measure[MeasureCount].measure * (i+NotesCountStart) / NotesCountMax;
 					Notes[id].renda_id = -1;
 
 					int renda_id = -1;
@@ -202,12 +211,14 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 
 			BarLine[i].x = BarLine[i].x_ini -
 				Notes_Area * BarLine[i].scroll * (NowTime - Measure[BarLine[i].measure].pop_time) / (60 / Measure[BarLine[i].measure].bpm * 4);
-			if (BarLine[i].isDisp == true)
+			if (BarLine[i].isDisp == true){
 				C2D_DrawRectangle(BarLine[i].x, 86, 0, 1, 46, C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1));
+				snprintf(buf_notes, sizeof(buf_notes), "%d", BarLine[i].measure);
+				debug_draw(BarLine[i].x - 10, 133, buf_notes);
+				}
 			
 			if (BarLine[i].x < 62) BarLine[i].flag = false;
-			//snprintf(buf_notes, sizeof(buf_notes), "%.1f", Measure[BarLine[i].measure].create_time);
-			//debug_draw(BarLine[i].x-10, 133, buf_notes);
+
 		}
 	}
 
@@ -215,14 +226,13 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 	notes_draw(sprites);
 
 	C2D_DrawRectangle(0 ,86, 0, 62, 58, C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1));
-	debug_draw(0, 40, tja_notes[Measure[MeasureCount-1].notes]);
-	snprintf(buf_notes, sizeof(buf_notes), "%d",MeasureCount-1);
+	int n =2;
+	debug_draw(0, 40, tja_notes[Measure[n].notes]);
+	snprintf(buf_notes, sizeof(buf_notes), "%d",Measure[n].start_measure_count);
 	debug_draw(0, 50, buf_notes);
-	snprintf(buf_notes, sizeof(buf_notes), "%d", balloon[4]);
-	debug_draw(0, 60, buf_notes);
 
-	snprintf(buf_notes, sizeof(buf_notes), "time1:%.2f", NowTime);
-	debug_draw(0, 0, buf_notes);
+	//snprintf(buf_notes, sizeof(buf_notes), "time1:%.2f", NowTime);
+	//debug_draw(0, 0, buf_notes);
 	snprintf(buf_notes, sizeof(buf_notes), "cnt :%d", cnt);
 	debug_draw(150, 0, buf_notes);
 
@@ -232,8 +242,6 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 	debug_draw(0, 30, buf_notes);
 	snprintf(buf_notes, sizeof(buf_notes), "create :%.1f", Measure[MeasureCount].create_time);
 	debug_draw(200, 30, buf_notes);
-	snprintf(buf_notes, sizeof(buf_notes), "Renda :%d", JudgeRendaState);
-	debug_draw(300, 30, buf_notes);
 }
 
 int find_notes_id() {
@@ -307,9 +315,9 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 			Notes[RendaNotes[i].start_id].judge_time < NowTime &&
 			(RendaNotes[i].finish_id == -1 || Notes[RendaNotes[i].finish_id].judge_time > NowTime)) JudgeRendaState = RendaNotes[i].knd;
 	}
-
-	int JudgeBalloonState = -1;
+	
 	//風船の処理
+	int JudgeBalloonState = -1;
 	for (int i = 0; i < Balloon_Max; i++) {
 
 		if (BalloonNotes[i].flag == true && Notes[BalloonNotes[i].start_id].judge_time <= NowTime) {
@@ -357,7 +365,7 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 			if (Notes[i].flag == true && Notes[i].judge_time <= NowTime && 
 				(Notes[i].knd != Renda && Notes[i].knd != BigRenda && Notes[i].knd != BigRendaEnd &&
 				Notes[i].knd != RendaEnd && Notes[i].knd != Balloon && Notes[i].knd != BalloonEnd)) {
-
+				
 				if (isSe[0] == false ||
 					Notes[i].knd == Don ||
 					Notes[i].knd == BigDon ||
@@ -614,8 +622,8 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 			default:
 				break;
 			}
-			//snprintf(buf_notes, sizeof(buf_notes), "%d", BalloonNotes[Notes[i].renda_id].need_hit);
-			//debug_draw(Notes[i].x, 132, buf_notes);
+			snprintf(buf_notes, sizeof(buf_notes), "%.1f", Notes[i].judge_time);
+			debug_draw(Notes[i].x, 132, buf_notes);
 		}
 	}
 

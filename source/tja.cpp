@@ -4,7 +4,7 @@
 
 
 char tja_notes[Measure_Max][Max_Notes_Measure];
-int tja_cnt = 0,MeasureMaxNumber=0;
+int tja_cnt = 0, MeasureMaxNumber = 0;
 double MainFirstMeasureTime;
 
 
@@ -18,6 +18,7 @@ void measure_structure_init() {
 	for (int i = 0; i < Measure_Max; i++) {
 
 		Measure[i].create_time = INT_MAX;
+		Measure[i].create_time_cmp = INT_MAX;
 		Measure[i].judge_time = INT_MAX;
 		Measure[i].pop_time = INT_MAX;
 		Measure[i].bpm = 0;
@@ -25,6 +26,9 @@ void measure_structure_init() {
 		Measure[i].notes = 0;
 		Measure[i].flag = false;
 		Measure[i].isDispBarLine = true;
+		Measure[i].firstmeasure = -1;
+		Measure[i].start_measure_count = 0;
+		Measure[i].max_notes = 0;
 	}
 }
 
@@ -32,31 +36,31 @@ void tja_init() {
 	measure_structure_init();
 }
 
-void tja_head_load(){
-	
-	FILE *fp; 
+void tja_head_load() {
+
+	FILE *fp;
 	char buf[128];
 
-	char default_title[] = "No title", 
-		 default_subtitle[] = "",
-		 default_level[] = "0",
-		 default_bpm[] = "60", 
-		 default_wave[] = "test.ogg", 
-		 default_offset[] = "0", 
-		 default_balloon[] = "5", 
-		 default_songvol[] = "100", 
-		 default_sevol[] = "100", 
-		 default_scoreinit[] = "-1", 
-		 default_scorediff[] = "-1",
-		 default_course[] = "oni",
-		 default_style[] = "1", 
-		 default_life[] = "-1", 
-		 default_demostart[] = "0", 
-		 default_side[] = "3",
-		 default_scoremode[] = "1";
-	
+	char default_title[] = "No title",
+		default_subtitle[] = "",
+		default_level[] = "0",
+		default_bpm[] = "60",
+		default_wave[] = "test.ogg",
+		default_offset[] = "0",
+		default_balloon[] = "5",
+		default_songvol[] = "100",
+		default_sevol[] = "100",
+		default_scoreinit[] = "-1",
+		default_scorediff[] = "-1",
+		default_course[] = "oni",
+		default_style[] = "1",
+		default_life[] = "-1",
+		default_demostart[] = "0",
+		default_side[] = "3",
+		default_scoremode[] = "1";
+
 	if ((fp = fopen("sdmc:/tjafiles/" File_Name "/" File_Name ".tja", "r")) != NULL) {
-		
+
 		Current_Header.title = default_title;
 		Current_Header.subtitle = default_subtitle;
 		Current_Header.level = atoi(default_level);
@@ -91,7 +95,7 @@ void tja_head_load(){
 			}
 
 			if (strstr(buf, "SUBTITLE:") == buf) {
-				strlcpy(temp, buf +9, 128);
+				strlcpy(temp, buf + 9, 128);
 				Current_Header.subtitle = temp;
 				continue;
 			}
@@ -101,7 +105,7 @@ void tja_head_load(){
 				Current_Header.level = atoi(temp);
 				continue;
 			}
-			
+
 			if (strstr(buf, "BPM:") == buf) {
 				strlcpy(temp, buf + 4, 128);
 				Current_Header.bpm = atof(temp);
@@ -152,13 +156,15 @@ void tja_head_load(){
 			if (strstr(buf, "SCOREDIFF:") == buf) {
 				strlcpy(temp, buf + 10, 128);
 				Current_Header.scorediff = atoi(temp);
-				continue;}
+				continue;
+			}
 
 
 			if (strstr(buf, "COURSE:") == buf) {
 				strlcpy(temp, buf + 7, 128);
 				Current_Header.course = atoi(temp);
-				continue;}
+				continue;
+			}
 
 			if (strstr(buf, "STYLE:") == buf) {
 				strlcpy(temp, buf + 6, 128);
@@ -186,17 +192,18 @@ void tja_head_load(){
 
 			if (strstr(buf, "SCOREMODE:") == buf) {
 				strlcpy(temp, buf + 10, 128);
-				Current_Header.scoremode= atoi(temp);
+				Current_Header.scoremode = atoi(temp);
 				continue;
 			}
 
 			free(temp);
 		}
 
-		fclose(fp);		
+		fclose(fp);
 		free(temp);
 
-	}else {
+	}
+	else {
 		//tjaファイルが開けなかった時
 	}
 }
@@ -220,7 +227,9 @@ void MeasureInsertionSort(MEASURE_T t[], int array_size) {
 
 void tja_notes_load() {
 
-	bool isStart = false,isEnd = false,isDispBarLine = true;
+	int FirstMultiMeasure = -1,	//複数行の小節の最初の小節id 複数出ない場合は-1
+		NotesCount = 0;
+	bool isStart = false, isEnd = false, isDispBarLine = true,isNoComma = false;
 	FILE *fp;
 	COMMAND_T Command;
 	double bpm = Current_Header.bpm,
@@ -234,19 +243,19 @@ void tja_notes_load() {
 
 		tja_cnt = 0;
 		int MeasureCount = 0;
-		double PreJudge=0,FirstMeasureTime = 0;
+		double PreJudge = 0, FirstMeasureTime = 0;
 
 
 		//MainFirstMeasureTime = (60.0 / bpm * measure*4)*((Notes_Area - Notes_Judge) / Notes_Area);
 
-		FirstMeasureTime = (60.0 / bpm * 4*measure)*(Notes_Judge_Range / Notes_Area) - 60.0 / bpm * 4*measure;
+		FirstMeasureTime = (60.0 / bpm * 4 * measure)*(Notes_Judge_Range / Notes_Area) - 60.0 / bpm * 4 * measure;
 		PreJudge = FirstMeasureTime;
 
 
 		while (
-			(fgets(tja_notes[tja_cnt], Max_Notes_Measure, fp) != NULL ||
-			tja_cnt < Measure_Max) &&
-			isEnd == false) {
+			(fgets(tja_notes[tja_cnt], Max_Notes_Measure, fp) != NULL || tja_cnt < Measure_Max) &&
+			isEnd == false
+			) {
 
 			if (isStart == false && strstr(tja_notes[tja_cnt], "#START") == tja_notes[tja_cnt]) {
 
@@ -255,21 +264,20 @@ void tja_notes_load() {
 			}
 
 			if (isStart == true) {
-				
-				if (
-					(strstr(tja_notes[tja_cnt], "//") == tja_notes[tja_cnt] || 
-					strstr(tja_notes[tja_cnt], ",") == NULL ||
-						(
-							strstr(tja_notes[tja_cnt], ",") != NULL &&
-							strstr(tja_notes[tja_cnt], "//") != NULL &&
-							strstr(tja_notes[tja_cnt], ",") > strstr(tja_notes[tja_cnt], "//")
-						)
-					) &&
-					tja_notes[tja_cnt][0] != '#'
-					) {
+
+				//一文字目がコメントアウトの時スキップ
+				if (strstr(tja_notes[tja_cnt], "//") == tja_notes[tja_cnt]) {
 
 					tja_cnt++;
 					continue;
+				}
+
+				if (strstr(tja_notes[tja_cnt], ",") == NULL && tja_notes[tja_cnt][0] != '#') {
+					isNoComma = true;
+					if(FirstMultiMeasure == -1) FirstMultiMeasure = MeasureCount;
+				}
+				else {
+					isNoComma = false;
 				}
 
 				if (tja_notes[tja_cnt][0] == '#') {
@@ -301,23 +309,49 @@ void tja_notes_load() {
 						break;
 					}
 				}
-				
+				else {
+
+					if (isNoComma == true || NotesCount != 0) {
+						Measure[MeasureCount].start_measure_count = NotesCount;
+						int i = 0;
+						while (tja_notes[tja_cnt][i] != '\n' && tja_notes[tja_cnt][i] != ',') i++;
+						NotesCount += i-1;
+					}
+				}
+
 				Measure[MeasureCount].notes = tja_cnt;
+				Measure[MeasureCount].firstmeasure = FirstMultiMeasure;
 				Measure[MeasureCount].bpm = NextBpm;
 				Measure[MeasureCount].measure = NextMeasure;
 				Measure[MeasureCount].scroll = scroll;
-				Measure[MeasureCount].judge_time = 60.0 / bpm * 4*measure + PreJudge + delay;
+				Measure[MeasureCount].judge_time = 60.0 / bpm * 4 * measure + PreJudge + delay;
 				Measure[MeasureCount].pop_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4)*(Notes_Judge_Range / Notes_Area);
 				Measure[MeasureCount].create_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4)*(Notes_Judge_Range / (Notes_Area*scroll));
 				Measure[MeasureCount].create_time_cmp = Measure[MeasureCount].create_time;
+
 				if (MeasureCount != 0 &&
 					Measure[MeasureCount].create_time_cmp == Measure[MeasureCount - 1].create_time_cmp) {
 					Measure[MeasureCount].create_time_cmp += 0.0001;
 				}
-				Measure[MeasureCount].isDispBarLine = isDispBarLine;
 
-				if (tja_notes[tja_cnt][0] != '#') {
-					PreJudge = Measure[MeasureCount].judge_time;
+				else Measure[MeasureCount].isDispBarLine = isDispBarLine;
+
+				if (isNoComma == false) {
+
+					if (NotesCount != 0) {	//複数小節の最後の行
+						Measure[Measure[MeasureCount].firstmeasure].max_notes = NotesCount+1;
+						FirstMultiMeasure = -1;
+						NotesCount = 0;
+						Measure[MeasureCount].isDispBarLine = false;
+					}
+				}
+
+				if (tja_notes[tja_cnt][0] == '#') {
+					Measure[MeasureCount].create_time = Measure[MeasureCount - 1].create_time;
+					Measure[MeasureCount].isDispBarLine = false;
+				}
+				else{
+					if (isNoComma == false) PreJudge = Measure[MeasureCount].judge_time;
 					bpm = NextBpm;
 					measure = NextMeasure;
 					delay = 0;
@@ -334,7 +368,7 @@ void tja_notes_load() {
 
 		MeasureMaxNumber = tja_cnt;
 		fclose(fp);
-		MeasureInsertionSort(Measure,Measure_Max);
+		MeasureInsertionSort(Measure, Measure_Max);
 		MainFirstMeasureTime = Measure[0].judge_time - Measure[0].create_time;
 	}
 }
@@ -344,9 +378,9 @@ void get_head(TJA_HEADER_T *Tja_Header) {
 	*Tja_Header = Current_Header;
 }
 
-void tja_to_notes(bool isDnon,bool isKa,int count, C2D_Sprite sprites[Sprite_Number]) {
-	
-	notes_main(isDnon, isKa, tja_notes,Measure,count,sprites);
+void tja_to_notes(bool isDnon, bool isKa, int count, C2D_Sprite sprites[Sprite_Number]) {
+
+	notes_main(isDnon, isKa, tja_notes, Measure, count, sprites);
 
 }
 
@@ -428,7 +462,7 @@ void get_command_value(char* buf, COMMAND_T *Command) {
 				free(molecule);
 			}
 			else {
-				if(strtod(value, NULL) != 0) Command->val = strtod(value, NULL);
+				if (strtod(value, NULL) != 0) Command->val = strtod(value, NULL);
 				else Command->val = 1.0;
 			}
 		}
