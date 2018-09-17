@@ -21,7 +21,7 @@ typedef struct {
 typedef struct {
 	double judge_time, create_time,create_time_cmp,pop_time,
 		bpm, speed,measure,scroll;
-	int notes,firstmeasure,start_measure_count,max_notes;
+	int notes,firstmeasure,start_measure_count,max_notes,original_id;	//ソート前のid
 	bool flag,isDispBarLine;
 } MEASURE_T;
 
@@ -32,3 +32,4 @@ void get_command_value(char* buf, COMMAND_T *Command);
 void get_head(TJA_HEADER_T *Tja_Header);
 void tja_init();
 double get_FirstMeasureTime();
+int MeasureIdFromOriginalId(int id);
