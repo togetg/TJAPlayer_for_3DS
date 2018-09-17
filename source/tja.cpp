@@ -29,6 +29,7 @@ void measure_structure_init() {
 		Measure[i].firstmeasure = -1;
 		Measure[i].start_measure_count = 0;
 		Measure[i].max_notes = 0;
+		Measure[i].original_id = -1;
 	}
 }
 
@@ -274,7 +275,12 @@ void tja_notes_load() {
 
 				if (strstr(tja_notes[tja_cnt], ",") == NULL && tja_notes[tja_cnt][0] != '#') {
 					isNoComma = true;
-					if(FirstMultiMeasure == -1) FirstMultiMeasure = MeasureCount;
+
+					if (FirstMultiMeasure == -1) {
+
+						FirstMultiMeasure = MeasureCount;
+						Measure[FirstMultiMeasure].original_id = FirstMultiMeasure;	//ソート前のidを格納
+					}
 				}
 				else {
 					isNoComma = false;
@@ -314,8 +320,9 @@ void tja_notes_load() {
 					if (isNoComma == true || NotesCount != 0) {
 						Measure[MeasureCount].start_measure_count = NotesCount;
 						int i = 0;
-						while (tja_notes[tja_cnt][i] != '\n' && tja_notes[tja_cnt][i] != ',') i++;
+						while (tja_notes[tja_cnt][i] != '\n' && tja_notes[tja_cnt][i] != ',' && tja_notes[tja_cnt][i] != '/') i++;
 						NotesCount += i-1;
+						if (tja_notes[tja_cnt][i] == '/') NotesCount++;
 					}
 				}
 
@@ -338,7 +345,7 @@ void tja_notes_load() {
 
 				if (isNoComma == false) {
 
-					if (NotesCount != 0) {	//複数小節の最後の行
+					if (NotesCount != 0 && tja_notes[tja_cnt][0] != '#') {	//複数小節の最後の行
 						Measure[Measure[MeasureCount].firstmeasure].max_notes = NotesCount+1;
 						FirstMultiMeasure = -1;
 						NotesCount = 0;
@@ -378,9 +385,9 @@ void get_head(TJA_HEADER_T *Tja_Header) {
 	*Tja_Header = Current_Header;
 }
 
-void tja_to_notes(bool isDnon, bool isKa, int count, C2D_Sprite sprites[Sprite_Number]) {
+void tja_to_notes(bool isDon, bool isKa, int count, C2D_Sprite sprites[Sprite_Number]) {
 
-	notes_main(isDnon, isKa, tja_notes, Measure, count, sprites);
+	notes_main(isDon, isKa, tja_notes, Measure, count, sprites);
 
 }
 
@@ -496,4 +503,13 @@ void get_command_value(char* buf, COMMAND_T *Command) {
 
 double get_FirstMeasureTime() {
 	return MainFirstMeasureTime;
+}
+
+int MeasureIdFromOriginalId(int id) {
+
+	for (int i = 0; i < Measure_Max; i++) {
+
+		if (Measure[i].original_id == id) return i;
+	}
+	return -1;
 }

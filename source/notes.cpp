@@ -51,7 +51,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 
 			NotesCount = 0;
 
-			while (isNotesLoad == true && tja_notes[Measure[MeasureCount].notes][NotesCount] != ',' && tja_notes[Measure[MeasureCount].notes][NotesCount] != '\n') {
+			while (isNotesLoad == true && tja_notes[Measure[MeasureCount].notes][NotesCount] != ',' && tja_notes[Measure[MeasureCount].notes][NotesCount] != '\n' && tja_notes[Measure[MeasureCount].notes][NotesCount] != '/') {
 
 				//命令
 				if (NotesCount == 0 && tja_notes[Measure[MeasureCount].notes][0] == '#') {
@@ -79,10 +79,10 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 
 			int NotesCountStart,NotesCountMax;
 
-			if (Measure[MeasureCount].firstmeasure != -1) {
+			if (Measure[MeasureCount].firstmeasure != -1 && MeasureIdFromOriginalId(Measure[MeasureCount].firstmeasure) != -1) {
 
 				NotesCountStart = Measure[MeasureCount].start_measure_count;
-				NotesCountMax = Measure[Measure[MeasureCount].firstmeasure].max_notes;
+				NotesCountMax = Measure[MeasureIdFromOriginalId(Measure[MeasureCount].firstmeasure)].max_notes;
 			}
 			else {
 
@@ -226,7 +226,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 	notes_draw(sprites);
 
 	C2D_DrawRectangle(0 ,86, 0, 62, 58, C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1));
-	int n =2;
+	int n =4;
 	debug_draw(0, 40, tja_notes[Measure[n].notes]);
 	snprintf(buf_notes, sizeof(buf_notes), "%d",Measure[n].start_measure_count);
 	debug_draw(0, 50, buf_notes);
