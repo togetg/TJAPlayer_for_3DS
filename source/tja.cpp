@@ -30,6 +30,7 @@ void measure_structure_init() {
 		Measure[i].start_measure_count = 0;
 		Measure[i].max_notes = 0;
 		Measure[i].original_id = -1;
+		Measure[i].notes_count = 0;
 	}
 }
 
@@ -238,7 +239,8 @@ void tja_notes_load() {
 		measure = 1,
 		scroll = 1,
 		NextMeasure = 1,
-		delay = 0;
+		delay = 0,
+		percent = 1;
 
 	if ((fp = fopen("sdmc:/tjafiles/" File_Name  "/" File_Name ".tja", "r")) != NULL) {
 
@@ -317,12 +319,16 @@ void tja_notes_load() {
 				}
 				else {
 
-					if (isNoComma == true || NotesCount != 0) {
+					if (isNoComma == true || NotesCount != 0) {	//複数小節
+
 						Measure[MeasureCount].start_measure_count = NotesCount;
 						int i = 0;
 						while (tja_notes[tja_cnt][i] != '\n' && tja_notes[tja_cnt][i] != ',' && tja_notes[tja_cnt][i] != '/') i++;
-						NotesCount += i-1;
+						NotesCount += i - 1;
 						if (tja_notes[tja_cnt][i] == '/') NotesCount++;
+						if (tja_notes[tja_cnt][i] != ',' && tja_notes[tja_cnt][i] != '/') i--;
+						Measure[MeasureCount].notes_count = i;
+						
 					}
 				}
 
@@ -331,7 +337,7 @@ void tja_notes_load() {
 				Measure[MeasureCount].bpm = NextBpm;
 				Measure[MeasureCount].measure = NextMeasure;
 				Measure[MeasureCount].scroll = scroll;
-				Measure[MeasureCount].judge_time = 60.0 / bpm * 4 * measure + PreJudge + delay;
+				Measure[MeasureCount].judge_time = 60.0 / bpm * 4 * measure * percent + PreJudge + delay;
 				Measure[MeasureCount].pop_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4)*(Notes_Judge_Range / Notes_Area);
 				Measure[MeasureCount].create_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4)*(Notes_Judge_Range / (Notes_Area*scroll));
 				Measure[MeasureCount].create_time_cmp = Measure[MeasureCount].create_time;
@@ -340,29 +346,50 @@ void tja_notes_load() {
 					Measure[MeasureCount].create_time_cmp == Measure[MeasureCount - 1].create_time_cmp) {
 					Measure[MeasureCount].create_time_cmp += 0.0001;
 				}
+				
 
-				else Measure[MeasureCount].isDispBarLine = isDispBarLine;
-
-				if (isNoComma == false) {
-
-					if (NotesCount != 0 && tja_notes[tja_cnt][0] != '#') {	//複数小節の最後の行
-						Measure[Measure[MeasureCount].firstmeasure].max_notes = NotesCount+1;
-						FirstMultiMeasure = -1;
-						NotesCount = 0;
-						Measure[MeasureCount].isDispBarLine = false;
-					}
-				}
 
 				if (tja_notes[tja_cnt][0] == '#') {
 					Measure[MeasureCount].create_time = Measure[MeasureCount - 1].create_time;
-					Measure[MeasureCount].isDispBarLine = false;
+					Measure[MeasureCount].judge_time = Measure[MeasureCount - 1].judge_time;
+					//Measure[MeasureCount].isDispBarLine = false;
 				}
-				else{
+				else {
 					if (isNoComma == false) PreJudge = Measure[MeasureCount].judge_time;
 					bpm = NextBpm;
 					measure = NextMeasure;
 					delay = 0;
 				}
+
+
+				if (isNoComma == false && NotesCount != 0 && tja_notes[tja_cnt][0] != '#') {	//複数行小節の最後の行
+
+					Measure[Measure[MeasureCount].firstmeasure].max_notes = NotesCount + 1;
+					FirstMultiMeasure = -1;
+					NotesCount = 0;
+
+					for (int i = 1; i < MeasureCount - Measure[MeasureCount].firstmeasure + 1; i++) {	//judge_timeの調整
+
+						if (tja_notes[Measure[MeasureCount].notes][0] != '#') {	//複数行小節の最初の小節以外
+
+							Measure[Measure[MeasureCount].firstmeasure + i].judge_time =
+								Measure[Measure[MeasureCount].firstmeasure + i - 1].judge_time +
+								(60.0 / Measure[Measure[MeasureCount].firstmeasure + i - 1].bpm * 4 * Measure[Measure[MeasureCount].firstmeasure + i - 1].measure)
+								* Measure[Measure[MeasureCount].firstmeasure + i - 1].notes_count / Measure[Measure[MeasureCount].firstmeasure].max_notes;	//delayはとりあえず放置
+							Measure[Measure[MeasureCount].firstmeasure + i].pop_time = Measure[Measure[MeasureCount].firstmeasure + i].judge_time - (60.0 / Measure[Measure[MeasureCount].firstmeasure + i].bpm * 4)*(Notes_Judge_Range / (Notes_Area));
+							Measure[Measure[MeasureCount].firstmeasure + i].create_time = Measure[Measure[MeasureCount].firstmeasure + i].judge_time - (60.0 / Measure[Measure[MeasureCount].firstmeasure + i].bpm * 4)*(Notes_Judge_Range / (Notes_Area*Measure[Measure[MeasureCount].firstmeasure + i].scroll));
+							percent = (double)Measure[Measure[MeasureCount].firstmeasure + i].notes_count / (double)Measure[Measure[MeasureCount].firstmeasure].max_notes;
+							
+							Measure[Measure[MeasureCount].firstmeasure + i].isDispBarLine = false;	//最初の小節は小節線をオフにしない
+						}
+					}
+
+					PreJudge = Measure[MeasureCount].judge_time;
+				}
+				else if (tja_notes[tja_cnt][0] != '#') {
+					percent = 1;
+				}
+
 
 				if (isEnd == true) {
 					break;

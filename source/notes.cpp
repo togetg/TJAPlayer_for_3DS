@@ -79,13 +79,14 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 
 			int NotesCountStart,NotesCountMax;
 
-			if (Measure[MeasureCount].firstmeasure != -1 && MeasureIdFromOriginalId(Measure[MeasureCount].firstmeasure) != -1) {
+			if (Measure[MeasureCount].firstmeasure != -1 && MeasureIdFromOriginalId(Measure[MeasureCount].firstmeasure) != -1
+				) {
 
-				NotesCountStart = Measure[MeasureCount].start_measure_count;
+				NotesCountStart = 0;// Measure[MeasureCount].start_measure_count;
 				NotesCountMax = Measure[MeasureIdFromOriginalId(Measure[MeasureCount].firstmeasure)].max_notes;
 			}
 			else {
-
+			
 				NotesCountStart = 0;
 				NotesCountMax = NotesCount;
 			}
@@ -213,8 +214,8 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 				Notes_Area * BarLine[i].scroll * (NowTime - Measure[BarLine[i].measure].pop_time) / (60 / Measure[BarLine[i].measure].bpm * 4);
 			if (BarLine[i].isDisp == true){
 				C2D_DrawRectangle(BarLine[i].x, 86, 0, 1, 46, C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1));
-				snprintf(buf_notes, sizeof(buf_notes), "%d", BarLine[i].measure);
-				debug_draw(BarLine[i].x - 10, 133, buf_notes);
+				//snprintf(buf_notes, sizeof(buf_notes), "%d", BarLine[i].measure);
+				//debug_draw(BarLine[i].x - 10, 133, buf_notes);
 				}
 			
 			if (BarLine[i].x < 62) BarLine[i].flag = false;
@@ -226,9 +227,9 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 	notes_draw(sprites);
 
 	C2D_DrawRectangle(0 ,86, 0, 62, 58, C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1));
-	int n =4;
+	int n =3;
 	debug_draw(0, 40, tja_notes[Measure[n].notes]);
-	snprintf(buf_notes, sizeof(buf_notes), "%d",Measure[n].start_measure_count);
+	snprintf(buf_notes, sizeof(buf_notes), "%.1f,%.1f,%.1f,%.1f,%.1f",Measure[0].judge_time, Measure[1].judge_time, Measure[2].judge_time, Measure[3].judge_time, Measure[4].judge_time);
 	debug_draw(0, 50, buf_notes);
 
 	//snprintf(buf_notes, sizeof(buf_notes), "time1:%.2f", NowTime);
@@ -622,8 +623,8 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 			default:
 				break;
 			}
-			snprintf(buf_notes, sizeof(buf_notes), "%.1f", Notes[i].judge_time);
-			debug_draw(Notes[i].x, 132, buf_notes);
+			//snprintf(buf_notes, sizeof(buf_notes), "%.1f", Notes[i].judge_time);
+			//debug_draw(Notes[i].x, 132, buf_notes);
 		}
 	}
 
