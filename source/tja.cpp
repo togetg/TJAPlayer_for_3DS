@@ -18,7 +18,6 @@ void measure_structure_init() {
 	for (int i = 0; i < Measure_Max; i++) {
 
 		Measure[i].create_time = INT_MAX;
-		Measure[i].create_time_cmp = INT_MAX;
 		Measure[i].judge_time = INT_MAX;
 		Measure[i].pop_time = INT_MAX;
 		Measure[i].bpm = 0;
@@ -340,14 +339,7 @@ void tja_notes_load() {
 				Measure[MeasureCount].judge_time = 60.0 / bpm * 4 * measure * percent + PreJudge + delay;
 				Measure[MeasureCount].pop_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4)*(Notes_Judge_Range / Notes_Area);
 				Measure[MeasureCount].create_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4)*(Notes_Judge_Range / (Notes_Area*scroll));
-				Measure[MeasureCount].create_time_cmp = Measure[MeasureCount].create_time;
-
-				if (MeasureCount != 0 &&
-					Measure[MeasureCount].create_time_cmp == Measure[MeasureCount - 1].create_time_cmp) {
-					Measure[MeasureCount].create_time_cmp += 0.0001;
-				}
-				
-
+				Measure[MeasureCount].isDispBarLine = isDispBarLine;
 
 				if (tja_notes[tja_cnt][0] == '#') {
 					Measure[MeasureCount].create_time = Measure[MeasureCount - 1].create_time;
