@@ -206,7 +206,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 	}
 
 	
-	for (int i = 0; i < (BarLine_Max - 1); i++) {
+	for (int i = 0; i < BarLine_Max - 1; i++) {
 
 		if (BarLine[i].flag == true) {
 
@@ -227,11 +227,13 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 	notes_draw(sprites);
 
 	C2D_DrawRectangle(0 ,86, 0, 62, 58, C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1));
-	int n =3;
-	debug_draw(0, 40, tja_notes[Measure[n].notes]);
-	snprintf(buf_notes, sizeof(buf_notes), "%.1f,%.1f,%.1f,%.1f,%.1f",Measure[0].judge_time, Measure[1].judge_time, Measure[2].judge_time, Measure[3].judge_time, Measure[4].judge_time);
-	debug_draw(0, 50, buf_notes);
 
+	snprintf(buf_notes, sizeof(buf_notes),"%d:%s", MeasureCount - 1,tja_notes[MeasureCount - 1]);
+	debug_draw(0, 40, buf_notes);
+	snprintf(buf_notes, sizeof(buf_notes), "連打:%d", JudgeRendaState);
+	debug_draw(0, 50, buf_notes);
+	snprintf(buf_notes, sizeof(buf_notes), "連打0 flag:%d:fini:%d:start:%d", RendaNotes[0].flag, RendaNotes[0].finish_id, RendaNotes[0].start_id);
+	debug_draw(0, 60, buf_notes);
 	//snprintf(buf_notes, sizeof(buf_notes), "time1:%.2f", NowTime);
 	//debug_draw(0, 0, buf_notes);
 	snprintf(buf_notes, sizeof(buf_notes), "cnt :%d", cnt);
@@ -247,7 +249,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 
 int find_notes_id() {
 
-	for (int i = 0; i < Notes_Max-1; i++) {
+	for (int i = 0; i < Notes_Max - 1; i++) {
 
 		if (Notes[i].flag == false) return i;
 	}
@@ -310,16 +312,16 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 	JudgeRendaState = -1;
 
 	//連打の状態
-	for (int i = 0; i < Renda_Max; i++) {
+	for (int i = 0; i < Renda_Max - 1; i++) {
 
 		if (RendaNotes[i].flag == true && 
 			Notes[RendaNotes[i].start_id].judge_time < NowTime &&
-			(RendaNotes[i].finish_id == -1 || Notes[RendaNotes[i].finish_id].judge_time > NowTime)) JudgeRendaState = RendaNotes[i].knd;
+			(RendaNotes[i].finish_id == -1 ||  (RendaNotes[i].finish_id != -1 && Notes[RendaNotes[i].finish_id].judge_time > NowTime))) JudgeRendaState = RendaNotes[i].knd;
 	}
 	
 	//風船の処理
 	int JudgeBalloonState = -1;
-	for (int i = 0; i < Balloon_Max; i++) {
+	for (int i = 0; i < Balloon_Max - 1; i++) {
 
 		if (BalloonNotes[i].flag == true && Notes[BalloonNotes[i].start_id].judge_time <= NowTime) {
 			JudgeBalloonState = i;
@@ -328,7 +330,7 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 	}
 
 	//判定すべきノーツを検索
-	for (int i = 0; i < Notes_Max-1; i++) {
+	for (int i = 0; i < Notes_Max - 1; i++) {
 
 		if (Notes[i].flag == true) {
 
@@ -457,7 +459,7 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 
 void notes_calc(bool isDon,bool isKa,double bpm, double NowTime, int cnt, C2D_Sprite sprites[Sprite_Number]) {
 		
-	for (int i = 0; i < Notes_Max; i++) {	//計算
+	for (int i = 0; i < Notes_Max-1; i++) {	//計算
 		
 		if (Notes[i].flag == true) {
 			
@@ -467,28 +469,28 @@ void notes_calc(bool isDon,bool isKa,double bpm, double NowTime, int cnt, C2D_Sp
 			switch (Notes[i].knd) {
 
 			case Renda:
-				if (Notes[i].renda_id != -1) {
+				if (Notes[i].renda_id != -1 && RendaNotes[Notes[i].renda_id].flag == true) {
 					RendaNotes[Notes[i].renda_id].start_x = Notes[i].x;
 					RendaNotes[Notes[i].renda_id].start_id = i;
 				}
 				break;
 
 			case RendaEnd:
-				if (Notes[i].renda_id != -1) {
+				if (Notes[i].renda_id != -1 && RendaNotes[Notes[i].renda_id].flag == true) {
 					RendaNotes[Notes[i].renda_id].finish_x = Notes[i].x;
 					RendaNotes[Notes[i].renda_id].finish_id = i;
 				}
 				break;
 
 			case BigRenda:
-				if (Notes[i].renda_id != -1) {
+				if (Notes[i].renda_id != -1 && RendaNotes[Notes[i].renda_id].flag == true) {
 					RendaNotes[Notes[i].renda_id].start_x = Notes[i].x;
 					RendaNotes[Notes[i].renda_id].start_id = i;
 				}
 				break;
 
 			case BigRendaEnd:
-				if (Notes[i].renda_id != -1) {
+				if (Notes[i].renda_id != -1 && RendaNotes[Notes[i].renda_id].flag == true) {
 					RendaNotes[Notes[i].renda_id].finish_x = Notes[i].x;
 					RendaNotes[Notes[i].renda_id].finish_id = i;
 				}
@@ -515,7 +517,7 @@ void notes_calc(bool isDon,bool isKa,double bpm, double NowTime, int cnt, C2D_Sp
 			}
 		}
 			
-		if (Notes[i].x <= 20 && 
+		if (Notes[i].x <= 20 &&
 			Notes[i].knd != Renda && Notes[i].knd != BigRenda) delete_notes(i);
 	}
 
@@ -527,7 +529,7 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 
 	int notes_y = 109;
 
-	for (int i = 0; i < Notes_Max; i++) {	//描画
+	for (int i = 0; i < Notes_Max - 1; i++) {	//描画
 
 		if (Notes[i].flag == true) {
 
@@ -550,32 +552,38 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 				break;
 			case Renda: {
 
-				double finish_x;
-				if (RendaNotes[Notes[i].renda_id].finish_id == -1) finish_x = TOP_WIDTH;
-				else finish_x = RendaNotes[Notes[i].renda_id].finish_x;
-				
-				for (int n = 0; n < (finish_x - RendaNotes[Notes[i].renda_id].start_x) / 9.0; n++) {
-					C2D_SpriteSetPos(&sprites[rEnda_int], Notes[i].x + 9 * n, notes_y);
-					C2D_DrawSprite(&sprites[rEnda_int]);
+				if (RendaNotes[Notes[i].renda_id].flag == true) {
+
+					double finish_x;
+					if (RendaNotes[Notes[i].renda_id].finish_id == -1) finish_x = TOP_WIDTH;
+					else finish_x = RendaNotes[Notes[i].renda_id].finish_x;
+
+					for (int n = 0; n < (finish_x - RendaNotes[Notes[i].renda_id].start_x) / 9.0; n++) {
+						C2D_SpriteSetPos(&sprites[rEnda_int], Notes[i].x + 9 * n, notes_y);
+						C2D_DrawSprite(&sprites[rEnda_int]);
+					}
+					C2D_SpriteSetPos(&sprites[rEnda_start], Notes[i].x, notes_y);
+					C2D_DrawSprite(&sprites[rEnda_start]);
 				}
-				C2D_SpriteSetPos(&sprites[rEnda_start], Notes[i].x, notes_y);
-				C2D_DrawSprite(&sprites[rEnda_start]);
 				break;
 			}
 			case BigRenda: {
 
-				double finish_x;
-				if (RendaNotes[Notes[i].renda_id].finish_id == -1) finish_x = TOP_WIDTH;
-				else finish_x = RendaNotes[Notes[i].renda_id].finish_x;
+				if (RendaNotes[Notes[i].renda_id].flag == true) {
 
-				for (int n = 0; n < (finish_x - RendaNotes[Notes[i].renda_id].start_x) / 9.0; n++) {
-					C2D_SpriteSetPos(&sprites[bIg_renda_int], Notes[i].x + 9 * n, notes_y);
-					C2D_DrawSprite(&sprites[bIg_renda_int]);
+					double finish_x;
+					if (RendaNotes[Notes[i].renda_id].finish_id == -1) finish_x = TOP_WIDTH;
+					else finish_x = RendaNotes[Notes[i].renda_id].finish_x;
+
+					for (int n = 0; n < (finish_x - RendaNotes[Notes[i].renda_id].start_x) / 9.0; n++) {
+						C2D_SpriteSetPos(&sprites[bIg_renda_int], Notes[i].x + 9 * n, notes_y);
+						C2D_DrawSprite(&sprites[bIg_renda_int]);
+					}
+
+					C2D_SpriteSetPos(&sprites[bIg_renda_start], Notes[i].x, notes_y);
+					C2D_DrawSprite(&sprites[bIg_renda_start]);
+					break;
 				}
-
-				C2D_SpriteSetPos(&sprites[bIg_renda_start], Notes[i].x, notes_y);
-				C2D_DrawSprite(&sprites[bIg_renda_start]);
-				break;
 			}
 			case Balloon:
 
@@ -623,8 +631,8 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 			default:
 				break;
 			}
-			//snprintf(buf_notes, sizeof(buf_notes), "%.1f", Notes[i].judge_time);
-			//debug_draw(Notes[i].x, 132, buf_notes);
+			snprintf(buf_notes, sizeof(buf_notes), "%d", Notes[i].knd);
+			debug_draw(Notes[i].x, 132, buf_notes);
 		}
 	}
 
@@ -682,19 +690,20 @@ void notes_sort() {	//ノーツを出現順にソート
 
 void delete_renda(int i) {
 
-	if (i >= 0 && i <= Renda_Max) {
+	if (i >= 0 && i < Renda_Max) {
 		RendaNotes[i].id = -1;
 		RendaNotes[i].start_x = -1;
 		RendaNotes[i].start_id = -1;
 		RendaNotes[i].finish_x = -1;
 		RendaNotes[i].finish_id = -1;
 		RendaNotes[i].flag = false;
+		RendaNotes[i].knd = -1;
 	}
 }
 
 void renda_notes_init() {
 
-	for (int i = 0; i < Renda_Max; i++) {
+	for (int i = 0; i < Renda_Max - 1; i++) {
 		delete_renda(i);
 	}
 }
@@ -753,7 +762,7 @@ void make_balloon_break() {
 
 void delete_balloon(int i) {
 
-	if (i >= 0 && i <= Balloon_Max) {
+	if (i >= 0 && i < Balloon_Max) {
 		BalloonNotes[i].id = -1;
 		BalloonNotes[i].start_id = -1;
 		BalloonNotes[i].finish_id = -1;
@@ -765,7 +774,7 @@ void delete_balloon(int i) {
 
 void balloon_notes_init() {
 
-	for (int i = 0; i < Balloon_Max; i++) {
+	for (int i = 0; i < Balloon_Max - 1; i++) {
 		delete_balloon(i);
 	}
 }
@@ -822,7 +831,22 @@ void delete_notes(int i) {
 		RendaNotes[Notes[i].renda_id].flag == true &&
 		(Notes[i].knd == RendaEnd || Notes[i].knd == BigRendaEnd)) {	//連打削除
 
-		delete_notes(RendaNotes[Notes[i].renda_id].start_id);
+		//delete_notes(RendaNotes[Notes[i].renda_id].start_id);
+		int n = RendaNotes[Notes[i].renda_id].start_id;
+		if (n >= 0 && n < Notes_Max) {
+			Notes[n].flag = false;
+			Notes[n].num = 0;
+			Notes[n].knd = 0;
+			Notes[n].notes_max = 0;
+			Notes[n].x_ini = 0;
+			Notes[n].x = 0;
+			Notes[n].create_time = 0;
+			Notes[n].judge_time = 0;
+			Notes[n].pop_time = 0;
+			Notes[n].bpm = 0;
+			Notes[n].scroll = 0;
+			Notes[n].renda_id = -1;
+		}
 		delete_renda(Notes[i].renda_id);
 	}
 
@@ -846,7 +870,7 @@ void delete_notes(int i) {
 		}
 	}
 
-	if (i >= 0 && i <= Notes_Max) {
+	if (i >= 0 && i < Notes_Max) {
 		Notes[i].flag = false;
 		Notes[i].num = 0;
 		Notes[i].knd = 0;
@@ -864,7 +888,7 @@ void delete_notes(int i) {
 
 void notes_structure_init() {
 
-	for (int i = 0; i < Notes_Max; i++) {
+	for (int i = 0; i < Notes_Max - 1; i++) {
 		delete_notes(i);
 	}
 }
