@@ -268,7 +268,7 @@ void tja_notes_load() {
 			if (isStart == true) {
 
 				//一文字目がコメントアウトの時スキップ
-				if (strstr(tja_notes[tja_cnt], "//") == tja_notes[tja_cnt]) {
+				if (strstr(tja_notes[tja_cnt], "//") == tja_notes[tja_cnt] || strstr(tja_notes[tja_cnt], "\r") == tja_notes[tja_cnt]) {
 
 					tja_cnt++;
 					continue;
