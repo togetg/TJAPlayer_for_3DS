@@ -459,12 +459,12 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 
 void notes_calc(bool isDon,bool isKa,double bpm, double NowTime, int cnt, C2D_Sprite sprites[Sprite_Number]) {
 		
-	for (int i = 0; i < Notes_Max-1; i++) {	//計算
-		
+	for (int i = 0; i < Notes_Max - 1; i++) {	//計算
+
 		if (Notes[i].flag == true) {
-			
+
 			Notes[i].x = Notes[i].x_ini -
-				Notes_Area* Notes[i].scroll * (NowTime - Notes[i].pop_time) / (60 / Notes[i].bpm * 4);
+				Notes_Area * Notes[i].scroll * (NowTime - Notes[i].pop_time) / (60 / Notes[i].bpm * 4);
 
 			switch (Notes[i].knd) {
 
@@ -495,7 +495,7 @@ void notes_calc(bool isDon,bool isKa,double bpm, double NowTime, int cnt, C2D_Sp
 					RendaNotes[Notes[i].renda_id].finish_id = i;
 				}
 				break;
-			
+
 			case Balloon:
 				if (Notes[i].x <= Notes_Judge) Notes[i].x = Notes_Judge;
 				if (Notes[i].renda_id != -1) {
@@ -516,7 +516,10 @@ void notes_calc(bool isDon,bool isKa,double bpm, double NowTime, int cnt, C2D_Sp
 				break;
 			}
 		}
-			
+	}
+	
+	for (int i = 0; i < Notes_Max - 1; i++) {	//連弾のバグ回避のためノーツの削除は一番最後
+
 		if (Notes[i].x <= 20 &&
 			Notes[i].knd != Renda && Notes[i].knd != BigRenda) delete_notes(i);
 	}
@@ -691,6 +694,7 @@ void notes_sort() {	//ノーツを出現順にソート
 void delete_renda(int i) {
 
 	if (i >= 0 && i < Renda_Max) {
+		if (RendaNotes[i].start_id != -1 && Notes[RendaNotes[i].start_id].flag == true) delete_notes(RendaNotes[i].start_id);
 		RendaNotes[i].id = -1;
 		RendaNotes[i].start_x = -1;
 		RendaNotes[i].start_id = -1;
@@ -828,8 +832,9 @@ void delete_notes(int i) {
 
 	if (i >= 0 &&
 		Notes[i].renda_id != -1 &&
-		RendaNotes[Notes[i].renda_id].flag == true &&
-		(Notes[i].knd == RendaEnd || Notes[i].knd == BigRendaEnd)) {	//連打削除
+		(Notes[i].knd == RendaEnd || Notes[i].knd == BigRendaEnd) &&
+		RendaNotes[Notes[i].renda_id].flag == true
+		) {	//連打削除
 
 		//delete_notes(RendaNotes[Notes[i].renda_id].start_id);
 		int n = RendaNotes[Notes[i].renda_id].start_id;
