@@ -4,13 +4,13 @@
 #include "tja.h"
 #include "audio.h"
 #include "playback.h"
+#include "score.h"
 
 C2D_Sprite sprites[Sprite_Number];			//画像用
 static C2D_SpriteSheet spriteSheet;
 C2D_TextBuf g_dynamicBuf;
 char buf_main[160];
 C2D_Text dynText;
-TJA_HEADER_T Tja_Header;
 
 void debug_draw(float x, float y, const char *text) {
 
@@ -50,6 +50,8 @@ int main() {
 	C3D_RenderTarget* top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
 	C3D_RenderTarget* bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
 
+	TJA_HEADER_T TJA_Header;
+
 	g_dynamicBuf = C2D_TextBufNew(4096);
 
 	spriteSheet = C2D_SpriteSheetLoad("romfs:/gfx/sprites.t3x");
@@ -74,13 +76,14 @@ int main() {
 	tja_head_load();
 	music_load();
 	init_main_music();
-	get_head(&Tja_Header);
-	notes_init(Tja_Header);
+	get_tja_header(&TJA_Header);
+	notes_init(TJA_Header);
+	score_init();
 
 	int cnt = 0, notes_cnt = 0;
 	bool isNotesStart = false, isMusicStart = false;
 	double FirstMeasureTime = INT_MAX,
-		offset = Tja_Header.offset,
+		offset = TJA_Header.offset,
 		NowTime;
 
 	while (aptMainLoop()) {
@@ -162,6 +165,7 @@ int main() {
 			tja_to_notes(isDon, isKa, notes_cnt,sprites);
 			notes_cnt++;
 		}
+		scoer_debug();
 
 		C2D_TargetClear(bottom, C2D_Color32(0x00, 0x00, 0x00, 0xFF));	//下画面
 		C2D_SceneBegin(bottom);
