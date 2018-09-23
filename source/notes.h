@@ -12,7 +12,7 @@ void notes_main(
 void toggle_auto();
 
 
-void notes_init(TJA_HEADER_T Tja_Header);
+void notes_init(TJA_HEADER_T TJA_Header);
 
 enum Notes_knd {
 	Rest = 0,	//休符
@@ -20,12 +20,12 @@ enum Notes_knd {
 	Ka,			//カツ
 	BigDon,		//ドン(大)
 	BigKa,		//カツ(大)
-	Renda,		//連打開始
-	BigRenda,	//連打(大)開始
+	Roll,		//連打開始
+	BigRoll,	//連打(大)開始
 	Balloon,	//風船開始
-	RendaEnd,	//連打終了
+	RollEnd,	//連打終了
 	Potato,		//お芋音符開始
-	BigRendaEnd,//大連打終了
+	BigRollEnd,//大連打終了
 	BalloonEnd,	//風船終了
 };
 
@@ -34,12 +34,12 @@ enum Sprite_Notes_knd {	//スプライト用
 	kA,
 	bIg_don,
 	bIg_ka,
-	rEnda_start,
-	rEnda_int,
-	rEnda_fini,
-	bIg_renda_start,
-	bIg_renda_int,
-	bIg_renda_fini,
+	rOll_start,
+	rOll_int,
+	rOll_end,
+	bIg_roll_start,
+	bIg_roll_int,
+	bIg_roll_end,
 	bAlloon,
 	bAlloon_1,
 	bAlloon_2,
@@ -75,9 +75,9 @@ enum Command_knd {
 };
 
 typedef struct {
-	int num, notes_max, knd, renda_id;
+	int num, notes_max, knd, roll_id;
 	double x_ini, x, create_time, judge_time, pop_time,bpm,scroll;
-	bool flag;
+	bool flag,isThrough;
 	C2D_Sprite spr;
 
 } NOTES_T;
@@ -90,13 +90,15 @@ typedef struct {
 } BARLINE_T;
 
 typedef struct {
-	int id,start_id,finish_id,knd;
-	double start_x, finish_x;
+	int id,start_id,end_id,knd;
+	double start_x, end_x;
 	bool flag;
-}RENDA_T;
+
+}Roll_T;
 
 typedef struct {
-	int id, start_id, finish_id,
+	int id, start_id, end_id,
 		need_hit,current_hit;
 	bool flag;
+
 }BALLOON_T;
