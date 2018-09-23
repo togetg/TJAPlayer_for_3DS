@@ -4,6 +4,7 @@
 #include <3ds.h>
 #include <citro2d.h>
 #include <limits.h>
+#include <iconv.h>
 
 #define File_Name "そつおめしき"
 
@@ -18,9 +19,9 @@
 #define BOTTOM_WIDTH  320
 #define BOTTOM_HEIGHT 240
 
-#define Sprite_Number 21
+#define Sprite_Number 22
 
 #define Notes_Max 512
 #define BarLine_Max 64
-#define Renda_Max 64
+#define Roll_Max 64
 #define Balloon_Max 64
