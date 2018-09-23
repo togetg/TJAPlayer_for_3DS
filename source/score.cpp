@@ -4,58 +4,107 @@
 #include "main.h"
 #include "score.h"
 
-int CurrentScore,CurrentRollCount,TotalRollCount,combo,init,diff,DiffMul,HitScore;
+bool isGOGO;
+int CurrentScore,CurrentRollCount,TotalRollCount,combo,init,diff,DiffMul,scoremode,HitScore,ScoreDiff;
 TJA_HEADER_T TJA_Header;
 char buf_score[160];
 
 void score_init() {
 
 	CurrentScore = 0;
+	CurrentRollCount = 0;
+	TotalRollCount = 0;
 	combo = 0;
 	get_tja_header(&TJA_Header);
 	init = TJA_Header.scoreinit;
 	diff = TJA_Header.scorediff;
+	DiffMul = 0;
+	scoremode = TJA_Header.scoremode;
+	HitScore = 0;
+	ScoreDiff = 0;
 }
+
 
 void score_update(int knd) {
 
-	int temp;
+	int PreScore = CurrentScore;
+	bool isCombo = false;
 
-	if (0 <= combo && combo <= 9) DiffMul = 0;
-	else if (10 <= combo && combo <= 29) DiffMul = 1;
-	else if (30 <= combo && combo <= 49) DiffMul = 1;
-	else if (30 <= combo && combo <= 49) DiffMul = 2;
-	else if (50 <= combo && combo <= 99) DiffMul = 4;
-	else if (100 <= combo) DiffMul = 8;
 
-	HitScore = init + diff * DiffMul;
 
-	switch (knd) {
+	if (scoremode == 2) {
 
-	case RYOU:
-		CurrentScore += HitScore;
-		combo++;
-		break;
+		double GOGOMul;
+		if (isGOGO == true) GOGOMul = 1.2;
+		else GOGOMul = 1.0;
 
-	case KA:
-		temp = HitScore / 20;
-		temp *= 10;
-		CurrentScore += temp;
-		combo++;
-		break;
+		if (0 <= combo && combo < 9) DiffMul = 0;
+		else if (9 <= combo && combo < 29) DiffMul = 1;
+		else if (29 <= combo && combo < 49) DiffMul = 2;
+		else if (49 <= combo && combo < 99) DiffMul = 4;
+		else if (99 <= combo) DiffMul = 8;
 
-	case FUKA:
-		CurrentScore += 0;
-		combo = 0;
-		break;
+		HitScore = init + diff * DiffMul;
 
-	case THROUGH:
-		combo = 0;
-		break;
+		switch (knd) {
 
-	default:
-		break;
+		case RYOU:
+			CurrentScore += round_down(HitScore*GOGOMul);
+			combo++;
+			isCombo = true;
+			break;
+
+		case SPECIAL_RYOU:
+			CurrentScore += round_down(HitScore * GOGOMul) * 2;
+			combo++;
+			isCombo = true;
+			break;
+
+		case KA:
+			CurrentScore += round_down(HitScore / 2);
+			combo++;
+			isCombo = true;
+			break;
+
+		case SPECIAL_KA:
+			CurrentScore += round_down(HitScore - 10);
+			combo++;
+			isCombo = true;
+			break;
+
+		case FUKA:
+			CurrentScore += 0;
+			combo = 0;
+			break;
+
+		case THROUGH:
+			combo = 0;
+			break;
+
+		case BALLOON:
+		case ROLL:
+			if (isGOGO == true) CurrentScore += 360;
+			else CurrentScore += 300;
+			break;
+
+		case BIG_ROLL:
+			if (isGOGO == true) CurrentScore += 430;
+			else CurrentScore += 360;
+			break;
+
+		case BALLOON_BREAK:
+			if (isGOGO == true) CurrentScore += 6000;
+			else CurrentScore += 5000;
+			break;
+			break;
+
+		default:
+			break;
+		}
 	}
+
+	if (isCombo == true && combo % 100 == 0) CurrentScore += 10000;
+	ScoreDiff = CurrentScore - PreScore;
 }
 
 void scoer_debug() {
@@ -64,6 +113,19 @@ void scoer_debug() {
 	debug_draw(0, 150, buf_score);
 	snprintf(buf_score, sizeof(buf_score), "Scoremode:%d   Init:%d   Diff:%d",TJA_Header.scoremode,TJA_Header.scoreinit, TJA_Header.scorediff);
 	debug_draw(0, 160, buf_score);
-	snprintf(buf_score, sizeof(buf_score), "%dCombo    Score:%d    HitScore:%d:%d",combo,CurrentScore, HitScore, DiffMul);
+	snprintf(buf_score, sizeof(buf_score), "Score:%d    %dCombo    diff:%d",CurrentScore, combo, ScoreDiff);
 	debug_draw(0, 180, buf_score);
+	if (isGOGO == true) {
+		snprintf(buf_score, sizeof(buf_score), "GOGOTIME");
+		debug_draw(0, 190, buf_score);
+	}
+}
+
+void send_gogotime(bool arg) {
+	isGOGO = arg;
+}
+
+int round_down(int arg) {
+	int temp = arg % 10;
+	return arg - temp;
 }
