@@ -30,6 +30,7 @@ void measure_structure_init() {
 		Measure[i].max_notes = 0;
 		Measure[i].original_id = -1;
 		Measure[i].notes_count = 0;
+		Measure[i].command = -1;
 	}
 }
 
@@ -300,6 +301,13 @@ void tja_notes_load() {
 						break;
 					case ENd:
 						isEnd = true;
+						Measure[MeasureCount].command = ENd;
+						break;
+					case GOgostart:
+						Measure[MeasureCount].command = GOgostart;
+						break;
+					case GOgoend:
+						Measure[MeasureCount].command = GOgoend;
 						break;
 					default:
 						break;
@@ -320,6 +328,7 @@ void tja_notes_load() {
 					}
 				}
 
+				Measure[MeasureCount].flag = true;
 				Measure[MeasureCount].notes = tja_cnt;
 				Measure[MeasureCount].firstmeasure = FirstMultiMeasure;
 				Measure[MeasureCount].bpm = NextBpm;
