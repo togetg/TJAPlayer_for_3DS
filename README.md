@@ -13,8 +13,8 @@ TITLE等が文字化けする時はTJAファイルをUTF-8にエンコードし�
   - ~~SCROLL~~
   - ~~BARLINEON~~
   - ~~BARLINEOFF~~
-  - GOGOSTART
-  - GOGOEND
+  - ~~GOGOSTART~~
+  - ~~GOGOEND~~
   - LEVELHOLD
   - BMSCROLL
   - HBSCROLL
@@ -23,8 +23,8 @@ TITLE等が文字化けする時はTJAファイルをUTF-8にエンコードし�
   -  ~~風船~~
   -  イモ
 - ~~複数行に分かれた小節に対応~~
-- 得点実装 　　　←今ココ
-- 分岐譜面対応
+- 得点実装
+- 分岐譜面対応 　　　←今ココ
 - 魂ゲージ対応
 - 選曲画面実装
 - 譜面の文字コードを変換する機能の実装
