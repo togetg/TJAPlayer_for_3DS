@@ -23,13 +23,14 @@ BALLOON_T BalloonNotes[Balloon_Max];
 
 int MeasureCount, RollState, NotesCount, JudgeDispknd, JudgeRollState, BalloonBreakCount,
 NotesNumber;	//何番目のノーツか
-bool  isNotesLoad= true,isAuto = false,isJudgeDisp = false,isBalloonBreakDisp = false;	//要初期化
+bool  isNotesLoad= true,isAuto = false,isJudgeDisp = false,isBalloonBreakDisp = false, isGOGOTime = false;;	//要初期化
 double JudgeMakeTime, JudgeY;
 
 void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Measure],MEASURE_T Measure[Measure_Max], int cnt, C2D_Sprite  sprites[Sprite_Number]) {
 	
 	//最初の小節のcreate_timeがマイナスだった時用に調整
 	double NowTime = time_now(0) + Measure[0].create_time;
+	
 
 	snprintf(buf_notes, sizeof(buf_notes), "time:%.2f", NowTime);
 	debug_draw(0, 0, buf_notes);
@@ -73,7 +74,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 					MeasureCount++;
 					continue;
 				}
-
+				
 				NotesCount++;
 			}
 
@@ -206,6 +207,27 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 
 	}
 
+	for (int i = 0; i < Measure_Max - 1; i++) {
+
+		if (Measure[i].flag == true) {
+			
+			if (Measure[i].command != -1 && Measure[i].judge_time <= NowTime) {
+
+				switch (Measure[i].command) {
+				case GOgostart:
+					isGOGOTime = true;
+					break;
+				case GOgoend:
+					isGOGOTime = false;
+					break;
+				default:
+					break;
+				}
+			}
+
+			if (Measure[i].judge_time <= NowTime) Measure[i].flag = false;
+		}
+	}
 	
 	for (int i = 0; i < BarLine_Max - 1; i++) {
 
@@ -223,6 +245,8 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 
 		}
 	}
+
+	send_gogotime(isGOGOTime);
 
 	notes_calc(isDon,isKa,bpm, NowTime, cnt, sprites);
 	notes_draw(sprites);
@@ -365,8 +389,6 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 
 	if (isAuto == true) {	//オート
 
-		bool isSe[2];
-
 		for (int i = 0; i < Notes_Max-1; i++) {
 
 			if (Notes[i].flag == true && Notes[i].judge_time <= NowTime && 
@@ -375,38 +397,46 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 				
 				if (Notes[i].knd == Don ||
 					Notes[i].knd == BigDon ||
-					Notes[i].knd == Potato &&
-					isSe[0] == false) {
+					Notes[i].knd == Potato) {
 					
-					isSe[0] = true;
 					music_play(0);
 					make_judge(0, NowTime);
 				}
 				else if (
 					Notes[i].knd == Ka ||
-					Notes[i].knd == BigKa &&
-					isSe[0] == false) {
+					Notes[i].knd == BigKa) {
 
-					isSe[1] = true;
 					music_play(1);
 					make_judge(0, NowTime);
 				}
 
-				score_update(RYOU);
+				if (Notes[i].knd == BigDon || Notes[i].knd == BigKa) score_update(SPECIAL_RYOU);
+				else if (Notes[i].knd == Don || Notes[i].knd == Ka) score_update(RYOU);
+
 				delete_notes(i);
 			}
 		}
 
 		if (JudgeRollState != -1) {	//連打
 
-			if(cnt % 5 == 0) music_play(0);
+			if (cnt % 5 == 0) {
+
+				if (JudgeRollState == Roll) score_update(ROLL);
+				else if (JudgeRollState == BigRoll) score_update(BIG_ROLL);
+
+				music_play(0);
+			}
 		}
 
 		if (JudgeBalloonState != -1) {	//風船
 
 			if (cnt % 4 == 0) {
+
 				music_play(0);
 				BalloonNotes[JudgeBalloonState].current_hit++;
+
+				if (BalloonNotes[JudgeBalloonState].current_hit >= BalloonNotes[JudgeBalloonState].need_hit) score_update(BALLOON_BREAK);	//破裂
+				else score_update(BALLOON);
 			}
 		}
 	}
@@ -415,16 +445,21 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 		
 		if (isDon == true && CurrentJudgeNotes[0] != -1) {	//ドン
 
+			bool isBig;
+			if (Notes[CurrentJudgeNotes[0]].knd == BigDon || Notes[CurrentJudgeNotes[0]].knd == BigKa) isBig = true;
+			else isBig = false;
+
 			if (CurrentJudgeNotesLag[0] <= 0.034) {			//良
 				make_judge(0,NowTime);
 				delete_notes(CurrentJudgeNotes[0]);
-				score_update(RYOU);
-
+				if (isBig == true) score_update(SPECIAL_RYOU);
+				else score_update(RYOU);
 			}
 			else if (CurrentJudgeNotesLag[0] <= 0.117) {	//可
 				make_judge(1, NowTime);
 				delete_notes(CurrentJudgeNotes[0]);
-				score_update(KA);
+				if (isBig == true) score_update(SPECIAL_KA);
+				else score_update(KA);
 			}
 			else if (CurrentJudgeNotesLag[0] <= 0.150) {	//不可
 				make_judge(2, NowTime);
@@ -452,9 +487,24 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 			}
 		}
 
+		if (JudgeRollState != -1) {	//連打
+
+			if (isDon == true) {
+				if (JudgeRollState == Roll) score_update(ROLL);
+				else if (JudgeRollState == BigRoll) score_update(BIG_ROLL);
+			}
+			if (isKa == true) {
+				if (JudgeRollState == Roll) score_update(ROLL);
+				else if (JudgeRollState == BigRoll) score_update(BIG_ROLL);
+			}
+		}
+
 		if (JudgeBalloonState != -1 && isDon == true) {	//風船
 
 			BalloonNotes[JudgeBalloonState].current_hit++;
+
+			if (BalloonNotes[JudgeBalloonState].current_hit >= BalloonNotes[JudgeBalloonState].need_hit) score_update(BALLOON_BREAK);	//破裂
+			else score_update(BALLOON);
 		}
 	}
 
@@ -532,6 +582,7 @@ void notes_calc(bool isDon,bool isKa,double bpm, double NowTime, int cnt, C2D_Sp
 					score_update(THROUGH);
 					Notes[i].isThrough = true;
 				}
+				break;
 
 			default:
 				break;
@@ -934,4 +985,5 @@ void notes_init(TJA_HEADER_T TJA_Header) {
 	BalloonCount = 0;
 	BalloonBreakCount = 0;
 	isBalloonBreakDisp = false;
+	isGOGOTime = false;
 }
