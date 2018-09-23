@@ -42,91 +42,74 @@ void tja_head_load() {
 	FILE *fp;
 	char buf[128];
 
-	char default_title[] = "No title",
-		default_subtitle[] = "",
-		default_level[] = "0",
-		default_bpm[] = "60",
-		default_wave[] = "test.ogg",
-		default_offset[] = "0",
-		default_balloon[] = "5",
-		default_songvol[] = "100",
-		default_sevol[] = "100",
-		default_scoreinit[] = "-1",
-		default_scorediff[] = "-1",
-		default_course[] = "oni",
-		default_style[] = "1",
-		default_life[] = "-1",
-		default_demostart[] = "0",
-		default_side[] = "3",
-		default_scoremode[] = "1";
-
 	if ((fp = fopen("sdmc:/tjafiles/" File_Name "/" File_Name ".tja", "r")) != NULL) {
 
-		Current_Header.title = default_title;
-		Current_Header.subtitle = default_subtitle;
-		Current_Header.level = atoi(default_level);
-		Current_Header.bpm = atof(default_bpm);
-		Current_Header.wave = default_wave;
-		Current_Header.offset = atof(default_offset);
-		Current_Header.balloon[0] = atoi(default_balloon);
-		Current_Header.songvol = atoi(default_songvol);
-		Current_Header.sevol = atoi(default_sevol);
-		Current_Header.scoreinit = atoi(default_scoreinit);
-		Current_Header.scorediff = atoi(default_scorediff);
-		Current_Header.course = atoi(default_course);
-		Current_Header.style = atoi(default_style);
-		Current_Header.life = atoi(default_life);
-		Current_Header.demostart = atof(default_demostart);
-		Current_Header.side = atoi(default_side);
-		Current_Header.scoremode = atoi(default_scoremode);
+		Current_Header.title = (char*)"No title";
+		Current_Header.subtitle = (char*)"";
+		Current_Header.level = 0;
+		Current_Header.bpm = 60.0;
+		Current_Header.wave = (char*)"audio.ogg";
+		Current_Header.offset = 0;
+		Current_Header.balloon[0] = 5;
+		Current_Header.songvol = 100;
+		Current_Header.sevol = 100;
+		Current_Header.scoreinit = -1;
+		Current_Header.scorediff = -1;
+		Current_Header.course = 3;
+		Current_Header.style = 1;
+		Current_Header.life = -1;
+		Current_Header.demostart = 0;
+		Current_Header.side = 3;
+		Current_Header.scoremode = 1;
 
 		char* temp = NULL;
 		while (fgets(buf, 128, fp) != NULL) {
 
 			temp = (char *)malloc((strlen(buf) + 1));
 
+
 			if (strstr(buf, "#START") == buf) {
 				break;
 			}
 
 			if (strstr(buf, "TITLE:") == buf) {
-				strlcpy(temp, buf + 6, 128);
+				strlcpy(temp,buf+6, strlen(buf)-7);
 				Current_Header.title = temp;
 				continue;
 			}
 
 			if (strstr(buf, "SUBTITLE:") == buf) {
-				strlcpy(temp, buf + 9, 128);
+				strlcpy(temp, buf + 9, strlen(buf)-10);
 				Current_Header.subtitle = temp;
 				continue;
 			}
 
 			if (strstr(buf, "LEVEL:") == buf) {
-				strlcpy(temp, buf + 6, 128);
+				strlcpy(temp, buf + 6, strlen(buf)-7);
 				Current_Header.level = atoi(temp);
 				continue;
 			}
 
 			if (strstr(buf, "BPM:") == buf) {
-				strlcpy(temp, buf + 4, 128);
+				strlcpy(temp, buf + 4, strlen(buf)-5);
 				Current_Header.bpm = atof(temp);
 				continue;
 			}
 
 			if (strstr(buf, "WAVE:") == buf) {
-				strlcpy(temp, buf + 5, 128);
+				strlcpy(temp, buf + 5, strlen(buf)-6);
 				Current_Header.wave = temp;
 				continue;
 			}
 
 			if (strstr(buf, "OFFSET:") == buf) {
-				strlcpy(temp, buf + 7, 128);
+				strlcpy(temp, buf + 7, strlen(buf)-8);
 				Current_Header.offset = atof(temp);
 				continue;
 			}
 
 			if (strstr(buf, "BALLOON:") == buf) {
-				strlcpy(temp, buf + 8, 128);
+				strlcpy(temp, buf + 8, strlen(buf)-9);
 				char *tp = strtok(temp, ",");
 				Current_Header.balloon[0] = atoi(tp);
 				int cnt = 1;
@@ -138,61 +121,67 @@ void tja_head_load() {
 			}
 
 			if (strstr(buf, "SONGVOL:") == buf) {
-				strlcpy(temp, buf + 8, 128);
+				strlcpy(temp, buf + 8, strlen(buf)-9);
 				Current_Header.songvol = atoi(temp);
 				continue;
 			}
 
 			if (strstr(buf, "SEVOL:") == buf) {
-				strlcpy(temp, buf + 6, 128);
+				strlcpy(temp, buf + 6, strlen(buf)-7);
 				Current_Header.sevol = atoi(temp);
 				continue;
 			}
 
 			if (strstr(buf, "SCOREINIT:") == buf) {
-				strlcpy(temp, buf + 10, 128);
+				strlcpy(temp, buf + 10, strlen(buf)-11);
+				Current_Header.scoreinit = atoi(temp);
 				continue;
 			}
 
 			if (strstr(buf, "SCOREDIFF:") == buf) {
-				strlcpy(temp, buf + 10, 128);
+				strlcpy(temp, buf + 10, strlen(buf)-11);
 				Current_Header.scorediff = atoi(temp);
 				continue;
 			}
 
 
 			if (strstr(buf, "COURSE:") == buf) {
-				strlcpy(temp, buf + 7, 128);
-				Current_Header.course = atoi(temp);
+				strlcpy(temp, buf + 7, strlen(buf)-8);
+				if (strlen(temp) == 1) Current_Header.course = atoi(temp);		//数字表記
+				else if (strcmp(temp, "Easy") == 0) Current_Header.course = 0;	//文字表記
+				else if (strcmp(temp, "Normal") == 0) Current_Header.course = 1;
+				else if (strcmp(temp, "Hard") == 0) Current_Header.course = 2;
+				else if (strcmp(temp, "Oni") == 0) Current_Header.course = 3;
+				else if (strcmp(temp, "Edit") == 0) Current_Header.course = 4;
 				continue;
 			}
 
 			if (strstr(buf, "STYLE:") == buf) {
-				strlcpy(temp, buf + 6, 128);
+				strlcpy(temp, buf + 6, strlen(buf)-7);
 				Current_Header.style = atoi(temp);
 				continue;
 			}
 
 			if (strstr(buf, "LIFE:") == buf) {
-				strlcpy(temp, buf + 5, 128);
+				strlcpy(temp, buf + 5, strlen(buf)-6);
 				Current_Header.life = atoi(temp);
 				continue;
 			}
 
 			if (strstr(buf, "DEMOSTART:") == buf) {
-				strlcpy(temp, buf + 10, 128);
+				strlcpy(temp, buf + 10, strlen(buf)-11);
 				Current_Header.demostart = atof(temp);
 				continue;
 			}
 
 			if (strstr(buf, "SIDE:") == buf) {
-				strlcpy(temp, buf + 5, 128);
+				strlcpy(temp, buf + 5, strlen(buf)-6);
 				Current_Header.side = atoi(temp);
 				continue;
 			}
 
 			if (strstr(buf, "SCOREMODE:") == buf) {
-				strlcpy(temp, buf + 10, 128);
+				strlcpy(temp, buf + 10, strlen(buf)-11);
 				Current_Header.scoremode = atoi(temp);
 				continue;
 			}
@@ -399,9 +388,9 @@ void tja_notes_load() {
 	}
 }
 
-void get_head(TJA_HEADER_T *Tja_Header) {
+void get_tja_header(TJA_HEADER_T *TJA_Header) {
 
-	*Tja_Header = Current_Header;
+	*TJA_Header = Current_Header;
 }
 
 void tja_to_notes(bool isDon, bool isKa, int count, C2D_Sprite sprites[Sprite_Number]) {
