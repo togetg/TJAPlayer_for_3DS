@@ -21,7 +21,7 @@ typedef struct {
 typedef struct {
 	double judge_time, create_time,pop_time,
 		bpm, speed,measure,scroll;
-	int notes,firstmeasure,start_measure_count,max_notes,notes_count,
+	int notes,firstmeasure,start_measure_count,max_notes,notes_count,command,
 		original_id;	//ソート前のid
 	bool flag,isDispBarLine;
 } MEASURE_T;
