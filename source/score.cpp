@@ -43,17 +43,23 @@ void score_update(int knd) {
 	int PreScore = CurrentScore;
 	bool isCombo = false;
 
-	if (scoremode == 2) {
+	if (scoremode == 1 || scoremode == 2) {
 
 		double GOGOMul;
 		if (isGOGO == true) GOGOMul = 1.2;
 		else GOGOMul = 1.0;
 
-		if (0 <= combo && combo < 9) DiffMul = 0;
-		else if (9 <= combo && combo < 29) DiffMul = 1;
-		else if (29 <= combo && combo < 49) DiffMul = 2;
-		else if (49 <= combo && combo < 99) DiffMul = 4;
-		else if (99 <= combo) DiffMul = 8;
+		if (scoremode == 2) {	//新配点
+			if (0 <= combo && combo < 9) DiffMul = 0;
+			else if (9 <= combo && combo < 29) DiffMul = 1;
+			else if (29 <= combo && combo < 49) DiffMul = 2;
+			else if (49 <= combo && combo < 99) DiffMul = 4;
+			else if (99 <= combo) DiffMul = 8;
+		}
+		else if (scoremode == 1) {	//旧配点
+			DiffMul = (combo+1)/10;
+			if (combo > 100) DiffMul = 10;
+		}
 
 		HitScore = init + diff * DiffMul;
 
@@ -114,7 +120,9 @@ void score_update(int knd) {
 		}
 	}
 
-	if (isCombo == true && combo % 100 == 0) CurrentScore += 10000;
+	if (scoremode == 2) {	//100コンボ毎のボーナス(新配点のみ)
+		if (isCombo == true && combo % 100 == 0) CurrentScore += 10000;
+	}
 	ScoreDiff = CurrentScore - PreScore;
 }
 
@@ -144,7 +152,7 @@ int round_down(int arg) {
 
 void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max_Notes_Measure]) {	//初項と公差を計算
 	
-	int NotesCount = 0, i = 0, combo = 0, DfiffTmp = 0, BalloonCnt = 0, TmpBaseCeilingPoint = 0,NotesCountMax = 0,RollCnt=0,RollKnd=0;
+	int NotesCount = 0, i = 0, combo = 0, DiffTmp = 0, BalloonCnt = 0, TmpBaseCeilingPoint = 0,NotesCountMax = 0,RollCnt=0,RollKnd=0;
 	bool isEND = false;
 	double init_cnt=0,diff_cnt=0,gogo = 1,special = 1,roll_start_time=0, roll_end_time = 0;
 	COMMAND_T Command;
@@ -170,7 +178,7 @@ void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max
 	}
 	TmpBaseCeilingPoint = BaseCeilingPoint;
 
-	if ((TJA_Header.scoreinit == -1 || TJA_Header.scorediff == -1) && scoremode == 2) {	//新配点
+	if ((TJA_Header.scoreinit == -1 || TJA_Header.scorediff == -1) && (scoremode == 1 || scoremode == 2)) {	//新配点と旧配点
 
 		while (isEND == false && i < Measure_Max && Measure[i].flag == true) {	//小節
 
@@ -218,13 +226,21 @@ void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max
 						combo++;
 						init_cnt += 1 * gogo * special;
 
-						if (combo >= 1 && combo <= 9) DfiffTmp = 0;
-						else if (combo >= 10 && combo <= 29) DfiffTmp = 1;
-						else if (combo >= 30 && combo <= 49) DfiffTmp = 2;
-						else if (combo >= 50 && combo <= 99) DfiffTmp = 4;
-						else if (combo >= 100) DfiffTmp = 8;
+						if (scoremode == 1) {		//旧配点
 
-						diff_cnt += DfiffTmp * gogo * special;
+							if (combo > 100) DiffTmp = 10;
+							else DiffTmp = combo / 10;
+						}
+						else if (scoremode == 2) {	//新配点
+
+							if (combo >= 1 && combo <= 9) DiffTmp = 0;
+							else if (combo >= 10 && combo <= 29) DiffTmp = 1;
+							else if (combo >= 30 && combo <= 49) DiffTmp = 2;
+							else if (combo >= 50 && combo <= 99) DiffTmp = 4;
+							else if (combo >= 100) DiffTmp = 8;
+						}
+
+						diff_cnt += DiffTmp * gogo * special;
 					}
 					else if (knd == Balloon) {	//風船
 
