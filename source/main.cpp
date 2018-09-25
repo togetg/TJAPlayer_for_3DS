@@ -77,8 +77,9 @@ int main() {
 	music_load();
 	init_main_music();
 	get_tja_header(&TJA_Header);
-	notes_init(TJA_Header);
 	score_init();
+	notes_init(TJA_Header);
+
 
 	int cnt = 0, notes_cnt = 0;
 	bool isNotesStart = false, isMusicStart = false;
