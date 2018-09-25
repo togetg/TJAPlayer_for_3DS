@@ -10,7 +10,7 @@ int balloon[256],BalloonCount;
 double bpm, offset;
 char buf_notes[160];
 
-int find_notes_id(), find_line_id(), ctoi(char c), make_roll_start(int NotesId), make_roll_end(int NotesId), make_balloon_start(int NotesId), make_balloon_end(int NotesId);
+int find_notes_id(), find_line_id(), make_roll_start(int NotesId), make_roll_end(int NotesId), make_balloon_start(int NotesId), make_balloon_end(int NotesId);
 void notes_calc(bool isDon, bool isKa,double bpm, double NowTime, int cnt, C2D_Sprite sprites[Sprite_Number]);
 void notes_draw(C2D_Sprite sprites[Sprite_Number]),notes_sort(), delete_roll(int i), notes_init(TJA_HEADER_T TJA_Header), delete_notes(int i), make_balloon_break();
 
@@ -78,17 +78,14 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 				NotesCount++;
 			}
 
-			int NotesCountStart,NotesCountMax;
+			int NotesCountMax;
 
 			if (Measure[MeasureCount].firstmeasure != -1 && MeasureIdFromOriginalId(Measure[MeasureCount].firstmeasure) != -1
 				) {
 
-				NotesCountStart = 0;// Measure[MeasureCount].start_measure_count;
 				NotesCountMax = Measure[MeasureIdFromOriginalId(Measure[MeasureCount].firstmeasure)].max_notes;
 			}
 			else {
-			
-				NotesCountStart = 0;
 				NotesCountMax = NotesCount;
 			}
 
@@ -102,13 +99,13 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 					Notes[id].notes_max = NotesCount;
 					Notes[id].num = NotesNumber;
 					Notes[id].scroll = Measure[MeasureCount].scroll;
-					Notes[id].x_ini = ((Notes_Area*Measure[MeasureCount].measure / NotesCountMax)*(i+NotesCountStart) + Notes_Judge_Range)*Notes[id].scroll + Notes_Judge;
+					Notes[id].x_ini = ((Notes_Area*Measure[MeasureCount].measure / NotesCountMax)*i + Notes_Judge_Range)*Notes[id].scroll + Notes_Judge;
 					Notes[id].x = Notes[id].x_ini;
 					Notes[id].bpm = Measure[MeasureCount].bpm;
 					Notes[id].knd = ctoi(tja_notes[Measure[MeasureCount].notes][i]);
 					//Notes[id].create_time = NowTime;
 					Notes[id].pop_time = Measure[MeasureCount].pop_time;
-					Notes[id].judge_time = Measure[MeasureCount].judge_time + 60.0 / Measure[MeasureCount].bpm * 4 * Measure[MeasureCount].measure * (i+NotesCountStart) / NotesCountMax;
+					Notes[id].judge_time = Measure[MeasureCount].judge_time + 60.0 / Measure[MeasureCount].bpm * 4 * Measure[MeasureCount].measure * i / NotesCountMax;
 					Notes[id].roll_id = -1;
 					Notes[id].isThrough = false;
 
