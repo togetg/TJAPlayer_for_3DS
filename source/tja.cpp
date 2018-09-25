@@ -1,6 +1,7 @@
 ﻿#include "header.h"
 #include "notes.h"
 #include "tja.h"
+#include "score.h"
 
 
 char tja_notes[Measure_Max][Max_Notes_Measure];
@@ -219,7 +220,7 @@ void MeasureInsertionSort(MEASURE_T t[], int array_size) {
 void tja_notes_load() {
 
 	int FirstMultiMeasure = -1,	//複数行の小節の最初の小節id 複数出ない場合は-1
-		NotesCount = 0;
+		NotesCount = 0, NextGOGO = -1;
 	bool isStart = false, isEnd = false, isDispBarLine = true,isNoComma = false;
 	FILE *fp;
 	COMMAND_T Command;
@@ -304,10 +305,10 @@ void tja_notes_load() {
 						Measure[MeasureCount].command = ENd;
 						break;
 					case GOgostart:
-						Measure[MeasureCount].command = GOgostart;
+						NextGOGO = GOgostart;
 						break;
 					case GOgoend:
-						Measure[MeasureCount].command = GOgoend;
+						NextGOGO = GOgoend;
 						break;
 					default:
 						break;
@@ -349,6 +350,10 @@ void tja_notes_load() {
 					bpm = NextBpm;
 					measure = NextMeasure;
 					delay = 0;
+					if (NextGOGO != -10) {
+						Measure[MeasureCount].command = NextGOGO;
+						NextGOGO = -1;
+					}
 				}
 
 
@@ -390,6 +395,10 @@ void tja_notes_load() {
 			}
 		}
 
+		//基本天井点を計算
+		calc_base_score(Measure,tja_notes);
+
+		
 		MeasureMaxNumber = tja_cnt;
 		fclose(fp);
 		MeasureInsertionSort(Measure, Measure_Max);
