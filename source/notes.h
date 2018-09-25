@@ -10,6 +10,7 @@ void notes_main(
 	int cnt,
 	C2D_Sprite  sprites[Sprite_Number]);
 void toggle_auto();
+int ctoi(char c);
 
 
 void notes_init(TJA_HEADER_T TJA_Header);
