@@ -103,3 +103,9 @@ typedef struct {
 	bool flag;
 
 }BALLOON_T;
+
+typedef struct {
+	int knd;
+	double x, y;
+
+}BRANCH_T;
