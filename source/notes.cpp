@@ -20,6 +20,7 @@ COMMAND_T Command;
 BARLINE_T BarLine[BarLine_Max];
 Roll_T RollNotes[Roll_Max];
 BALLOON_T BalloonNotes[Balloon_Max];
+BRANCH_T Branch;
 
 int MeasureCount, RollState, NotesCount, JudgeDispknd, JudgeRollState, BalloonBreakCount,
 NotesNumber;	//何番目のノーツか
@@ -54,7 +55,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 
 			while (isNotesLoad == true && tja_notes[Measure[MeasureCount].notes][NotesCount] != ',' && tja_notes[Measure[MeasureCount].notes][NotesCount] != '\n' && tja_notes[Measure[MeasureCount].notes][NotesCount] != '/') {
 
-				//命令
+				//生成時に発動する命令
 				if (NotesCount == 0 && tja_notes[Measure[MeasureCount].notes][0] == '#') {
 
 					get_command_value(tja_notes[Measure[MeasureCount].notes], &Command);
@@ -64,7 +65,11 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 					case ENd:
 						isNotesLoad = false;
 						break;
-
+					case BRanchstart:
+						Branch.knd = Command.val[0];
+						Branch.x = Command.val[1];
+						Branch.y = Command.val[2];
+						break;
 					default:
 						break;
 
@@ -204,7 +209,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 
 	}
 
-	for (int i = 0; i < Measure_Max - 1; i++) {
+	for (int i = 0; i < Measure_Max - 1; i++) {	//判定時に発動する命令
 
 		if (Measure[i].flag == true) {
 			
@@ -216,6 +221,13 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 					break;
 				case GOgoend:
 					isGOGOTime = false;
+					break;
+				case SEction:
+					branch_section_init();
+					branch_start(Branch.knd, Branch.x, Branch.y);
+					break;
+				case BRanchstart:
+					branch_start(Branch.knd,Branch.x,Branch.y);
 					break;
 				default:
 					break;
@@ -253,23 +265,22 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 	snprintf(buf_notes, sizeof(buf_notes), "cnt :%d", cnt);
 	debug_draw(100, 0, buf_notes);
 
-	snprintf(buf_notes, sizeof(buf_notes), "BPM :%.1f", Measure[MeasureCount].bpm);
+	snprintf(buf_notes, sizeof(buf_notes), "Bpm:%.1f     Measure:%.1f     Scroll:%.1f", Measure[MeasureCount].bpm, Measure[MeasureCount].measure, Measure[MeasureCount].scroll);
 	debug_draw(0, 20, buf_notes);
-	snprintf(buf_notes, sizeof(buf_notes), "MEASURE :%.1f", Measure[MeasureCount].measure);
-	debug_draw(100, 20, buf_notes);
-	snprintf(buf_notes, sizeof(buf_notes), "SCROLL :%.1f", Measure[MeasureCount].scroll);
-	debug_draw(200, 20, buf_notes);
 
-	snprintf(buf_notes, sizeof(buf_notes), "judge :%.1f", Measure[MeasureCount].judge_time);
+	/*snprintf(buf_notes, sizeof(buf_notes), "judge :%.1f", Measure[MeasureCount].judge_time);
 	debug_draw(0, 30, buf_notes);
 	snprintf(buf_notes, sizeof(buf_notes), "create :%.1f", Measure[MeasureCount].create_time);
-	debug_draw(100, 30, buf_notes);
+	debug_draw(100, 30, buf_notes);*/
 
 	snprintf(buf_notes, sizeof(buf_notes), "%d:%s", MeasureCount - 1, tja_notes[MeasureCount - 1]);
 	debug_draw(0, 50, buf_notes);
 
 	if (isAuto == true) debug_draw(0, 200, "Auto");
 	else debug_draw(0, 200, "Manual");
+
+	snprintf(buf_notes, sizeof(buf_notes), "%s", tja_notes[4]);
+	debug_draw(0, 210, buf_notes);
 }
 
 int find_notes_id() {
@@ -962,7 +973,9 @@ void notes_init(TJA_HEADER_T TJA_Header) {
 	tja_notes_load();
 	Command.data[0] = 0; Command.data[1] = 0; Command.data[2] = 0;
 	Command.knd = 0;
-	Command.val = 0;
+	Command.val[0] = 0;
+	Command.val[1] = 0;
+	Command.val[2] = 0;
 	bpm = TJA_Header.bpm;
 	offset = TJA_Header.offset;
 	for (int i = 0;i < (int)(sizeof(balloon) / sizeof(balloon[0]));i++) {
@@ -983,4 +996,7 @@ void notes_init(TJA_HEADER_T TJA_Header) {
 	BalloonBreakCount = 0;
 	isBalloonBreakDisp = false;
 	isGOGOTime = false;
+	Branch.knd = 0;
+	Branch.x = 0;
+	Branch.y = 0;
 }
