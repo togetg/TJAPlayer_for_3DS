@@ -7,7 +7,7 @@
 bool isGOGO;
 int combo,init,diff,DiffMul,scoremode,HitScore,ScoreDiff,BaseCeilingPoint;
 int CurrentScore,TotalScore,CurrentRollCount, TotalRollCount,TotalRyouCount,TotalKaCount,TotalFukaCount, CurrentRyouCount, CurrentKaCount, CurrentFukaCount;
-double tmp;
+double tmp,Perfect,CurrentPerfect;
 TJA_HEADER_T TJA_Header;
 char buf_score[160];
 double A, B, C, D;
@@ -33,6 +33,8 @@ void score_init() {
 	CurrentRyouCount = 0;
 	CurrentKaCount = 0;
 	CurrentFukaCount = 0;
+	Perfect = 0;
+	CurrentPerfect = 0;
 }
 
 
@@ -189,6 +191,10 @@ void score_update(int knd) {
 		}
 	}
 	ScoreDiff = TotalScore - PreScore;
+	if ((TotalRyouCount + TotalKaCount + TotalFukaCount) != 0) Perfect = (double)TotalRyouCount / (TotalRyouCount + TotalKaCount + TotalFukaCount)*100.0;
+	else Perfect = 0;
+	if ((CurrentRyouCount + CurrentKaCount + CurrentFukaCount) != 0) CurrentPerfect = (double)CurrentRyouCount / (CurrentRyouCount + CurrentKaCount + CurrentFukaCount)*100.0;
+	else CurrentPerfect = 0;
 }
 
 void scoer_debug() {
@@ -199,9 +205,9 @@ void scoer_debug() {
 	debug_draw(0, 30, buf_score);
 	snprintf(buf_score, sizeof(buf_score), "Score:%d    %dCombo    diff:%d",TotalScore, combo, ScoreDiff);
 	debug_draw(0, 150, buf_score);
-	snprintf(buf_score, sizeof(buf_score), "Current   Score:%d    Roll:%d    Perfect:%.1f", CurrentScore, CurrentRollCount, (double)CurrentRyouCount/(CurrentRyouCount+CurrentKaCount+CurrentFukaCount)*100.0);
+	snprintf(buf_score, sizeof(buf_score), "Current   Score:%d    Roll:%d    Perfect:%.1f", CurrentScore, CurrentRollCount, CurrentPerfect);
 	debug_draw(0, 160, buf_score);
-	snprintf(buf_score, sizeof(buf_score), "%.0f:%.0f:%.0f",A,B,C);
+	snprintf(buf_score, sizeof(buf_score), "%.0f:%.0f:%.0f:%.0f",A,B,C,D);
 	debug_draw(0, 170, buf_score);
 	if (isGOGO == true) {
 		snprintf(buf_score, sizeof(buf_score), "GOGOTIME");
@@ -209,11 +215,34 @@ void scoer_debug() {
 	}
 }
 
-void branch_start(int knd,double x,double y) {
+int branch_start(int knd,double x,double y) {	//分岐
 
 	A = knd;
 	B = x;
 	C = y;
+	int branch;
+	switch (knd) {
+	case 0:	//連打
+		if (y <= CurrentRollCount) branch = 2;
+		else if (x <= CurrentRollCount) branch = 1;
+		else branch = 0;
+		break;
+	case 1:	//精度
+		if (y <= CurrentPerfect) branch = 2;
+		else if (x <= CurrentPerfect) branch = 1;
+		else branch = 0;
+		break;
+	case 2:	//スコア
+		if (y <= CurrentScore) branch = 2;
+		else if (x <= CurrentScore) branch = 1;
+		else branch = 0;
+		break;
+	default:
+		branch = 0;
+		break;
+	}
+	D = (double)branch;
+	return branch;
 }
 
 void branch_section_init() {	//#SECTION
@@ -223,6 +252,7 @@ void branch_section_init() {	//#SECTION
 	CurrentKaCount = 0;
 	CurrentFukaCount = 0;
 	CurrentScore = 0;
+	CurrentPerfect = 0;
 }
 
 void send_gogotime(bool arg) {
