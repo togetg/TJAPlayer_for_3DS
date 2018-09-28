@@ -6,13 +6,13 @@
 #include "notes.h"
 #include "score.h"
 
-int balloon[256],BalloonCount;
+int balloon[256], BalloonCount;
 double bpm, offset;
 char buf_notes[160];
 
 int find_notes_id(), find_line_id(), make_roll_start(int NotesId), make_roll_end(int NotesId), make_balloon_start(int NotesId), make_balloon_end(int NotesId);
-void notes_calc(bool isDon, bool isKa,double bpm, double NowTime, int cnt, C2D_Sprite sprites[Sprite_Number]);
-void notes_draw(C2D_Sprite sprites[Sprite_Number]),notes_sort(), delete_roll(int i), notes_init(TJA_HEADER_T TJA_Header), delete_notes(int i), make_balloon_break();
+void notes_calc(bool isDon, bool isKa, double bpm, double NowTime, int cnt, C2D_Sprite sprites[Sprite_Number]);
+void notes_draw(C2D_Sprite sprites[Sprite_Number]), notes_sort(), delete_roll(int i), notes_init(TJA_HEADER_T TJA_Header), delete_notes(int i), make_balloon_break();
 
 
 NOTES_T Notes[Notes_Max];
@@ -22,38 +22,59 @@ Roll_T RollNotes[Roll_Max];
 BALLOON_T BalloonNotes[Balloon_Max];
 BRANCH_T Branch;
 
-int MeasureCount, RollState, NotesCount, JudgeDispknd, JudgeRollState, BalloonBreakCount,
+int MeasureCount, RollState, NotesCount, JudgeDispknd, JudgeRollState, BalloonBreakCount, BranchCourse,
 NotesNumber;	//何番目のノーツか
-bool  isNotesLoad= true,isAuto = false,isJudgeDisp = false,isBalloonBreakDisp = false, isGOGOTime = false;;	//要初期化
+bool  isNotesLoad = true, isAuto = false, isJudgeDisp = false, isBalloonBreakDisp = false, isGOGOTime = false;;	//要初期化
 double JudgeMakeTime, JudgeY;
 
-void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Measure],MEASURE_T Measure[Measure_Max], int cnt, C2D_Sprite  sprites[Sprite_Number]) {
-	
+void notes_main(bool isDon, bool isKa, char tja_notes[Measure_Max][Max_Notes_Measure], MEASURE_T Measure[Measure_Max], int cnt, C2D_Sprite  sprites[Sprite_Number]) {
+
 	//最初の小節のcreate_timeがマイナスだった時用に調整
 	double NowTime = time_now(0) + Measure[0].create_time;
-	
 
-	snprintf(buf_notes, sizeof(buf_notes), "time:%.2f", NowTime);
+
+	snprintf(buf_notes, sizeof(buf_notes), "time:%.2f:%d", NowTime, Branch.wait);
 	debug_draw(0, 0, buf_notes);
 
-	if ( cnt >= 0 && isNotesLoad== true) {
+	if (cnt >= 0 && isNotesLoad == true) {
 
-		while (Measure[MeasureCount].create_time <= NowTime) {
+		//分岐
+		if (Branch.next == true) {
 
-			int BarLineId = find_line_id();
-			if (BarLineId != -1) {
-				BarLine[BarLineId].flag = true;
-				BarLine[BarLineId].scroll = Measure[MeasureCount].scroll;
-				BarLine[BarLineId].x = BarLine[BarLineId].x_ini;
-				BarLine[BarLineId].measure = MeasureCount;
-				BarLine[BarLineId].x_ini = Notes_Judge_Range * BarLine[BarLineId].scroll + Notes_Judge;
-				BarLine[BarLineId].create_time = NowTime;
-				BarLine[BarLineId].isDisp = Measure[MeasureCount].isDispBarLine;
+			while (MeasureCount < Measure_Max) {
+
+				bool escape = false;
+
+				if (tja_notes[Measure[MeasureCount].notes][0] == '#') {
+
+					switch (Branch.course) {
+					case 0:
+						if (Measure[MeasureCount].command == N) escape = true;
+						break;
+					case 1:
+						if (Measure[MeasureCount].command == E) escape = true;
+						break;
+					case 2:
+						if (Measure[MeasureCount].command == M) escape = true;
+						break;
+					default:
+						if (Measure[MeasureCount].command == N) escape = true;
+						break;
+					}
+					if (escape == true) break;
+				}
+
+				MeasureCount++;
 			}
+			Branch.next = false;
+		}
+
+		while (Measure[MeasureCount].create_time <= NowTime && Branch.wait == false) {
 
 			NotesCount = 0;
 
-			while (isNotesLoad == true && tja_notes[Measure[MeasureCount].notes][NotesCount] != ',' && tja_notes[Measure[MeasureCount].notes][NotesCount] != '\n' && tja_notes[Measure[MeasureCount].notes][NotesCount] != '/') {
+			//ノーツ数の計測
+			while (isNotesLoad == true && tja_notes[Measure[MeasureCount].notes][NotesCount] != ',' && tja_notes[Measure[MeasureCount].notes][NotesCount] != '/') {
 
 				//生成時に発動する命令
 				if (NotesCount == 0 && tja_notes[Measure[MeasureCount].notes][0] == '#') {
@@ -69,18 +90,33 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 						Branch.knd = Command.val[0];
 						Branch.x = Command.val[1];
 						Branch.y = Command.val[2];
+						Branch.wait = true;
 						break;
 					default:
 						break;
-
 					}
 
 					NotesCount = 0;
 					MeasureCount++;
-					continue;
+					if (Branch.wait == true) break;
+					else continue;
 				}
-				
+
 				NotesCount++;
+			}
+
+			if (Branch.wait == true) break;
+
+			//小節線
+			int BarLineId = find_line_id();
+			if (BarLineId != -1) {
+				BarLine[BarLineId].flag = true;
+				BarLine[BarLineId].scroll = Measure[MeasureCount].scroll;
+				BarLine[BarLineId].x = BarLine[BarLineId].x_ini;
+				BarLine[BarLineId].measure = MeasureCount;
+				BarLine[BarLineId].x_ini = Notes_Judge_Range * BarLine[BarLineId].scroll + Notes_Judge;
+				BarLine[BarLineId].create_time = NowTime;
+				BarLine[BarLineId].isDisp = Measure[MeasureCount].isDispBarLine;
 			}
 
 			int NotesCountMax;
@@ -174,7 +210,7 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 								RollState = 0;
 							}
 							else {
-							delete_notes(id);
+								delete_notes(id);
 							}
 							break;
 
@@ -209,10 +245,34 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 
 	}
 
+	for (int i = 0; i < BarLine_Max - 1; i++) {
+
+		if (BarLine[i].flag == true) {
+
+			BarLine[i].x = BarLine[i].x_ini -
+				Notes_Area * BarLine[i].scroll * (NowTime - Measure[BarLine[i].measure].pop_time) / (60 / Measure[BarLine[i].measure].bpm * 4);
+
+			if (BarLine[i].isDisp == true) {
+				C2D_DrawRectangle(BarLine[i].x, 86, 0, 1, 46, C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1));
+				//snprintf(buf_notes, sizeof(buf_notes), "%d", BarLine[i].measure);
+				//debug_draw(BarLine[i].x - 10, 133, buf_notes);
+			}
+
+			if (BarLine[i].x < 62) BarLine[i].flag = false;
+
+		}
+	}
+
+	send_gogotime(isGOGOTime);
+
+	notes_calc(isDon, isKa, bpm, NowTime, cnt, sprites);
+
 	for (int i = 0; i < Measure_Max - 1; i++) {	//判定時に発動する命令
 
 		if (Measure[i].flag == true) {
-			
+
+			bool NotFalse = false;
+
 			if (Measure[i].command != -1 && Measure[i].judge_time <= NowTime) {
 
 				switch (Measure[i].command) {
@@ -224,43 +284,29 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 					break;
 				case SEction:
 					branch_section_init();
-					branch_start(Branch.knd, Branch.x, Branch.y);
 					break;
 				case BRanchstart:
-					branch_start(Branch.knd,Branch.x,Branch.y);
+
+					if (Branch.knd != 0 || JudgeRollState == -1) {	//連打分岐の時は連打が無くなってから分岐
+
+						Branch.course = branch_start(Branch.knd, Branch.x, Branch.y);
+						Branch.next = true;
+						Branch.wait = false;
+					}
+					else NotFalse = true;
 					break;
 				default:
 					break;
 				}
 			}
 
-			if (Measure[i].judge_time <= NowTime) Measure[i].flag = false;
-		}
-	}
-	
-	for (int i = 0; i < BarLine_Max - 1; i++) {
-
-		if (BarLine[i].flag == true) {
-
-			BarLine[i].x = BarLine[i].x_ini -
-				Notes_Area * BarLine[i].scroll * (NowTime - Measure[BarLine[i].measure].pop_time) / (60 / Measure[BarLine[i].measure].bpm * 4);
-			if (BarLine[i].isDisp == true){
-				C2D_DrawRectangle(BarLine[i].x, 86, 0, 1, 46, C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1));
-				//snprintf(buf_notes, sizeof(buf_notes), "%d", BarLine[i].measure);
-				//debug_draw(BarLine[i].x - 10, 133, buf_notes);
-				}
-			
-			if (BarLine[i].x < 62) BarLine[i].flag = false;
-
+			if (NotFalse == false && Measure[i].judge_time <= NowTime) Measure[i].flag = false;
 		}
 	}
 
-	send_gogotime(isGOGOTime);
-
-	notes_calc(isDon,isKa,bpm, NowTime, cnt, sprites);
 	notes_draw(sprites);
 
-	C2D_DrawRectangle(0 ,86, 0, 62, 58, C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1), C2D_Color32f(1,0,0,1));
+	C2D_DrawRectangle(0, 86, 0, 62, 58, C2D_Color32f(1, 0, 0, 1), C2D_Color32f(1, 0, 0, 1), C2D_Color32f(1, 0, 0, 1), C2D_Color32f(1, 0, 0, 1));
 
 	snprintf(buf_notes, sizeof(buf_notes), "cnt :%d", cnt);
 	debug_draw(100, 0, buf_notes);
@@ -275,6 +321,9 @@ void notes_main(bool isDon,bool isKa, char tja_notes[Measure_Max][Max_Notes_Meas
 
 	snprintf(buf_notes, sizeof(buf_notes), "%d:%s", MeasureCount - 1, tja_notes[MeasureCount - 1]);
 	debug_draw(0, 50, buf_notes);
+	int n = 2;
+	snprintf(buf_notes, sizeof(buf_notes), "%d:%.1f:%s", n, Measure[n].judge_time, tja_notes[Measure[n].notes]);
+	debug_draw(0, 60, buf_notes);
 
 	if (isAuto == true) debug_draw(0, 200, "Auto");
 	else debug_draw(0, 200, "Manual");
@@ -301,7 +350,7 @@ int find_line_id() {
 	return -1;
 }
 
-void make_judge(int knd,double NowTime) {
+void make_judge(int knd, double NowTime) {
 	isJudgeDisp = true;
 	JudgeMakeTime = NowTime;
 	JudgeDispknd = knd;
@@ -313,23 +362,23 @@ void calc_judge(double NowTime, C2D_Sprite sprites[Sprite_Number]) {
 	if (isJudgeDisp == true) {
 
 		//アニメーション
-		if (NowTime - JudgeMakeTime < 0.05)  JudgeY = 73+(NowTime - JudgeMakeTime)*140;
+		if (NowTime - JudgeMakeTime < 0.05)  JudgeY = 73 + (NowTime - JudgeMakeTime) * 140;
 		if (JudgeY >= 80) JudgeY = 80;
 
 		switch (JudgeDispknd) {
 
 		case 0:		//良
-			C2D_SpriteSetPos(&sprites[jUdge_ryou], 93, JudgeY );
+			C2D_SpriteSetPos(&sprites[jUdge_ryou], 93, JudgeY);
 			C2D_DrawSprite(&sprites[jUdge_ryou]);
 			break;
 
 		case 1:		//可
-			C2D_SpriteSetPos(&sprites[jUdge_ka], 93, JudgeY );
+			C2D_SpriteSetPos(&sprites[jUdge_ka], 93, JudgeY);
 			C2D_DrawSprite(&sprites[jUdge_ka]);
 			break;
 
 		case 2:		//不可
-			C2D_SpriteSetPos(&sprites[jUdge_fuka], 92, JudgeY );
+			C2D_SpriteSetPos(&sprites[jUdge_fuka], 92, JudgeY);
 			C2D_DrawSprite(&sprites[jUdge_fuka]);
 			break;
 
@@ -340,21 +389,21 @@ void calc_judge(double NowTime, C2D_Sprite sprites[Sprite_Number]) {
 	}
 }
 
-void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
-	
+void notes_judge(double NowTime, bool isDon, bool isKa, int cnt) {
+
 	int CurrentJudgeNotes[2] = { -1,-1 };		//現在判定すべきノーツ ドン,カツ
 	double CurrentJudgeNotesLag[2] = { -1,-1 };	//判定すべきノーツの誤差(s)
-	
+
 	JudgeRollState = -1;
 
 	//連打の状態
 	for (int i = 0; i < Roll_Max - 1; i++) {
 
-		if (RollNotes[i].flag == true && 
+		if (RollNotes[i].flag == true &&
 			Notes[RollNotes[i].start_id].judge_time < NowTime &&
-			(RollNotes[i].end_id == -1 ||  (RollNotes[i].end_id != -1 && Notes[RollNotes[i].end_id].judge_time > NowTime))) JudgeRollState = RollNotes[i].knd;
+			(RollNotes[i].end_id == -1 || (RollNotes[i].end_id != -1 && Notes[RollNotes[i].end_id].judge_time > NowTime))) JudgeRollState = RollNotes[i].knd;
 	}
-	
+
 	//風船の処理
 	int JudgeBalloonState = -1;
 	for (int i = 0; i < Balloon_Max - 1; i++) {
@@ -397,16 +446,16 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 
 	if (isAuto == true) {	//オート
 
-		for (int i = 0; i < Notes_Max-1; i++) {
+		for (int i = 0; i < Notes_Max - 1; i++) {
 
-			if (Notes[i].flag == true && Notes[i].judge_time <= NowTime && 
+			if (Notes[i].flag == true && Notes[i].judge_time <= NowTime &&
 				(Notes[i].knd != Roll && Notes[i].knd != BigRoll && Notes[i].knd != BigRollEnd &&
-				Notes[i].knd != RollEnd && Notes[i].knd != Balloon && Notes[i].knd != BalloonEnd)) {
-				
+					Notes[i].knd != RollEnd && Notes[i].knd != Balloon && Notes[i].knd != BalloonEnd)) {
+
 				if (Notes[i].knd == Don ||
 					Notes[i].knd == BigDon ||
 					Notes[i].knd == Potato) {
-					
+
 					music_play(0);
 					make_judge(0, NowTime);
 				}
@@ -450,7 +499,7 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 	}
 
 	else if (isAuto == false) {			//手動
-		
+
 		if (isDon == true && CurrentJudgeNotes[0] != -1) {	//ドン
 
 			bool isBig;
@@ -458,7 +507,7 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 			else isBig = false;
 
 			if (CurrentJudgeNotesLag[0] <= 0.034) {			//良
-				make_judge(0,NowTime);
+				make_judge(0, NowTime);
 				delete_notes(CurrentJudgeNotes[0]);
 				if (isBig == true) score_update(SPECIAL_RYOU);
 				else score_update(RYOU);
@@ -521,14 +570,14 @@ void notes_judge(double NowTime, bool isDon, bool isKa,int cnt) {
 
 		if (BalloonNotes[JudgeBalloonState].end_id != -1) delete_notes(BalloonNotes[JudgeBalloonState].end_id);
 		else delete_notes(BalloonNotes[JudgeBalloonState].start_id);
-		
+
 		music_play(2);
 		make_balloon_break();
 	}
 }
 
-void notes_calc(bool isDon,bool isKa,double bpm, double NowTime, int cnt, C2D_Sprite sprites[Sprite_Number]) {
-		
+void notes_calc(bool isDon, bool isKa, double bpm, double NowTime, int cnt, C2D_Sprite sprites[Sprite_Number]) {
+
 	for (int i = 0; i < Notes_Max - 1; i++) {	//計算
 
 		if (Notes[i].flag == true) {
@@ -597,14 +646,14 @@ void notes_calc(bool isDon,bool isKa,double bpm, double NowTime, int cnt, C2D_Sp
 			}
 		}
 	}
-	
+
 	for (int i = 0; i < Notes_Max - 1; i++) {	//連打のバグ回避のためノーツの削除は一番最後
 
 		if (Notes[i].x <= 20 &&
 			Notes[i].knd != Roll && Notes[i].knd != BigRoll) delete_notes(i);
 	}
 
-	notes_judge(NowTime, isDon, isKa ,cnt);
+	notes_judge(NowTime, isDon, isKa, cnt);
 	calc_judge(NowTime, sprites);
 }
 
@@ -674,7 +723,7 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 
 					C2D_SpriteSetPos(&sprites[bAlloon], Notes[i].x, notes_y);
 					C2D_DrawSprite(&sprites[bAlloon]);
-				} 
+				}
 				else if (BalloonNotes[Notes[i].roll_id].current_hit <= BalloonNotes[Notes[i].roll_id].need_hit * 1 / 5) {
 
 					C2D_SpriteSetPos(&sprites[bAlloon_1], Notes[i].x, notes_y);
@@ -700,7 +749,7 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 					C2D_SpriteSetPos(&sprites[bAlloon_5], Notes[i].x, notes_y);
 					C2D_DrawSprite(&sprites[bAlloon_5]);
 				}
-				snprintf(buf_notes, sizeof(buf_notes), "%d", BalloonNotes[Notes[i].roll_id].need_hit- BalloonNotes[Notes[i].roll_id].current_hit);
+				snprintf(buf_notes, sizeof(buf_notes), "%d", BalloonNotes[Notes[i].roll_id].need_hit - BalloonNotes[Notes[i].roll_id].current_hit);
 				debug_draw(Notes[i].x, 132, buf_notes);
 				break;
 			case RollEnd:
@@ -723,20 +772,18 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 	if (isBalloonBreakDisp == true) {
 		BalloonBreakCount--;
 		C2D_ImageTint Tint;
-		C2D_AlphaImageTint(&Tint,BalloonBreakCount/40.0);
+		C2D_AlphaImageTint(&Tint, BalloonBreakCount / 40.0);
 		C2D_SpriteSetPos(&sprites[bAlloon_6], Notes_Judge, notes_y);
-		C2D_DrawSpriteTinted(&sprites[bAlloon_6],&Tint);
+		C2D_DrawSpriteTinted(&sprites[bAlloon_6], &Tint);
 	}
 	if (BalloonBreakCount <= 0) isBalloonBreakDisp = false;
 
 }
 
 void toggle_auto() {
-	
+
 	isAuto = !isAuto;
 }
-
-
 
 int ctoi(char c) {
 
@@ -927,7 +974,7 @@ void delete_notes(int i) {
 
 		if (Notes[i].knd == BalloonEnd) {
 
-			if (BalloonNotes[Notes[i].roll_id].start_id != -1 ) delete_notes(BalloonNotes[Notes[i].roll_id].start_id);
+			if (BalloonNotes[Notes[i].roll_id].start_id != -1) delete_notes(BalloonNotes[Notes[i].roll_id].start_id);
 			delete_balloon(Notes[i].roll_id);
 		}
 		else if (Notes[i].knd == Balloon) {
@@ -978,7 +1025,7 @@ void notes_init(TJA_HEADER_T TJA_Header) {
 	Command.val[2] = 0;
 	bpm = TJA_Header.bpm;
 	offset = TJA_Header.offset;
-	for (int i = 0;i < (int)(sizeof(balloon) / sizeof(balloon[0]));i++) {
+	for (int i = 0; i < (int)(sizeof(balloon) / sizeof(balloon[0])); i++) {
 		balloon[i] = TJA_Header.balloon[i];
 	}
 	NotesNumber = 0;
@@ -999,4 +1046,7 @@ void notes_init(TJA_HEADER_T TJA_Header) {
 	Branch.knd = 0;
 	Branch.x = 0;
 	Branch.y = 0;
+	Branch.course = 0;
+	Branch.next = false;
+	Branch.wait = false;
 }
