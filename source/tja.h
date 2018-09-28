@@ -5,7 +5,7 @@
 typedef struct {
 
 	int knd, data[3],test;
-	double val[3];
+	double val;
 	char* command_s,*notes,*value_s;
 } COMMAND_T;
 
