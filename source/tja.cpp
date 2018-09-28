@@ -220,7 +220,7 @@ void MeasureInsertionSort(MEASURE_T t[], int array_size) {
 void tja_notes_load() {
 
 	int FirstMultiMeasure = -1,	//複数行の小節の最初の小節id 複数出ない場合は-1
-		NotesCount = 0;
+		NotesCount = 0, NextGOGO = -1;
 	bool isStart = false, isEnd = false, isDispBarLine = true,isNoComma = false;
 	FILE *fp;
 	COMMAND_T Command;
@@ -281,19 +281,18 @@ void tja_notes_load() {
 				if (tja_notes[tja_cnt][0] == '#') {
 
 					get_command_value(tja_notes[tja_cnt], &Command);
-					Measure[MeasureCount].command = Command.knd;
 					switch (Command.knd) {
 					case BPmchange:
-						NextBpm = Command.val[0];
+						NextBpm = Command.val;
 						break;
 					case MEasure:
-						NextMeasure = Command.val[0];
+						NextMeasure = Command.val;
 						break;
 					case SCroll:
-						scroll = Command.val[0];
+						scroll = Command.val;
 						break;
 					case DElay:
-						delay = Command.val[0];
+						delay = Command.val;
 						break;
 					case BArlineon:
 						isDispBarLine = true;
@@ -304,6 +303,12 @@ void tja_notes_load() {
 					case ENd:
 						isEnd = true;
 						Measure[MeasureCount].command = ENd;
+						break;
+					case GOgostart:
+						NextGOGO = GOgostart;
+						break;
+					case GOgoend:
+						NextGOGO = GOgoend;
 						break;
 					default:
 						break;
@@ -345,6 +350,10 @@ void tja_notes_load() {
 					bpm = NextBpm;
 					measure = NextMeasure;
 					delay = 0;
+					if (NextGOGO != -10) {
+						Measure[MeasureCount].command = NextGOGO;
+						NextGOGO = -1;
+					}
 				}
 
 
@@ -386,22 +395,11 @@ void tja_notes_load() {
 			}
 		}
 
-		MeasureMaxNumber = tja_cnt;
-
-		for (int i = 0; i < MeasureMaxNumber; i++) {	//次の小節の判定時に発動する命令の調整
-
-			if (tja_notes[i][0] == '#' && Measure[i].command == BRanchstart) {
-
-				int n = i+1;
-				while (n <= MeasureMaxNumber && tja_notes[n][0] == '#') n++;
-				Measure[i].judge_time = Measure[n].judge_time;
-			}
-		}
 		//基本天井点を計算
 		calc_base_score(Measure,tja_notes);
 
-
 		
+		MeasureMaxNumber = tja_cnt;
 		fclose(fp);
 		MeasureInsertionSort(Measure, Measure_Max);
 		MainFirstMeasureTime = Measure[0].judge_time - Measure[0].create_time;
@@ -472,15 +470,13 @@ void get_command_value(char* buf, COMMAND_T *Command) {
 
 		Command->command_s = command;
 		Command->value_s = value;
-		Command->val[0] = 0;
-		Command->val[1] = 0;
-		Command->val[2] = 0;
+		Command->val = 0;
 
 		if (strcmp(command, "START") == 0) Command->knd = STart;
 		else if (strcmp(command, "END") == 0) Command->knd = ENd;
 		else if (strcmp(command, "BPMCHANGE") == 0) {
 			Command->knd = BPmchange;
-			Command->val[0] = strtod(value, NULL);
+			Command->val = strtod(value, NULL);
 		}
 		else if (strcmp(command, "GOGOSTART") == 0) Command->knd = GOgostart;
 		else if (strcmp(command, "GOGOEND") == 0) Command->knd = GOgoend;
@@ -494,40 +490,25 @@ void get_command_value(char* buf, COMMAND_T *Command) {
 					*molecule = (char *)malloc((strlen(buf) + 1));
 				strlcpy(molecule, value + 1, srash);
 				strlcpy(denominator, value + srash + 1, strlen(buf) - srash);
-				Command->val[0] = strtod(molecule, NULL) / strtod(denominator, NULL);
+				Command->val = strtod(molecule, NULL) / strtod(denominator, NULL);
 				free(denominator);
 				free(molecule);
 			}
 			else {
-				if (strtod(value, NULL) != 0) Command->val[0] = strtod(value, NULL);
-				else Command->val[0] = 1.0;
+				if (strtod(value, NULL) != 0) Command->val = strtod(value, NULL);
+				else Command->val = 1.0;
 			}
 		}
 		else if (strcmp(command, "SCROLL") == 0) {
 			Command->knd = SCroll;
-			Command->val[0] = strtod(value, NULL);
+			Command->val = strtod(value, NULL);
 		}
 		else if (strcmp(command, "DELAY") == 0) {
 			Command->knd = DElay;
-			Command->val[0] = strtod(value, NULL);
+			Command->val = strtod(value, NULL);
 		}
 		else if (strcmp(command, "SECTION") == 0) Command->knd = SEction;
-		else if (strcmp(command, "BRANCHSTART") == 0) {
-			Command->knd = BRanchstart;
-			char* tp;
-			tp = strtok(value, ",");
-			switch (value[1]) {
-			case 'r':Command->val[0] = 0; break;	//連打
-			case 'p':Command->val[0] = 1; break;	//精度
-			case 's':Command->val[0] = 2; break;	//スコア
-			default: break;
-			}
-			int i = 1;
-			while ((tp = strtok(NULL, ","))) {
-				Command->val[i] = strtod(tp, NULL);
-				i++;
-			}
-		}
+		else if (strcmp(command, "BRANCHSTART") == 0) Command->knd = BRanchstart;
 		else if (strcmp(command, "BRANCHEND") == 0) Command->knd = BRanchend;
 		else if (strcmp(command, "N") == 0) Command->knd = N;
 		else if (strcmp(command, "E") == 0) Command->knd = E;
