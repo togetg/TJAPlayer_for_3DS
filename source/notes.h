@@ -105,7 +105,7 @@ typedef struct {
 }BALLOON_T;
 
 typedef struct {
-	int knd;
+	int knd, course;
 	double x, y;
-
+	bool next, wait;
 }BRANCH_T;
