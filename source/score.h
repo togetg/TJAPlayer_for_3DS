@@ -5,7 +5,7 @@ void send_gogotime(bool temp);
 int round_down(int arg);
 void calc_base_score(MEASURE_T Measure[Measure_Max], char tja_notes[Measure_Max][Max_Notes_Measure]);
 void branch_section_init();
-void branch_start(int knd, double x, double y);
+int branch_start(int knd, double x, double y);
 
 enum Judge_Knd {
 	RYOU = 0,
