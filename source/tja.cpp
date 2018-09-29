@@ -19,6 +19,7 @@ void measure_structure_init() {
 	for (int i = 0; i < Measure_Max; i++) {
 
 		Measure[i].create_time = INT_MAX;
+		Measure[i].create_time_cmp = INT_MAX;
 		Measure[i].judge_time = INT_MAX;
 		Measure[i].pop_time = INT_MAX;
 		Measure[i].bpm = 0;
@@ -75,43 +76,43 @@ void tja_head_load() {
 			}
 
 			if (strstr(buf, "TITLE:") == buf) {
-				strlcpy(temp,buf+6, strlen(buf)-7);
+				strlcpy(temp, buf + 6, strlen(buf) - 7);
 				Current_Header.title = temp;
 				continue;
 			}
 
 			if (strstr(buf, "SUBTITLE:") == buf) {
-				strlcpy(temp, buf + 9, strlen(buf)-10);
+				strlcpy(temp, buf + 9, strlen(buf) - 10);
 				Current_Header.subtitle = temp;
 				continue;
 			}
 
 			if (strstr(buf, "LEVEL:") == buf) {
-				strlcpy(temp, buf + 6, strlen(buf)-7);
+				strlcpy(temp, buf + 6, strlen(buf) - 7);
 				Current_Header.level = atoi(temp);
 				continue;
 			}
 
 			if (strstr(buf, "BPM:") == buf) {
-				strlcpy(temp, buf + 4, strlen(buf)-5);
+				strlcpy(temp, buf + 4, strlen(buf) - 5);
 				Current_Header.bpm = atof(temp);
 				continue;
 			}
 
 			if (strstr(buf, "WAVE:") == buf) {
-				strlcpy(temp, buf + 5, strlen(buf)-6);
+				strlcpy(temp, buf + 5, strlen(buf) - 6);
 				Current_Header.wave = temp;
 				continue;
 			}
 
 			if (strstr(buf, "OFFSET:") == buf) {
-				strlcpy(temp, buf + 7, strlen(buf)-8);
+				strlcpy(temp, buf + 7, strlen(buf) - 8);
 				Current_Header.offset = atof(temp);
 				continue;
 			}
 
 			if (strstr(buf, "BALLOON:") == buf) {
-				strlcpy(temp, buf + 8, strlen(buf)-9);
+				strlcpy(temp, buf + 8, strlen(buf) - 9);
 				char *tp = strtok(temp, ",");
 				Current_Header.balloon[0] = atoi(tp);
 				int cnt = 1;
@@ -123,32 +124,32 @@ void tja_head_load() {
 			}
 
 			if (strstr(buf, "SONGVOL:") == buf) {
-				strlcpy(temp, buf + 8, strlen(buf)-9);
+				strlcpy(temp, buf + 8, strlen(buf) - 9);
 				Current_Header.songvol = atoi(temp);
 				continue;
 			}
 
 			if (strstr(buf, "SEVOL:") == buf) {
-				strlcpy(temp, buf + 6, strlen(buf)-7);
+				strlcpy(temp, buf + 6, strlen(buf) - 7);
 				Current_Header.sevol = atoi(temp);
 				continue;
 			}
 
 			if (strstr(buf, "SCOREINIT:") == buf) {
-				strlcpy(temp, buf + 10, strlen(buf)-11);
+				strlcpy(temp, buf + 10, strlen(buf) - 11);
 				Current_Header.scoreinit = atoi(temp);
 				continue;
 			}
 
 			if (strstr(buf, "SCOREDIFF:") == buf) {
-				strlcpy(temp, buf + 10, strlen(buf)-11);
+				strlcpy(temp, buf + 10, strlen(buf) - 11);
 				Current_Header.scorediff = atoi(temp);
 				continue;
 			}
 
 
 			if (strstr(buf, "COURSE:") == buf) {
-				strlcpy(temp, buf + 7, strlen(buf)-8);
+				strlcpy(temp, buf + 7, strlen(buf) - 8);
 				if (strlen(temp) == 1) Current_Header.course = atoi(temp);		//数字表記
 				else if (strcmp(temp, "Easy") == 0) Current_Header.course = 0;	//文字表記
 				else if (strcmp(temp, "Normal") == 0) Current_Header.course = 1;
@@ -159,31 +160,31 @@ void tja_head_load() {
 			}
 
 			if (strstr(buf, "STYLE:") == buf) {
-				strlcpy(temp, buf + 6, strlen(buf)-7);
+				strlcpy(temp, buf + 6, strlen(buf) - 7);
 				Current_Header.style = atoi(temp);
 				continue;
 			}
 
 			if (strstr(buf, "LIFE:") == buf) {
-				strlcpy(temp, buf + 5, strlen(buf)-6);
+				strlcpy(temp, buf + 5, strlen(buf) - 6);
 				Current_Header.life = atoi(temp);
 				continue;
 			}
 
 			if (strstr(buf, "DEMOSTART:") == buf) {
-				strlcpy(temp, buf + 10, strlen(buf)-11);
+				strlcpy(temp, buf + 10, strlen(buf) - 11);
 				Current_Header.demostart = atof(temp);
 				continue;
 			}
 
 			if (strstr(buf, "SIDE:") == buf) {
-				strlcpy(temp, buf + 5, strlen(buf)-6);
+				strlcpy(temp, buf + 5, strlen(buf) - 6);
 				Current_Header.side = atoi(temp);
 				continue;
 			}
 
 			if (strstr(buf, "SCOREMODE:") == buf) {
-				strlcpy(temp, buf + 10, strlen(buf)-11);
+				strlcpy(temp, buf + 10, strlen(buf) - 11);
 				Current_Header.scoremode = atoi(temp);
 				continue;
 			}
@@ -205,13 +206,13 @@ void MeasureInsertionSort(MEASURE_T t[], int array_size) {
 	for (int i = 1; i < array_size; i++) {
 
 		MEASURE_T temp = t[i];
-		if (t[i - 1].create_time > temp.create_time) {
+		if (t[i - 1].create_time_cmp > temp.create_time_cmp) {
 
 			int j = i;
 			do {
 				t[j] = t[j - 1];
 				--j;
-			} while (j > 0 && t[j - 1].create_time > temp.create_time);
+			} while (j > 0 && t[j - 1].create_time_cmp > temp.create_time_cmp);
 			t[j] = temp;
 		}
 	}
@@ -220,8 +221,8 @@ void MeasureInsertionSort(MEASURE_T t[], int array_size) {
 void tja_notes_load() {
 
 	int FirstMultiMeasure = -1,	//複数行の小節の最初の小節id 複数出ない場合は-1
-		NotesCount = 0, NextGOGO = -1;
-	bool isStart = false, isEnd = false, isDispBarLine = true,isNoComma = false;
+		NotesCount = 0,BranchCourse = -1;
+	bool isStart = false, isEnd = false, isDispBarLine = true, isNoComma = false;
 	FILE *fp;
 	COMMAND_T Command;
 	double bpm = Current_Header.bpm,
@@ -230,7 +231,14 @@ void tja_notes_load() {
 		scroll = 1,
 		NextMeasure = 1,
 		delay = 0,
-		percent = 1;
+		percent = 1,
+		BeforeBranchJudgeTime = 0,
+		BeforeBranchCreateTime = 0,
+		BeforeBranchPreJudge = 0,
+		BeforeBranchBpm = 0,
+		BeforeBranchDelay = 0,
+		BeforeBranchMeasure = 0,
+		BeforeBranchScroll = 1;
 
 	if ((fp = fopen("sdmc:/tjafiles/" File_Name  "/" File_Name ".tja", "r")) != NULL) {
 
@@ -281,18 +289,19 @@ void tja_notes_load() {
 				if (tja_notes[tja_cnt][0] == '#') {
 
 					get_command_value(tja_notes[tja_cnt], &Command);
+					Measure[MeasureCount].command = Command.knd;
 					switch (Command.knd) {
 					case BPmchange:
-						NextBpm = Command.val;
+						NextBpm = Command.val[0];
 						break;
 					case MEasure:
-						NextMeasure = Command.val;
+						NextMeasure = Command.val[0];
 						break;
 					case SCroll:
-						scroll = Command.val;
+						scroll = Command.val[0];
 						break;
 					case DElay:
-						delay = Command.val;
+						delay = Command.val[0];
 						break;
 					case BArlineon:
 						isDispBarLine = true;
@@ -300,15 +309,21 @@ void tja_notes_load() {
 					case BArlineoff:
 						isDispBarLine = false;
 						break;
+					case N:
+						BranchCourse = N;
+						break;
+					case E:
+						BranchCourse = E;
+						break;
+					case M:
+						BranchCourse = M;
+						break;
+					case BRanchend:
+						BranchCourse = -1;
+						break;
 					case ENd:
 						isEnd = true;
 						Measure[MeasureCount].command = ENd;
-						break;
-					case GOgostart:
-						NextGOGO = GOgostart;
-						break;
-					case GOgoend:
-						NextGOGO = GOgoend;
 						break;
 					default:
 						break;
@@ -325,7 +340,7 @@ void tja_notes_load() {
 						if (tja_notes[tja_cnt][i] == '/') NotesCount++;
 						if (tja_notes[tja_cnt][i] != ',' && tja_notes[tja_cnt][i] != '/') i--;
 						Measure[MeasureCount].notes_count = i;
-						
+
 					}
 				}
 
@@ -341,19 +356,42 @@ void tja_notes_load() {
 				Measure[MeasureCount].isDispBarLine = isDispBarLine;
 
 				if (tja_notes[tja_cnt][0] == '#') {
-					Measure[MeasureCount].create_time = Measure[MeasureCount - 1].create_time;
-					Measure[MeasureCount].judge_time = Measure[MeasureCount - 1].judge_time;
-					//Measure[MeasureCount].isDispBarLine = false;
+
+					if (MeasureCount > 0) {
+						Measure[MeasureCount].judge_time = Measure[MeasureCount - 1].judge_time;
+						Measure[MeasureCount].create_time = Measure[MeasureCount - 1].create_time;
+						//Measure[MeasureCount].isDispBarLine = false;
+					}
+					switch (Command.knd) {
+					case BRanchstart:
+						BeforeBranchJudgeTime = Measure[MeasureCount].judge_time;
+						BeforeBranchCreateTime = Measure[MeasureCount].create_time;
+						BeforeBranchBpm = NextBpm;
+						BeforeBranchDelay = delay;
+						BeforeBranchMeasure = NextMeasure;
+						BeforeBranchPreJudge = PreJudge;
+						BeforeBranchScroll = scroll;
+						break;
+					case N:
+					case E:
+					case M:
+						NextBpm = BeforeBranchBpm;
+						NextMeasure = BeforeBranchMeasure;
+						delay = BeforeBranchDelay;
+						scroll = BeforeBranchScroll;
+						Measure[MeasureCount].judge_time = BeforeBranchJudgeTime;
+						Measure[MeasureCount].create_time = BeforeBranchCreateTime;
+						PreJudge = BeforeBranchPreJudge;
+						break;
+					default:
+						break;
+					}
 				}
 				else {
 					if (isNoComma == false) PreJudge = Measure[MeasureCount].judge_time;
 					bpm = NextBpm;
 					measure = NextMeasure;
 					delay = 0;
-					if (NextGOGO != -10) {
-						Measure[MeasureCount].command = NextGOGO;
-						NextGOGO = -1;
-					}
 				}
 
 
@@ -374,7 +412,7 @@ void tja_notes_load() {
 							Measure[Measure[MeasureCount].firstmeasure + i].pop_time = Measure[Measure[MeasureCount].firstmeasure + i].judge_time - (60.0 / Measure[Measure[MeasureCount].firstmeasure + i].bpm * 4)*(Notes_Judge_Range / (Notes_Area));
 							Measure[Measure[MeasureCount].firstmeasure + i].create_time = Measure[Measure[MeasureCount].firstmeasure + i].judge_time - (60.0 / Measure[Measure[MeasureCount].firstmeasure + i].bpm * 4)*(Notes_Judge_Range / (Notes_Area*Measure[Measure[MeasureCount].firstmeasure + i].scroll));
 							percent = (double)Measure[Measure[MeasureCount].firstmeasure + i].notes_count / (double)Measure[Measure[MeasureCount].firstmeasure].max_notes;
-							
+
 							Measure[Measure[MeasureCount].firstmeasure + i].isDispBarLine = false;	//最初の小節は小節線をオフにしない
 						}
 					}
@@ -383,6 +421,19 @@ void tja_notes_load() {
 				}
 				else if (tja_notes[tja_cnt][0] != '#') {
 					percent = 1;
+				}
+				
+				switch (BranchCourse) {
+				case E:
+					Measure[MeasureCount].create_time_cmp = Measure[MeasureCount].create_time + 100000;
+					break;
+				case M:
+					Measure[MeasureCount].create_time_cmp = Measure[MeasureCount].create_time + 200000;
+					break;
+				case N:
+				default:
+					Measure[MeasureCount].create_time_cmp = Measure[MeasureCount].create_time;
+					break;
 				}
 
 
@@ -395,11 +446,22 @@ void tja_notes_load() {
 			}
 		}
 
-		//基本天井点を計算
-		calc_base_score(Measure,tja_notes);
-
-		
 		MeasureMaxNumber = tja_cnt;
+		/*
+		for (int i = 0; i < MeasureMaxNumber; i++) {	//次の小節の判定時に発動する命令の調整
+			
+			if (tja_notes[i][0] == '#' && Measure[i].command == BRanchstart) {
+
+				int n = i + 1;
+				while (n <= MeasureMaxNumber && tja_notes[n][0] == '#') n++;
+				Measure[i].judge_time = Measure[n].judge_time;
+			}
+		}*/
+		//基本天井点を計算
+		calc_base_score(Measure, tja_notes);
+
+
+
 		fclose(fp);
 		MeasureInsertionSort(Measure, Measure_Max);
 		MainFirstMeasureTime = Measure[0].judge_time - Measure[0].create_time;
@@ -470,13 +532,15 @@ void get_command_value(char* buf, COMMAND_T *Command) {
 
 		Command->command_s = command;
 		Command->value_s = value;
-		Command->val = 0;
+		Command->val[0] = 0;
+		Command->val[1] = 0;
+		Command->val[2] = 0;
 
 		if (strcmp(command, "START") == 0) Command->knd = STart;
 		else if (strcmp(command, "END") == 0) Command->knd = ENd;
 		else if (strcmp(command, "BPMCHANGE") == 0) {
 			Command->knd = BPmchange;
-			Command->val = strtod(value, NULL);
+			Command->val[0] = strtod(value, NULL);
 		}
 		else if (strcmp(command, "GOGOSTART") == 0) Command->knd = GOgostart;
 		else if (strcmp(command, "GOGOEND") == 0) Command->knd = GOgoend;
@@ -490,25 +554,40 @@ void get_command_value(char* buf, COMMAND_T *Command) {
 					*molecule = (char *)malloc((strlen(buf) + 1));
 				strlcpy(molecule, value + 1, srash);
 				strlcpy(denominator, value + srash + 1, strlen(buf) - srash);
-				Command->val = strtod(molecule, NULL) / strtod(denominator, NULL);
+				Command->val[0] = strtod(molecule, NULL) / strtod(denominator, NULL);
 				free(denominator);
 				free(molecule);
 			}
 			else {
-				if (strtod(value, NULL) != 0) Command->val = strtod(value, NULL);
-				else Command->val = 1.0;
+				if (strtod(value, NULL) != 0) Command->val[0] = strtod(value, NULL);
+				else Command->val[0] = 1.0;
 			}
 		}
 		else if (strcmp(command, "SCROLL") == 0) {
 			Command->knd = SCroll;
-			Command->val = strtod(value, NULL);
+			Command->val[0] = strtod(value, NULL);
 		}
 		else if (strcmp(command, "DELAY") == 0) {
 			Command->knd = DElay;
-			Command->val = strtod(value, NULL);
+			Command->val[0] = strtod(value, NULL);
 		}
 		else if (strcmp(command, "SECTION") == 0) Command->knd = SEction;
-		else if (strcmp(command, "BRANCHSTART") == 0) Command->knd = BRanchstart;
+		else if (strcmp(command, "BRANCHSTART") == 0) {
+			Command->knd = BRanchstart;
+			char* tp;
+			tp = strtok(value, ",");
+			switch (value[1]) {
+			case 'r':Command->val[0] = 0; break;	//連打
+			case 'p':Command->val[0] = 1; break;	//精度
+			case 's':Command->val[0] = 2; break;	//スコア
+			default: break;
+			}
+			int i = 1;
+			while ((tp = strtok(NULL, ","))) {
+				Command->val[i] = strtod(tp, NULL);
+				i++;
+			}
+		}
 		else if (strcmp(command, "BRANCHEND") == 0) Command->knd = BRanchend;
 		else if (strcmp(command, "N") == 0) Command->knd = N;
 		else if (strcmp(command, "E") == 0) Command->knd = E;
