@@ -246,9 +246,6 @@ void tja_notes_load() {
 		int MeasureCount = 0;
 		double PreJudge = 0, FirstMeasureTime = 0;
 
-
-		//MainFirstMeasureTime = (60.0 / bpm * measure*4)*((Notes_Area - Notes_Judge) / Notes_Area);
-
 		FirstMeasureTime = (60.0 / bpm * 4 * measure)*(Notes_Judge_Range / Notes_Area) - 60.0 / bpm * 4 * measure;
 		PreJudge = FirstMeasureTime;
 
@@ -366,17 +363,17 @@ void tja_notes_load() {
 					case BRanchstart:
 						BeforeBranchJudgeTime = Measure[MeasureCount].judge_time;
 						BeforeBranchCreateTime = Measure[MeasureCount].create_time;
-						BeforeBranchBpm = NextBpm;
+						BeforeBranchBpm = bpm;
 						BeforeBranchDelay = delay;
-						BeforeBranchMeasure = NextMeasure;
+						BeforeBranchMeasure = measure;
 						BeforeBranchPreJudge = PreJudge;
 						BeforeBranchScroll = scroll;
 						break;
 					case N:
 					case E:
 					case M:
-						NextBpm = BeforeBranchBpm;
-						NextMeasure = BeforeBranchMeasure;
+						bpm = BeforeBranchBpm;
+						measure = BeforeBranchMeasure;
 						delay = BeforeBranchDelay;
 						scroll = BeforeBranchScroll;
 						Measure[MeasureCount].judge_time = BeforeBranchJudgeTime;
