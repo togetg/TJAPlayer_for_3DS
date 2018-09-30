@@ -19,7 +19,6 @@ void measure_structure_init() {
 	for (int i = 0; i < Measure_Max; i++) {
 
 		Measure[i].create_time = INT_MAX;
-		Measure[i].create_time_cmp = INT_MAX;
 		Measure[i].judge_time = INT_MAX;
 		Measure[i].pop_time = INT_MAX;
 		Measure[i].bpm = 0;
@@ -206,13 +205,13 @@ void MeasureInsertionSort(MEASURE_T t[], int array_size) {
 	for (int i = 1; i < array_size; i++) {
 
 		MEASURE_T temp = t[i];
-		if (t[i - 1].create_time_cmp > temp.create_time_cmp) {
+		if (t[i - 1].create_time > temp.create_time) {
 
 			int j = i;
 			do {
 				t[j] = t[j - 1];
 				--j;
-			} while (j > 0 && t[j - 1].create_time_cmp > temp.create_time_cmp);
+			} while (j > 0 && t[j - 1].create_time > temp.create_time);
 			t[j] = temp;
 		}
 	}
@@ -351,6 +350,7 @@ void tja_notes_load() {
 				Measure[MeasureCount].pop_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4)*(Notes_Judge_Range / Notes_Area);
 				Measure[MeasureCount].create_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4)*(Notes_Judge_Range / (Notes_Area*scroll));
 				Measure[MeasureCount].isDispBarLine = isDispBarLine;
+				Measure[MeasureCount].branch = BranchCourse;
 
 				if (tja_notes[tja_cnt][0] == '#') {
 
@@ -419,19 +419,6 @@ void tja_notes_load() {
 				else if (tja_notes[tja_cnt][0] != '#') {
 					percent = 1;
 				}
-				
-				switch (BranchCourse) {
-				case E:
-					Measure[MeasureCount].create_time_cmp = Measure[MeasureCount].create_time + 100000;
-					break;
-				case M:
-					Measure[MeasureCount].create_time_cmp = Measure[MeasureCount].create_time + 200000;
-					break;
-				case N:
-				default:
-					Measure[MeasureCount].create_time_cmp = Measure[MeasureCount].create_time;
-					break;
-				}
 
 
 				if (isEnd == true) {
@@ -444,20 +431,9 @@ void tja_notes_load() {
 		}
 
 		MeasureMaxNumber = tja_cnt;
-		/*
-		for (int i = 0; i < MeasureMaxNumber; i++) {	//次の小節の判定時に発動する命令の調整
-			
-			if (tja_notes[i][0] == '#' && Measure[i].command == BRanchstart) {
 
-				int n = i + 1;
-				while (n <= MeasureMaxNumber && tja_notes[n][0] == '#') n++;
-				Measure[i].judge_time = Measure[n].judge_time;
-			}
-		}*/
 		//基本天井点を計算
 		calc_base_score(Measure, tja_notes);
-
-
 
 		fclose(fp);
 		MeasureInsertionSort(Measure, Measure_Max);

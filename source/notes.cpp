@@ -43,6 +43,7 @@ void notes_main(bool isDon, bool isKa, char tja_notes[Measure_Max][Max_Notes_Mea
 
 			while (MeasureCount < Measure_Max) {
 
+				/*
 				bool escape = false;
 
 				if (tja_notes[Measure[MeasureCount].notes][0] == '#') {
@@ -63,8 +64,9 @@ void notes_main(bool isDon, bool isKa, char tja_notes[Measure_Max][Max_Notes_Mea
 					}
 					if (escape == true) break;
 				}
-
+				*/
 				MeasureCount++;
+				break;
 			}
 			Branch.next = false;
 		}
@@ -72,6 +74,12 @@ void notes_main(bool isDon, bool isKa, char tja_notes[Measure_Max][Max_Notes_Mea
 		while (Measure[MeasureCount].create_time <= NowTime && Branch.wait == false) {
 
 			NotesCount = 0;
+
+			if (Measure[MeasureCount].branch != Branch.course && Measure[MeasureCount].branch != -1) {
+
+				MeasureCount++;
+				continue;
+			}
 
 			//ノーツ数の計測
 			while (isNotesLoad == true && tja_notes[Measure[MeasureCount].notes][NotesCount] != ',' && tja_notes[Measure[MeasureCount].notes][NotesCount] != '/') {
@@ -91,6 +99,9 @@ void notes_main(bool isDon, bool isKa, char tja_notes[Measure_Max][Max_Notes_Mea
 						Branch.x = Command.val[1];
 						Branch.y = Command.val[2];
 						Branch.wait = true;
+						break;
+					case BRanchend:
+						Branch.course = -1;
 						break;
 					default:
 						break;
@@ -319,10 +330,10 @@ void notes_main(bool isDon, bool isKa, char tja_notes[Measure_Max][Max_Notes_Mea
 	snprintf(buf_notes, sizeof(buf_notes), "create :%.1f", Measure[MeasureCount].create_time);
 	debug_draw(100, 30, buf_notes);*/
 
-	snprintf(buf_notes, sizeof(buf_notes), "%d:%s", MeasureCount - 1, tja_notes[MeasureCount - 1]);
+	snprintf(buf_notes, sizeof(buf_notes), "%d:%.1f:%s", MeasureCount - 1,Measure[MeasureCount-1].judge_time, tja_notes[MeasureCount - 1]);
 	debug_draw(0, 50, buf_notes);
-	int n = 2;
-	snprintf(buf_notes, sizeof(buf_notes), "%d:%.1f:%s", n, Measure[n].judge_time, tja_notes[Measure[n].notes]);
+	int n = 3;
+	snprintf(buf_notes, sizeof(buf_notes), "%d:%d:%s", n, Measure[n].branch, tja_notes[Measure[n].notes]);
 	debug_draw(0, 60, buf_notes);
 
 	if (isAuto == true) debug_draw(0, 200, "Auto");
@@ -1046,7 +1057,7 @@ void notes_init(TJA_HEADER_T TJA_Header) {
 	Branch.knd = 0;
 	Branch.x = 0;
 	Branch.y = 0;
-	Branch.course = 0;
+	Branch.course = -1;
 	Branch.next = false;
 	Branch.wait = false;
 }

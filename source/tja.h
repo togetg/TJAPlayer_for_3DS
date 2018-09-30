@@ -19,9 +19,9 @@ typedef struct {
 }TJA_HEADER_T;
 
 typedef struct {
-	double judge_time, create_time, create_time_cmp, pop_time,
+	double judge_time, create_time, pop_time,
 		bpm, speed,measure,scroll;
-	int notes,firstmeasure,start_measure_count,max_notes,notes_count,command,
+	int notes,firstmeasure,start_measure_count,max_notes,notes_count,command,branch,
 		original_id;	//ソート前のid
 	bool flag,isDispBarLine;
 	
