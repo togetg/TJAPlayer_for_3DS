@@ -223,22 +223,22 @@ int branch_start(int knd,double x,double y) {	//分岐
 	int branch;
 	switch (knd) {
 	case 0:	//連打
-		if (y <= CurrentRollCount) branch = 2;
-		else if (x <= CurrentRollCount) branch = 1;
-		else branch = 0;
+		if (y <= CurrentRollCount) branch = M;
+		else if (x <= CurrentRollCount) branch = E;
+		else branch = N;
 		break;
 	case 1:	//精度
-		if (y <= CurrentPerfect) branch = 2;
-		else if (x <= CurrentPerfect) branch = 1;
-		else branch = 0;
+		if (y <= CurrentPerfect) branch = M;
+		else if (x <= CurrentPerfect) branch = E;
+		else branch = N;
 		break;
 	case 2:	//スコア
-		if (y <= CurrentScore) branch = 2;
-		else if (x <= CurrentScore) branch = 1;
-		else branch = 0;
+		if (y <= CurrentScore) branch = M;
+		else if (x <= CurrentScore) branch = E;
+		else branch = N;
 		break;
 	default:
-		branch = 0;
+		branch = N;
 		break;
 	}
 	D = (double)branch;
