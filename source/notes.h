@@ -11,6 +11,7 @@ void notes_main(
 	C2D_Sprite  sprites[Sprite_Number]);
 void toggle_auto();
 int ctoi(char c);
+int get_branch_course();
 
 
 void notes_init(TJA_HEADER_T TJA_Header);
@@ -31,7 +32,9 @@ enum Notes_knd {
 };
 
 enum Sprite_Notes_knd {	//スプライト用
-	dOn = 2,
+	tOp = 0,
+	bOttom,
+	dOn,
 	kA,
 	bIg_don,
 	bIg_ka,
@@ -51,6 +54,12 @@ enum Sprite_Notes_knd {	//スプライト用
 	jUdge_ryou,
 	jUdge_ka,
 	jUdge_fuka,
+	jUdge_circle,
+	cHart_normal,
+	cHart_expert,
+	cHart_master,
+	lAne_expert,
+	lAne_master,
 };
 
 enum Command_knd {
