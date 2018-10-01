@@ -29,9 +29,10 @@ typedef struct {
 
 void tja_head_load();
 void tja_notes_load();
-void tja_to_notes(bool isDnon, bool isKa, int count, C2D_Sprite sprites[Sprite_Number]);
+void tja_to_notes(bool isDnon, bool isKatsu, int count, C2D_Sprite sprites[Sprite_Number]);
 void get_command_value(char* buf, COMMAND_T *Command);
 void get_tja_header(TJA_HEADER_T *TJA_Header);
 void tja_init();
 double get_FirstMeasureTime();
 int MeasureIdFromOriginalId(int id);
+bool get_isBranch();
