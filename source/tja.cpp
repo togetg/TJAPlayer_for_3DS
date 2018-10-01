@@ -7,6 +7,7 @@
 char tja_notes[Measure_Max][Max_Notes_Measure];
 int tja_cnt = 0, MeasureMaxNumber = 0;
 double MainFirstMeasureTime;
+bool isBranch = false;
 
 
 TJA_HEADER_T Current_Header;
@@ -37,6 +38,10 @@ void measure_structure_init() {
 
 void tja_init() {
 	measure_structure_init();
+	tja_cnt = 0;
+	MeasureMaxNumber = 0;
+	MainFirstMeasureTime = 0;
+	isBranch = false;
 }
 
 void tja_head_load() {
@@ -314,6 +319,9 @@ void tja_notes_load() {
 					case M:
 						BranchCourse = M;
 						break;
+					case BRanchstart:
+						isBranch = true;
+						break;
 					case BRanchend:
 						BranchCourse = -1;
 						break;
@@ -457,9 +465,9 @@ void get_tja_header(TJA_HEADER_T *TJA_Header) {
 	*TJA_Header = Current_Header;
 }
 
-void tja_to_notes(bool isDon, bool isKa, int count, C2D_Sprite sprites[Sprite_Number]) {
+void tja_to_notes(bool isDon, bool isKatsu, int count, C2D_Sprite sprites[Sprite_Number]) {
 
-	notes_main(isDon, isKa, tja_notes, Measure, count, sprites);
+	notes_main(isDon, isKatsu, tja_notes, Measure, count, sprites);
 
 }
 
@@ -601,4 +609,8 @@ int MeasureIdFromOriginalId(int id) {
 		if (Measure[i].original_id == id) return i;
 	}
 	return -1;
+}
+
+bool get_isBranch() {
+	return isBranch;
 }
