@@ -317,9 +317,11 @@ void tja_notes_load() {
 					case BRanchend:
 						BranchCourse = -1;
 						break;
+					case SEction:
+						Measure[MeasureCount].command = SEction;
+						break;
 					case ENd:
 						isEnd = true;
-						Measure[MeasureCount].command = ENd;
 						break;
 					default:
 						break;
@@ -431,6 +433,15 @@ void tja_notes_load() {
 		}
 
 		MeasureMaxNumber = tja_cnt;
+
+		for (int i = 0; i < MeasureMaxNumber; i++) {	//次の小節の判定時に発動する命令の調整
+
+			if (Measure[i].command == SEction) {
+				int n = i + 1;
+				while (n <= MeasureMaxNumber && tja_notes[n][0] == '#') n++;
+				Measure[i].judge_time = Measure[n].judge_time;
+			}
+		}
 
 		//基本天井点を計算
 		calc_base_score(Measure, tja_notes);
