@@ -11,9 +11,9 @@ double bpm, offset;
 char buf_notes[160];
 
 int find_notes_id(), find_line_id(), make_roll_start(int NotesId), make_roll_end(int NotesId), make_balloon_start(int NotesId), make_balloon_end(int NotesId);
-void notes_calc(bool isDon, bool isKa, double bpm, double NowTime, int cnt, C2D_Sprite sprites[Sprite_Number]);
+void notes_calc(bool isDon, bool isKatsu, double bpm, double NowTime, int cnt, C2D_Sprite sprites[Sprite_Number]);
 void notes_draw(C2D_Sprite sprites[Sprite_Number]), notes_sort(), delete_roll(int i), notes_init(TJA_HEADER_T TJA_Header), delete_notes(int i), make_balloon_break();
-
+void draw_judge(double NowTime, C2D_Sprite sprites[Sprite_Number]);
 
 NOTES_T Notes[Notes_Max];
 COMMAND_T Command;
@@ -25,9 +25,9 @@ BRANCH_T Branch;
 int MeasureCount, RollState, NotesCount, JudgeDispknd, JudgeRollState, BalloonBreakCount, BranchCourse,
 NotesNumber;	//何番目のノーツか
 bool  isNotesLoad = true, isAuto = false, isJudgeDisp = false, isBalloonBreakDisp = false, isGOGOTime = false;;	//要初期化
-double JudgeMakeTime, JudgeY;
+double JudgeMakeTime, JudgeY,JudgeEffectCnt;
 
-void notes_main(bool isDon, bool isKa, char tja_notes[Measure_Max][Max_Notes_Measure], MEASURE_T Measure[Measure_Max], int cnt, C2D_Sprite  sprites[Sprite_Number]) {
+void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_Measure], MEASURE_T Measure[Measure_Max], int cnt, C2D_Sprite  sprites[Sprite_Number]) {
 
 	//最初の小節のcreate_timeがマイナスだった時用に調整
 	double NowTime = time_now(0) + Measure[0].create_time;
@@ -94,7 +94,7 @@ void notes_main(bool isDon, bool isKa, char tja_notes[Measure_Max][Max_Notes_Mea
 				NotesCount++;
 			}
 
-			if (Branch.wait == true) break;
+			if (isNotesLoad == false || Branch.wait == true) break;
 
 			//小節線
 			int BarLineId = find_line_id();
@@ -254,7 +254,7 @@ void notes_main(bool isDon, bool isKa, char tja_notes[Measure_Max][Max_Notes_Mea
 
 	send_gogotime(isGOGOTime);
 
-	notes_calc(isDon, isKa, bpm, NowTime, cnt, sprites);
+	notes_calc(isDon, isKatsu, bpm, NowTime, cnt, sprites);
 
 	for (int i = 0; i < Measure_Max - 1; i++) {	//判定時に発動する命令
 
@@ -296,6 +296,8 @@ void notes_main(bool isDon, bool isKa, char tja_notes[Measure_Max][Max_Notes_Mea
 	notes_draw(sprites);
 
 	C2D_DrawRectangle(0, 86, 0, 62, 58, C2D_Color32f(0, 0, 1, 1), C2D_Color32f(0, 0, 1, 1), C2D_Color32f(0, 0, 1, 1), C2D_Color32f(0, 0, 1, 1));
+
+	draw_judge(NowTime, sprites);
 
 	snprintf(buf_notes, sizeof(buf_notes), "cnt :%d", cnt);
 	debug_draw(100, 0, buf_notes);
@@ -339,11 +341,17 @@ void make_judge(int knd, double NowTime) {
 	JudgeMakeTime = NowTime;
 	JudgeDispknd = knd;
 	JudgeY = 73;
+	JudgeEffectCnt = 0;
 }
 
-void calc_judge(double NowTime, C2D_Sprite sprites[Sprite_Number]) {
+void draw_judge(double NowTime, C2D_Sprite sprites[Sprite_Number]) {
 
 	if (isJudgeDisp == true) {
+
+		JudgeEffectCnt++;
+
+		C2D_ImageTint Tint;
+		C2D_AlphaImageTint(&Tint, 1.0 - JudgeEffectCnt * 1.0 / 20);
 
 		//アニメーション
 		if (NowTime - JudgeMakeTime < 0.05)  JudgeY = 73 + (NowTime - JudgeMakeTime) * 140;
@@ -351,19 +359,33 @@ void calc_judge(double NowTime, C2D_Sprite sprites[Sprite_Number]) {
 
 		switch (JudgeDispknd) {
 
-		case 0:		//良
-			C2D_SpriteSetPos(&sprites[jUdge_ryou], 93, JudgeY);
-			C2D_DrawSprite(&sprites[jUdge_ryou]);
+		case PERFECT:			//良
+			C2D_DrawSpriteTinted(&sprites[eFfect_perfect], &Tint);
+			C2D_SpriteSetPos(&sprites[jUdge_perfect], 93, JudgeY);
+			C2D_DrawSprite(&sprites[jUdge_perfect]);
 			break;
 
-		case 1:		//可
-			C2D_SpriteSetPos(&sprites[jUdge_ka], 93, JudgeY);
-			C2D_DrawSprite(&sprites[jUdge_ka]);
+		case SPECIAL_PERFECT:	//特良
+			C2D_DrawSpriteTinted(&sprites[eFfect_special_perfect], &Tint);
+			C2D_SpriteSetPos(&sprites[jUdge_perfect], 93, JudgeY);
+			C2D_DrawSprite(&sprites[jUdge_perfect]);
 			break;
 
-		case 2:		//不可
-			C2D_SpriteSetPos(&sprites[jUdge_fuka], 92, JudgeY);
-			C2D_DrawSprite(&sprites[jUdge_fuka]);
+		case NICE:				//可
+			C2D_DrawSpriteTinted(&sprites[eFfect_nice], &Tint);
+			C2D_SpriteSetPos(&sprites[jUdge_nice], 93, JudgeY);
+			C2D_DrawSprite(&sprites[jUdge_nice]);
+			break;
+
+		case SPECIAL_NICE:		//特可
+			C2D_DrawSpriteTinted(&sprites[eFfect_special_nice], &Tint);
+			C2D_SpriteSetPos(&sprites[jUdge_nice], 93, JudgeY);
+			C2D_DrawSprite(&sprites[jUdge_nice]);
+			break;
+
+		case BAD:				//不可
+			C2D_SpriteSetPos(&sprites[jUdge_bad], 92, JudgeY);
+			C2D_DrawSprite(&sprites[jUdge_bad]);
 			break;
 
 		}
@@ -371,9 +393,10 @@ void calc_judge(double NowTime, C2D_Sprite sprites[Sprite_Number]) {
 		//debug_draw(92, JudgeY, buf_notes);
 		if (NowTime - JudgeMakeTime >= 0.5) isJudgeDisp = false;
 	}
+
 }
 
-void notes_judge(double NowTime, bool isDon, bool isKa, int cnt) {
+void notes_judge(double NowTime, bool isDon, bool isKatsu, int cnt) {
 
 	int CurrentJudgeNotes[2] = { -1,-1 };		//現在判定すべきノーツ ドン,カツ
 	double CurrentJudgeNotesLag[2] = { -1,-1 };	//判定すべきノーツの誤差(s)
@@ -415,8 +438,8 @@ void notes_judge(double NowTime, bool isDon, bool isKa, int cnt) {
 				}
 			}
 			else if (
-				Notes[i].knd == Ka ||
-				Notes[i].knd == BigKa) {	//カツ
+				Notes[i].knd == Katsu ||
+				Notes[i].knd == BigKatsu) {	//カツ
 
 				if (CurrentJudgeNotesLag[1] > fabs(Notes[i].judge_time - NowTime) ||
 					CurrentJudgeNotesLag[1] == -1) {
@@ -437,22 +460,26 @@ void notes_judge(double NowTime, bool isDon, bool isKa, int cnt) {
 					Notes[i].knd != RollEnd && Notes[i].knd != Balloon && Notes[i].knd != BalloonEnd)) {
 
 				if (Notes[i].knd == Don ||
-					Notes[i].knd == BigDon ||
 					Notes[i].knd == Potato) {
 
 					music_play(0);
-					make_judge(0, NowTime);
+					make_judge(PERFECT, NowTime);
 				}
-				else if (
-					Notes[i].knd == Ka ||
-					Notes[i].knd == BigKa) {
-
+				else if (Notes[i].knd == BigDon) {
+					music_play(0);
+					make_judge(SPECIAL_PERFECT, NowTime);
+				}
+				else if (Notes[i].knd == Katsu) {
 					music_play(1);
-					make_judge(0, NowTime);
+					make_judge(PERFECT, NowTime);
+				}
+				else if (Notes[i].knd == BigKatsu) {
+					music_play(1);
+					make_judge(SPECIAL_PERFECT, NowTime);
 				}
 
-				if (Notes[i].knd == BigDon || Notes[i].knd == BigKa) score_update(SPECIAL_RYOU);
-				else if (Notes[i].knd == Don || Notes[i].knd == Ka) score_update(RYOU);
+				if (Notes[i].knd == BigDon || Notes[i].knd == BigKatsu) score_update(SPECIAL_PERFECT);
+				else if (Notes[i].knd == Don || Notes[i].knd == Katsu) score_update(PERFECT);
 
 				delete_notes(i);
 			}
@@ -484,47 +511,71 @@ void notes_judge(double NowTime, bool isDon, bool isKa, int cnt) {
 
 	else if (isAuto == false) {			//手動
 
+		bool isBig;
+		if (Notes[CurrentJudgeNotes[0]].knd == BigDon || Notes[CurrentJudgeNotes[0]].knd == BigKatsu) isBig = true;
+		else isBig = false;
+
 		if (isDon == true && CurrentJudgeNotes[0] != -1) {	//ドン
 
-			bool isBig;
-			if (Notes[CurrentJudgeNotes[0]].knd == BigDon || Notes[CurrentJudgeNotes[0]].knd == BigKa) isBig = true;
-			else isBig = false;
-
 			if (CurrentJudgeNotesLag[0] <= 0.034) {			//良
-				make_judge(0, NowTime);
 				delete_notes(CurrentJudgeNotes[0]);
-				if (isBig == true) score_update(SPECIAL_RYOU);
-				else score_update(RYOU);
+				if (isBig == true) {
+					make_judge(SPECIAL_PERFECT, NowTime);
+					score_update(SPECIAL_PERFECT);
+				}
+				else {
+					make_judge(PERFECT, NowTime);
+					score_update(PERFECT);
+				}
 			}
 			else if (CurrentJudgeNotesLag[0] <= 0.117) {	//可
 				make_judge(1, NowTime);
 				delete_notes(CurrentJudgeNotes[0]);
-				if (isBig == true) score_update(SPECIAL_KA);
-				else score_update(KA);
+				if (isBig == true) {
+					make_judge(SPECIAL_NICE, NowTime);
+					score_update(SPECIAL_NICE);
+				}
+				else {
+					make_judge(NICE, NowTime);
+					score_update(NICE);
+				}
 			}
 			else if (CurrentJudgeNotesLag[0] <= 0.150) {	//不可
 				make_judge(2, NowTime);
 				delete_notes(CurrentJudgeNotes[0]);
-				score_update(FUKA);
+				score_update(BAD);
 			}
 		}
 
-		if (isKa == true && CurrentJudgeNotes[1] != -1) {	//カツ
+		if (isKatsu == true && CurrentJudgeNotes[1] != -1) {	//カツ
 
-			if (CurrentJudgeNotesLag[1] <= 0.034) {			//良
-				make_judge(0, NowTime);
-				delete_notes(CurrentJudgeNotes[1]);
-				score_update(RYOU);
+			if (CurrentJudgeNotesLag[0] <= 0.034) {			//良
+				delete_notes(CurrentJudgeNotes[0]);
+				if (isBig == true) {
+					make_judge(SPECIAL_PERFECT, NowTime);
+					score_update(SPECIAL_PERFECT);
+				}
+				else {
+					make_judge(PERFECT, NowTime);
+					score_update(PERFECT);
+				}
 			}
-			else if (CurrentJudgeNotesLag[1] <= 0.117) {	//可
+			else if (CurrentJudgeNotesLag[0] <= 0.117) {	//可
 				make_judge(1, NowTime);
-				delete_notes(CurrentJudgeNotes[1]);
-				score_update(KA);
+				delete_notes(CurrentJudgeNotes[0]);
+				if (isBig == true) {
+					make_judge(SPECIAL_NICE, NowTime);
+					score_update(SPECIAL_NICE);
+				}
+				else {
+					make_judge(NICE, NowTime);
+					score_update(NICE);
+				}
 			}
-			else if (CurrentJudgeNotesLag[1] <= 0.150) {	//不可
+			else if (CurrentJudgeNotesLag[0] <= 0.150) {	//不可
 				make_judge(2, NowTime);
-				delete_notes(CurrentJudgeNotes[1]);
-				score_update(FUKA);
+				delete_notes(CurrentJudgeNotes[0]);
+				score_update(BAD);
 			}
 		}
 
@@ -534,7 +585,7 @@ void notes_judge(double NowTime, bool isDon, bool isKa, int cnt) {
 				if (JudgeRollState == Roll) score_update(ROLL);
 				else if (JudgeRollState == BigRoll) score_update(BIG_ROLL);
 			}
-			if (isKa == true) {
+			if (isKatsu == true) {
 				if (JudgeRollState == Roll) score_update(ROLL);
 				else if (JudgeRollState == BigRoll) score_update(BIG_ROLL);
 			}
@@ -560,7 +611,7 @@ void notes_judge(double NowTime, bool isDon, bool isKa, int cnt) {
 	}
 }
 
-void notes_calc(bool isDon, bool isKa, double bpm, double NowTime, int cnt, C2D_Sprite sprites[Sprite_Number]) {
+void notes_calc(bool isDon, bool isKatsu, double bpm, double NowTime, int cnt, C2D_Sprite sprites[Sprite_Number]) {
 
 	for (int i = 0; i < Notes_Max - 1; i++) {	//計算
 
@@ -616,9 +667,9 @@ void notes_calc(bool isDon, bool isKa, double bpm, double NowTime, int cnt, C2D_
 				break;
 
 			case Don:
-			case Ka:
+			case Katsu:
 			case BigDon:
-			case BigKa:
+			case BigKatsu:
 				if (NowTime - Notes[i].judge_time > 0.150 && Notes[i].isThrough == false) {
 					score_update(THROUGH);
 					Notes[i].isThrough = true;
@@ -637,8 +688,7 @@ void notes_calc(bool isDon, bool isKa, double bpm, double NowTime, int cnt, C2D_
 			Notes[i].knd != Roll && Notes[i].knd != BigRoll) delete_notes(i);
 	}
 
-	notes_judge(NowTime, isDon, isKa, cnt);
-	calc_judge(NowTime, sprites);
+	notes_judge(NowTime, isDon, isKatsu, cnt);
 }
 
 void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
@@ -654,17 +704,17 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 				C2D_SpriteSetPos(&sprites[dOn], Notes[i].x, notes_y);
 				C2D_DrawSprite(&sprites[dOn]);
 				break;
-			case Ka:
-				C2D_SpriteSetPos(&sprites[kA], Notes[i].x, notes_y);
-				C2D_DrawSprite(&sprites[kA]);
+			case Katsu:
+				C2D_SpriteSetPos(&sprites[kAtsu], Notes[i].x, notes_y);
+				C2D_DrawSprite(&sprites[kAtsu]);
 				break;
 			case BigDon:
 				C2D_SpriteSetPos(&sprites[bIg_don], Notes[i].x, notes_y);
 				C2D_DrawSprite(&sprites[bIg_don]);
 				break;
-			case BigKa:
-				C2D_SpriteSetPos(&sprites[bIg_ka], Notes[i].x, notes_y);
-				C2D_DrawSprite(&sprites[bIg_ka]);
+			case BigKatsu:
+				C2D_SpriteSetPos(&sprites[bIg_katsu], Notes[i].x, notes_y);
+				C2D_DrawSprite(&sprites[bIg_katsu]);
 				break;
 			case Roll: {
 
