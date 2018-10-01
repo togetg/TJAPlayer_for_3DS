@@ -205,7 +205,7 @@ void scoer_debug() {
 	debug_draw(0, 30, buf_score);
 	snprintf(buf_score, sizeof(buf_score), "Score:%d    %dCombo    diff:%d",TotalScore, combo, ScoreDiff);
 	debug_draw(0, 150, buf_score);
-	snprintf(buf_score, sizeof(buf_score), "Current   Score:%d    Roll:%d    Perfect:%.1f", CurrentScore, CurrentRollCount, CurrentPerfect);
+	snprintf(buf_score, sizeof(buf_score), "Current   Score:%d    Roll:%d    Precision:%.1f", CurrentScore, CurrentRollCount, CurrentPerfect);
 	debug_draw(0, 160, buf_score);
 	snprintf(buf_score, sizeof(buf_score), "%.0f:%.0f:%.0f:%.0f",A,B,C,D);
 	debug_draw(0, 170, buf_score);
@@ -213,6 +213,35 @@ void scoer_debug() {
 		snprintf(buf_score, sizeof(buf_score), "GOGOTIME");
 		debug_draw(0, 190, buf_score);
 	}
+}
+
+void draw_lane(C2D_Sprite  sprites[Sprite_Number]) {
+
+	int branch = get_branch_course();
+
+	switch (branch) {
+	case N:
+		C2D_SpriteSetPos(&sprites[cHart_normal], 350, 110);
+		C2D_DrawSprite(&sprites[cHart_normal]);
+		break;
+
+	case E:
+		C2D_SpriteSetPos(&sprites[lAne_expert], 233, 109);
+		C2D_DrawSprite(&sprites[lAne_expert]);
+		C2D_SpriteSetPos(&sprites[cHart_expert], 350, 110);
+		C2D_DrawSprite(&sprites[cHart_expert]);
+		break;
+
+	case M:
+		C2D_SpriteSetPos(&sprites[lAne_master], 233, 109);
+		C2D_DrawSprite(&sprites[lAne_master]);
+		C2D_SpriteSetPos(&sprites[cHart_master], 350, 110);
+		C2D_DrawSprite(&sprites[cHart_master]);
+		break;
+	}
+
+	C2D_SpriteSetPos(&sprites[jUdge_circle], Notes_Judge, 109);
+	C2D_DrawSprite(&sprites[jUdge_circle]);
 }
 
 int branch_start(int knd,double x,double y) {	//分岐
@@ -297,6 +326,12 @@ void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max
 		while (isEND == false && i < Measure_Max && Measure[i].flag == true) {	//小節
 
 			NotesCount = 0;
+
+			if (Measure[i].branch != -1 && Measure[i].branch != M) {
+
+				i++;
+				continue;
+			}
 
 			if (NotesCount == 0 && notes[i][0] == '#') {
 
