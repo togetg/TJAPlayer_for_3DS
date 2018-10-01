@@ -62,7 +62,7 @@ int main() {
 		C2D_SpriteSetCenter(&sprites[i], 0.5f, 0.5f);
 	}
 	C2D_SpriteSetCenterRaw(&sprites[bAlloon], 13, 13);
-	C2D_SpriteSetCenterRaw(&sprites[bAlloon_1], 8.5, 12);
+	C2D_SpriteSetCenterRaw(&sprites[bAlloon_1], 9, 12);
 	C2D_SpriteSetCenterRaw(&sprites[bAlloon_2], 9, 26);
 	C2D_SpriteSetCenterRaw(&sprites[bAlloon_3], 9, 31);
 	C2D_SpriteSetCenterRaw(&sprites[bAlloon_4], 9, 45);
@@ -111,9 +111,11 @@ int main() {
 		}
 
 		draw_fps();
+		draw_lane(sprites);
 
 		debug_draw(200, 20, buf_main);
 		debug_draw(50, 200, "日本語テスト");
+
 		
 		//譜面が先
 		if (offset > 0 && (isNotesStart == false || isMusicStart == false)) {
