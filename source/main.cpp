@@ -68,6 +68,7 @@ int main() {
 	C2D_SpriteSetCenterRaw(&sprites[bAlloon_4], 9, 45);
 	C2D_SpriteSetCenterRaw(&sprites[bAlloon_5], 9, 51);
 	C2D_SpriteSetCenterRaw(&sprites[bAlloon_6], 9, 59);
+	for (int i = 0; i < 4;i++) C2D_SpriteSetPos(&sprites[eFfect_perfect + i], 93, 109);
 
 	C2D_SpriteSetPos(&sprites[0], TOP_WIDTH / 2, TOP_HEIGHT / 2);
 	C2D_SpriteSetPos(&sprites[1], BOTTOM_WIDTH / 2, BOTTOM_HEIGHT / 2);
@@ -138,7 +139,7 @@ int main() {
 			}
 		}
 		
-		bool isDon = false, isKa = false;
+		bool isDon = false, isKatsu = false;
 		if ((((tp.px - 160)*(tp.px - 160) + (tp.py - 145)*(tp.py - 145)) <= 105 * 105 && key & KEY_TOUCH) ||
 		key & KEY_B ||
 		key & KEY_Y ||
@@ -159,13 +160,13 @@ int main() {
 		key & KEY_L ||
 		key & KEY_ZR ||
 		key & KEY_ZL) {//カツ
-		isKa = true;
+		isKatsu = true;
 		}
 
 		if (key & KEY_SELECT) toggle_auto();
 
 		if (isNotesStart == true) {
-			tja_to_notes(isDon, isKa, notes_cnt,sprites);
+			tja_to_notes(isDon, isKatsu, notes_cnt,sprites);
 			notes_cnt++;
 		}
 		scoer_debug();
@@ -177,7 +178,7 @@ int main() {
 		if (isDon == true) {	//ドン
 		music_play(0);
 		}
-		if (isKa == true) {		//カツ
+		if (isKatsu == true) {		//カツ
 		music_play(1);
 		}
 		

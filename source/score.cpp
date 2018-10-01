@@ -6,8 +6,8 @@
 
 bool isGOGO;
 int combo,init,diff,DiffMul,scoremode,HitScore,ScoreDiff,BaseCeilingPoint;
-int CurrentScore,TotalScore,CurrentRollCount, TotalRollCount,TotalRyouCount,TotalKaCount,TotalFukaCount, CurrentRyouCount, CurrentKaCount, CurrentFukaCount;
-double tmp,Perfect,CurrentPerfect;
+int CurrentScore,TotalScore,CurrentRollCount, TotalRollCount,TotalPerfectCount,TotalNiceCount,TotalBadCount, CurrentPerfectCount, CurrentNiceCount, CurrentBadCount;
+double tmp,Precision,CurrentPrecision;
 TJA_HEADER_T TJA_Header;
 char buf_score[160];
 double A, B, C, D;
@@ -27,14 +27,14 @@ void score_init() {
 	TotalScore = 0;
 	CurrentRollCount = 0;
 	TotalRollCount = 0;
-	TotalRyouCount = 0;
-	TotalKaCount = 0;
-	TotalFukaCount = 0;
-	CurrentRyouCount = 0;
-	CurrentKaCount = 0;
-	CurrentFukaCount = 0;
-	Perfect = 0;
-	CurrentPerfect = 0;
+	TotalPerfectCount = 0;
+	TotalNiceCount = 0;
+	TotalBadCount = 0;
+	CurrentPerfectCount = 0;
+	CurrentNiceCount = 0;
+	CurrentBadCount = 0;
+	Precision = 0;
+	CurrentPrecision = 0;
 }
 
 
@@ -69,52 +69,52 @@ void score_update(int knd) {
 
 		switch (knd) {
 
-		case RYOU:
+		case PERFECT:
 			TotalScore += round_down(HitScore*GOGOMul);
 			CurrentScore += round_down(HitScore*GOGOMul);
 			combo++;
 			isCombo = true;
-			TotalRyouCount++;
-			CurrentRyouCount++;
+			TotalPerfectCount++;
+			CurrentPerfectCount++;
 			break;
 
-		case SPECIAL_RYOU:
+		case SPECIAL_PERFECT:
 			TotalScore += round_down(HitScore * GOGOMul) * 2;
 			CurrentScore += round_down(HitScore * GOGOMul) * 2;
 			combo++;
 			isCombo = true;
-			TotalRyouCount++;
-			CurrentRyouCount++;
+			TotalPerfectCount++;
+			CurrentPerfectCount++;
 			break;
 
-		case KA:
+		case NICE:
 			TotalScore += round_down(HitScore / 2);
 			CurrentScore += round_down(HitScore / 2);
 			combo++;
 			isCombo = true;
-			TotalKaCount++;
-			CurrentKaCount++;
+			TotalNiceCount++;
+			CurrentNiceCount++;
 			break;
 
-		case SPECIAL_KA:
+		case SPECIAL_NICE:
 			TotalScore += round_down(HitScore - 10);
 			CurrentScore += round_down(HitScore - 10);
 			combo++;
 			isCombo = true;
-			TotalKaCount++;
-			CurrentKaCount++;
+			TotalNiceCount++;
+			CurrentNiceCount++;
 			break;
 
-		case FUKA:
+		case BAD:
 			combo = 0;
-			TotalFukaCount++;
-			CurrentFukaCount++;
+			TotalBadCount++;
+			CurrentBadCount++;
 			break;
 
 		case THROUGH:
 			combo = 0;
-			TotalFukaCount++;
-			CurrentFukaCount++;
+			TotalBadCount++;
+			CurrentBadCount++;
 			break;
 
 		case BALLOON:
@@ -191,10 +191,10 @@ void score_update(int knd) {
 		}
 	}
 	ScoreDiff = TotalScore - PreScore;
-	if ((TotalRyouCount + TotalKaCount + TotalFukaCount) != 0) Perfect = (double)TotalRyouCount / (TotalRyouCount + TotalKaCount + TotalFukaCount)*100.0;
-	else Perfect = 0;
-	if ((CurrentRyouCount + CurrentKaCount + CurrentFukaCount) != 0) CurrentPerfect = (double)CurrentRyouCount / (CurrentRyouCount + CurrentKaCount + CurrentFukaCount)*100.0;
-	else CurrentPerfect = 0;
+	if ((TotalPerfectCount + TotalNiceCount + TotalBadCount) != 0) Precision = (double)TotalPerfectCount / (TotalPerfectCount + TotalNiceCount + TotalBadCount)*100.0;
+	else Precision = 0;
+	if ((CurrentPerfectCount + CurrentNiceCount + CurrentBadCount) != 0) CurrentPrecision = (double)CurrentPerfectCount / (CurrentPerfectCount + CurrentNiceCount + CurrentBadCount)*100.0;
+	else CurrentPrecision = 0;
 }
 
 void scoer_debug() {
@@ -205,7 +205,7 @@ void scoer_debug() {
 	debug_draw(0, 30, buf_score);
 	snprintf(buf_score, sizeof(buf_score), "Score:%d    %dCombo    diff:%d",TotalScore, combo, ScoreDiff);
 	debug_draw(0, 150, buf_score);
-	snprintf(buf_score, sizeof(buf_score), "Current   Score:%d    Roll:%d    Precision:%.1f", CurrentScore, CurrentRollCount, CurrentPerfect);
+	snprintf(buf_score, sizeof(buf_score), "Current   Score:%d    Roll:%d    Precision:%.1f", CurrentScore, CurrentRollCount, CurrentPrecision);
 	debug_draw(0, 160, buf_score);
 	snprintf(buf_score, sizeof(buf_score), "%.0f:%.0f:%.0f:%.0f",A,B,C,D);
 	debug_draw(0, 170, buf_score);
@@ -217,27 +217,32 @@ void scoer_debug() {
 
 void draw_lane(C2D_Sprite  sprites[Sprite_Number]) {
 
-	int branch = get_branch_course();
 
-	switch (branch) {
-	case N:
-		C2D_SpriteSetPos(&sprites[cHart_normal], 350, 110);
-		C2D_DrawSprite(&sprites[cHart_normal]);
-		break;
+	if (get_isBranch() == true) {
 
-	case E:
-		C2D_SpriteSetPos(&sprites[lAne_expert], 233, 109);
-		C2D_DrawSprite(&sprites[lAne_expert]);
-		C2D_SpriteSetPos(&sprites[cHart_expert], 350, 110);
-		C2D_DrawSprite(&sprites[cHart_expert]);
-		break;
+		int branch = get_branch_course();
 
-	case M:
-		C2D_SpriteSetPos(&sprites[lAne_master], 233, 109);
-		C2D_DrawSprite(&sprites[lAne_master]);
-		C2D_SpriteSetPos(&sprites[cHart_master], 350, 110);
-		C2D_DrawSprite(&sprites[cHart_master]);
-		break;
+		switch (branch) {
+		case N:
+		default:
+			C2D_SpriteSetPos(&sprites[cHart_normal], 350, 110);
+			C2D_DrawSprite(&sprites[cHart_normal]);
+			break;
+
+		case E:
+			C2D_SpriteSetPos(&sprites[lAne_expert], 233, 109);
+			C2D_DrawSprite(&sprites[lAne_expert]);
+			C2D_SpriteSetPos(&sprites[cHart_expert], 350, 110);
+			C2D_DrawSprite(&sprites[cHart_expert]);
+			break;
+
+		case M:
+			C2D_SpriteSetPos(&sprites[lAne_master], 233, 109);
+			C2D_DrawSprite(&sprites[lAne_master]);
+			C2D_SpriteSetPos(&sprites[cHart_master], 350, 110);
+			C2D_DrawSprite(&sprites[cHart_master]);
+			break;
+		}
 	}
 
 	C2D_SpriteSetPos(&sprites[jUdge_circle], Notes_Judge, 109);
@@ -257,8 +262,8 @@ int branch_start(int knd,double x,double y) {	//分岐
 		else branch = N;
 		break;
 	case 1:	//精度
-		if (y <= CurrentPerfect) branch = M;
-		else if (x <= CurrentPerfect) branch = E;
+		if (y <= CurrentPrecision) branch = M;
+		else if (x <= CurrentPrecision) branch = E;
 		else branch = N;
 		break;
 	case 2:	//スコア
@@ -277,11 +282,11 @@ int branch_start(int knd,double x,double y) {	//分岐
 void branch_section_init() {	//#SECTION
 
 	CurrentRollCount = 0;
-	CurrentRyouCount = 0;
-	CurrentKaCount = 0;
-	CurrentFukaCount = 0;
+	CurrentPerfectCount = 0;
+	CurrentNiceCount = 0;
+	CurrentBadCount = 0;
 	CurrentScore = 0;
-	CurrentPerfect = 0;
+	CurrentPrecision = 0;
 }
 
 void send_gogotime(bool arg) {
@@ -369,8 +374,8 @@ void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max
 
 				if (knd != 0) {
 
-					if (knd == Don || knd == Ka || knd == BigDon || knd == BigKa) {
-						if (knd == BigDon || knd == BigKa) special = 2.0;
+					if (knd == Don || knd == Katsu || knd == BigDon || knd == BigKatsu) {
+						if (knd == BigDon || knd == BigKatsu) special = 2.0;
 						else special = 1.0;
 						combo++;
 						init_cnt += 1 * gogo * special;
@@ -391,17 +396,17 @@ void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max
 
 						diff_cnt += DiffTmp * gogo * special;
 					}
-					else if (knd == Balloon) {	//風船
+					else if (knd == Balloon) {		//風船
 
 						TmpBaseCeilingPoint -= (TJA_Header.balloon[BalloonCnt] * 300 + 5000) * gogo;
 						BalloonCnt++;
 					}
-					else if (knd == Roll) { //連打
+					else if (knd == Roll) {			//連打
 					
 						roll_start_time = Measure[i].judge_time + 60.0 / Measure[i].bpm * 4 * Measure[i].measure * i / NotesCountMax;
 						RollKnd = Roll;
 					}
-					else if (knd == BigRoll) { //大連打
+					else if (knd == BigRoll) {		//大連打
 
 						roll_start_time = Measure[i].judge_time + 60.0 / Measure[i].bpm * 4 * Measure[i].measure * i / NotesCountMax;
 						RollKnd = BigRoll;

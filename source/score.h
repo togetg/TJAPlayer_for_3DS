@@ -1,4 +1,19 @@
-﻿void score_init();
+﻿#pragma once
+
+enum Judge_Knd {
+	PERFECT = 0,
+	SPECIAL_PERFECT,
+	NICE,
+	SPECIAL_NICE,
+	BAD,
+	THROUGH,
+	ROLL,
+	BIG_ROLL,
+	BALLOON,
+	BALLOON_BREAK,
+};
+
+void score_init();
 void scoer_debug();
 void score_update(int knd);
 void send_gogotime(bool temp);
@@ -7,16 +22,3 @@ void calc_base_score(MEASURE_T Measure[Measure_Max], char tja_notes[Measure_Max]
 void branch_section_init();
 int branch_start(int knd, double x, double y);
 void draw_lane(C2D_Sprite  sprites[Sprite_Number]);
-
-enum Judge_Knd {
-	RYOU = 0,
-	SPECIAL_RYOU,
-	KA,
-	SPECIAL_KA,
-	FUKA,
-	THROUGH,
-	ROLL,
-	BIG_ROLL,
-	BALLOON,
-	BALLOON_BREAK,
-};
