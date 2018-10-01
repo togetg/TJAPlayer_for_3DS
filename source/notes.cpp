@@ -43,28 +43,6 @@ void notes_main(bool isDon, bool isKa, char tja_notes[Measure_Max][Max_Notes_Mea
 
 			while (MeasureCount < Measure_Max) {
 
-				/*
-				bool escape = false;
-
-				if (tja_notes[Measure[MeasureCount].notes][0] == '#') {
-
-					switch (Branch.course) {
-					case 0:
-						if (Measure[MeasureCount].command == N) escape = true;
-						break;
-					case 1:
-						if (Measure[MeasureCount].command == E) escape = true;
-						break;
-					case 2:
-						if (Measure[MeasureCount].command == M) escape = true;
-						break;
-					default:
-						if (Measure[MeasureCount].command == N) escape = true;
-						break;
-					}
-					if (escape == true) break;
-				}
-				*/
 				MeasureCount++;
 				break;
 			}
@@ -317,7 +295,7 @@ void notes_main(bool isDon, bool isKa, char tja_notes[Measure_Max][Max_Notes_Mea
 
 	notes_draw(sprites);
 
-	C2D_DrawRectangle(0, 86, 0, 62, 58, C2D_Color32f(1, 0, 0, 1), C2D_Color32f(1, 0, 0, 1), C2D_Color32f(1, 0, 0, 1), C2D_Color32f(1, 0, 0, 1));
+	C2D_DrawRectangle(0, 86, 0, 62, 58, C2D_Color32f(0, 0, 1, 1), C2D_Color32f(0, 0, 1, 1), C2D_Color32f(0, 0, 1, 1), C2D_Color32f(0, 0, 1, 1));
 
 	snprintf(buf_notes, sizeof(buf_notes), "cnt :%d", cnt);
 	debug_draw(100, 0, buf_notes);
@@ -325,15 +303,10 @@ void notes_main(bool isDon, bool isKa, char tja_notes[Measure_Max][Max_Notes_Mea
 	snprintf(buf_notes, sizeof(buf_notes), "Bpm:%.1f     Measure:%.1f     Scroll:%.1f", Measure[MeasureCount].bpm, Measure[MeasureCount].measure, Measure[MeasureCount].scroll);
 	debug_draw(0, 20, buf_notes);
 
-	/*snprintf(buf_notes, sizeof(buf_notes), "judge :%.1f", Measure[MeasureCount].judge_time);
-	debug_draw(0, 30, buf_notes);
-	snprintf(buf_notes, sizeof(buf_notes), "create :%.1f", Measure[MeasureCount].create_time);
-	debug_draw(100, 30, buf_notes);*/
-
 	snprintf(buf_notes, sizeof(buf_notes), "%d:%.1f:%s", MeasureCount - 1,Measure[MeasureCount-1].judge_time, tja_notes[MeasureCount - 1]);
 	debug_draw(0, 50, buf_notes);
-	int n = 3;
-	snprintf(buf_notes, sizeof(buf_notes), "%d:%d:%s", n, Measure[n].branch, tja_notes[Measure[n].notes]);
+	int n = 1;
+	snprintf(buf_notes, sizeof(buf_notes), "%d:%.1f:%s", n, Measure[n].judge_time, tja_notes[Measure[n].notes]);
 	debug_draw(0, 60, buf_notes);
 
 	if (isAuto == true) debug_draw(0, 200, "Auto");
@@ -794,6 +767,11 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 void toggle_auto() {
 
 	isAuto = !isAuto;
+}
+
+int get_branch_course() {
+
+	return Branch.course;
 }
 
 int ctoi(char c) {
