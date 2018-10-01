@@ -1,11 +1,13 @@
-﻿#include <string.h>
+﻿#pragma once
+
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <3ds.h>
 #include <citro2d.h>
 #include <limits.h>
 
-#define File_Name "さいたま2000"
+#define File_Name "百花繚乱"
 
 #define Max_Notes_Measure 130	//一小節の最大ノーツ数+1
 #define Measure_Max 4096
@@ -18,7 +20,7 @@
 #define BOTTOM_WIDTH  320
 #define BOTTOM_HEIGHT 240
 
-#define Sprite_Number 28
+#define Sprite_Number 32
 
 #define Notes_Max 512
 #define BarLine_Max 64
