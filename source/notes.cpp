@@ -60,7 +60,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 			}
 
 			//ノーツ数の計測
-			while (isNotesLoad == true && tja_notes[Measure[MeasureCount].notes][NotesCount] != ',' && tja_notes[Measure[MeasureCount].notes][NotesCount] != '/') {
+			while (isNotesLoad == true && tja_notes[Measure[MeasureCount].notes][NotesCount] != ',' && tja_notes[Measure[MeasureCount].notes][NotesCount] != '\n' && tja_notes[Measure[MeasureCount].notes][NotesCount] != '/') {
 
 				//生成時に発動する命令
 				if (NotesCount == 0 && tja_notes[Measure[MeasureCount].notes][0] == '#') {
@@ -797,8 +797,8 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 			default:
 				break;
 			}
-			//snprintf(buf_notes, sizeof(buf_notes), "%d", Notes[i].knd);
-			//debug_draw(Notes[i].x, 132, buf_notes);
+			snprintf(buf_notes, sizeof(buf_notes), "%d", i);
+			debug_draw(Notes[i].x, 132, buf_notes);
 		}
 	}
 
