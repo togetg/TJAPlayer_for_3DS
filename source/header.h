@@ -20,7 +20,7 @@
 #define BOTTOM_WIDTH  320
 #define BOTTOM_HEIGHT 240
 
-#define Sprite_Number 32
+#define Sprite_Number 34
 
 #define Notes_Max 512
 #define BarLine_Max 64
