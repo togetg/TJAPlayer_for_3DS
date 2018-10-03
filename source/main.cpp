@@ -69,6 +69,7 @@ int main() {
 	C2D_SpriteSetCenterRaw(&sprites[bAlloon_5], 9, 51);
 	C2D_SpriteSetCenterRaw(&sprites[bAlloon_6], 9, 59);
 	for (int i = 0; i < 4;i++) C2D_SpriteSetPos(&sprites[eFfect_perfect + i], 93, 109);
+	for (int i = 0; i < 2;i++) C2D_SpriteSetPos(&sprites[sOul_on + i], 385, 75);
 
 	C2D_SpriteSetPos(&sprites[0], TOP_WIDTH / 2, TOP_HEIGHT / 2);
 	C2D_SpriteSetPos(&sprites[1], BOTTOM_WIDTH / 2, BOTTOM_HEIGHT / 2);
@@ -113,6 +114,7 @@ int main() {
 
 		draw_fps();
 		draw_lane(sprites);
+		draw_gauge(sprites);
 
 		debug_draw(200, 20, buf_main);
 		debug_draw(50, 200, "日本語テスト");
