@@ -10,7 +10,17 @@ int CurrentScore,TotalScore,CurrentRollCount, TotalRollCount,TotalPerfectCount,T
 double tmp,Precision,CurrentPrecision;
 TJA_HEADER_T TJA_Header;
 char buf_score[160];
-double A, B, C, D;
+GAUGE_T Gauge;
+
+void guage_structure_init() {
+
+	Gauge.perfect = 0;
+	Gauge.nice = 0;
+	Gauge.bad = 0;
+	Gauge.score = 0;
+	Gauge.norma = 0;
+	Gauge.soul = 0;
+}
 
 void score_init() {
 
@@ -35,6 +45,7 @@ void score_init() {
 	CurrentBadCount = 0;
 	Precision = 0;
 	CurrentPrecision = 0;
+	guage_structure_init();
 }
 
 
@@ -76,6 +87,7 @@ void score_update(int knd) {
 			isCombo = true;
 			TotalPerfectCount++;
 			CurrentPerfectCount++;
+			Gauge.score += Gauge.perfect;
 			break;
 
 		case SPECIAL_PERFECT:
@@ -85,6 +97,7 @@ void score_update(int knd) {
 			isCombo = true;
 			TotalPerfectCount++;
 			CurrentPerfectCount++;
+			Gauge.score += Gauge.perfect;
 			break;
 
 		case NICE:
@@ -94,6 +107,7 @@ void score_update(int knd) {
 			isCombo = true;
 			TotalNiceCount++;
 			CurrentNiceCount++;
+			Gauge.score += Gauge.nice;
 			break;
 
 		case SPECIAL_NICE:
@@ -103,18 +117,21 @@ void score_update(int knd) {
 			isCombo = true;
 			TotalNiceCount++;
 			CurrentNiceCount++;
+			Gauge.score += Gauge.nice;
 			break;
 
 		case BAD:
 			combo = 0;
 			TotalBadCount++;
 			CurrentBadCount++;
+			Gauge.score -= Gauge.bad;
 			break;
 
 		case THROUGH:
 			combo = 0;
 			TotalBadCount++;
 			CurrentBadCount++;
+			Gauge.score -= Gauge.bad;
 			break;
 
 		case BALLOON:
@@ -207,12 +224,31 @@ void scoer_debug() {
 	debug_draw(0, 150, buf_score);
 	snprintf(buf_score, sizeof(buf_score), "Current   Score:%d    Roll:%d    Precision:%.1f", CurrentScore, CurrentRollCount, CurrentPrecision);
 	debug_draw(0, 160, buf_score);
-	snprintf(buf_score, sizeof(buf_score), "%.0f:%.0f:%.0f:%.0f",A,B,C,D);
+	snprintf(buf_score, sizeof(buf_score), "良:%d 可:%d 不可:%d ゲージ%d",Gauge.perfect,Gauge.nice,Gauge.bad,Gauge.score);
 	debug_draw(0, 170, buf_score);
 	if (isGOGO == true) {
 		snprintf(buf_score, sizeof(buf_score), "GOGOTIME");
 		debug_draw(0, 190, buf_score);
 	}
+}
+
+void draw_gauge(C2D_Sprite  sprites[Sprite_Number]) {
+	
+	double gauge = 1.0 * Gauge.score / Gauge.soul;
+	if (gauge > 1.0) gauge = 1.0;
+
+	//赤
+	C2D_DrawRectSolid(123, 76, 0, 250.0*Gauge.norma/Gauge.soul, 8, C2D_Color32f(102.0/255, 0, 0, 1));
+	C2D_DrawRectSolid(123, 76, 0, 250.0*gauge, 8, C2D_Color32f(1, 0, 0, 1));
+
+	//黄
+	C2D_DrawRectSolid(123 + 250.0*Gauge.norma / Gauge.soul, 67, 0, 250 - 250.0*Gauge.norma / Gauge.soul, 17, C2D_Color32f(102.0 / 255, 68.0 / 255, 0, 1));
+	if (250 * gauge - (250.0*Gauge.norma / Gauge.soul) >= 0)
+	C2D_DrawRectSolid(123 + 250.0*Gauge.norma / Gauge.soul, 67, 0, 250 * gauge - (250.0*Gauge.norma / Gauge.soul), 17, C2D_Color32f(1, 1, 12.0/255, 1));
+
+	//魂
+	if (Gauge.score >= Gauge.soul) C2D_DrawSprite(&sprites[sOul_on]);
+	else C2D_DrawSprite(&sprites[sOul_off]);
 }
 
 void draw_lane(C2D_Sprite  sprites[Sprite_Number]) {
@@ -251,9 +287,6 @@ void draw_lane(C2D_Sprite  sprites[Sprite_Number]) {
 
 int branch_start(int knd,double x,double y) {	//分岐
 
-	A = knd;
-	B = x;
-	C = y;
 	int branch;
 	switch (knd) {
 	case 0:	//連打
@@ -275,7 +308,6 @@ int branch_start(int knd,double x,double y) {	//分岐
 		branch = N;
 		break;
 	}
-	D = (double)branch;
 	return branch;
 }
 
@@ -298,12 +330,14 @@ int round_down(int arg) {
 	return arg - temp;
 }
 
-void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max_Notes_Measure]) {	//初項と公差を計算
+void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max_Notes_Measure]) {	//初項と公差を計算　魂ゲージの伸びも
 	
 	int NotesCount = 0, i = 0, combo = 0, DiffTmp = 0, BalloonCnt = 0, TmpBaseCeilingPoint = 0,NotesCountMax = 0,RollCnt=0,RollKnd=0;
 	bool isEND = false;
 	double init_cnt=0,diff_cnt=0,gogo = 1,special = 1,roll_start_time=0, roll_end_time = 0;
 	COMMAND_T Command;
+
+	int PerfectNotesCount = 0;	//魂ゲージの伸び計算用
 
 	int level = TJA_Header.level;
 	if (level > 10) level = 10;
@@ -326,133 +360,231 @@ void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max
 	}
 	TmpBaseCeilingPoint = BaseCeilingPoint;
 
-	if ((TJA_Header.scoreinit == -1 || TJA_Header.scorediff == -1) && (scoremode == 1 || scoremode == 2)) {	//新配点と旧配点
 
-		while (isEND == false && i < Measure_Max && Measure[i].flag == true) {	//小節
+	while (isEND == false && i < Measure_Max && Measure[i].flag == true) {	//小節
 
-			NotesCount = 0;
+		NotesCount = 0;
 
-			if (Measure[i].branch != -1 && Measure[i].branch != M) {
+		if (Measure[i].branch != -1 && Measure[i].branch != M) {
 
-				i++;
-				continue;
-			}
-
-			if (NotesCount == 0 && notes[i][0] == '#') {
-
-				get_command_value(notes[i], &Command);
-
-				switch (Command.knd) {
-				case GOgostart:
-					gogo = 1.2;
-					break;
-				case GOgoend:
-					gogo = 1.0;
-					break;
-				case ENd:
-					isEND = true;
-					break;
-				default:
-					break;
-
-				}
-				NotesCount = 0;
-				i++;
-				continue;
-			}
-
-			while (notes[i][NotesCount] != ',' && notes[i][NotesCount] != '\n' && notes[i][NotesCount] != '/') {
-
-				NotesCount++;
-			}
-			if (Measure[i].firstmeasure != -1) NotesCountMax = Measure[Measure[i].firstmeasure].max_notes;
-			else NotesCountMax = NotesCount;
-
-			for (int j = 0; j < NotesCount; j++) {	//ノーツ
-
-				int knd = ctoi(notes[i][j]);
-
-				if (knd != 0) {
-
-					if (knd == Don || knd == Katsu || knd == BigDon || knd == BigKatsu) {
-						if (knd == BigDon || knd == BigKatsu) special = 2.0;
-						else special = 1.0;
-						combo++;
-						init_cnt += 1 * gogo * special;
-
-						if (scoremode == 1) {		//旧配点
-
-							if (combo > 100) DiffTmp = 10;
-							else DiffTmp = combo / 10;
-						}
-						else if (scoremode == 2) {	//新配点
-
-							if (combo >= 1 && combo <= 9) DiffTmp = 0;
-							else if (combo >= 10 && combo <= 29) DiffTmp = 1;
-							else if (combo >= 30 && combo <= 49) DiffTmp = 2;
-							else if (combo >= 50 && combo <= 99) DiffTmp = 4;
-							else if (combo >= 100) DiffTmp = 8;
-						}
-
-						diff_cnt += DiffTmp * gogo * special;
-					}
-					else if (knd == Balloon) {		//風船
-
-						TmpBaseCeilingPoint -= (TJA_Header.balloon[BalloonCnt] * 300 + 5000) * gogo;
-						BalloonCnt++;
-					}
-					else if (knd == Roll) {			//連打
-					
-						roll_start_time = Measure[i].judge_time + 60.0 / Measure[i].bpm * 4 * Measure[i].measure * i / NotesCountMax;
-						RollKnd = Roll;
-					}
-					else if (knd == BigRoll) {		//大連打
-
-						roll_start_time = Measure[i].judge_time + 60.0 / Measure[i].bpm * 4 * Measure[i].measure * i / NotesCountMax;
-						RollKnd = BigRoll;
-					}
-					else if (knd == RollEnd) {
-
-						if (roll_start_time != 0) {
-
-							roll_end_time = Measure[i].judge_time + 60.0 / Measure[i].bpm * 4 * Measure[i].measure * i / NotesCountMax;
-							RollCnt = (int)((roll_end_time - roll_start_time) / (1.0 / 12.0));
-
-							if (RollKnd == Roll) {
-								if (scoremode == 1) {
-									if (gogo == true) TmpBaseCeilingPoint -= RollCnt * 360;
-									else TmpBaseCeilingPoint -= RollCnt * 300;
-								}
-								if (scoremode == 2) {
-									if (gogo == true) TmpBaseCeilingPoint -= RollCnt * 120;
-									else TmpBaseCeilingPoint -= RollCnt * 100;
-								}
-							}
-							else if (RollKnd == BigRoll) {
-								if (scoremode == 1) {
-									if (gogo == true) TmpBaseCeilingPoint -= RollCnt * 430 * gogo;
-									else TmpBaseCeilingPoint -= RollCnt * 360 * gogo;
-								}
-								if (scoremode == 1) {
-									if (gogo == true) TmpBaseCeilingPoint -= RollCnt * 240 * gogo;
-									else TmpBaseCeilingPoint -= RollCnt * 200 * gogo;
-								}
-							}
-							roll_start_time = 0;
-							roll_end_time = 0;
-							RollCnt = 0;
-						}
-					}
-				}
-			}
 			i++;
+			continue;
 		}
+
+		if (NotesCount == 0 && notes[i][0] == '#') {
+
+			get_command_value(notes[i], &Command);
+
+			switch (Command.knd) {
+			case GOgostart:
+				gogo = 1.2;
+				break;
+			case GOgoend:
+				gogo = 1.0;
+				break;
+			case ENd:
+				isEND = true;
+				break;
+			default:
+				break;
+
+			}
+			NotesCount = 0;
+			i++;
+			continue;
+		}
+
+		while (notes[i][NotesCount] != ',' && notes[i][NotesCount] != '\n' && notes[i][NotesCount] != '/') {
+
+			NotesCount++;
+		}
+		if (Measure[i].firstmeasure != -1) NotesCountMax = Measure[Measure[i].firstmeasure].max_notes;
+		else NotesCountMax = NotesCount;
+
+		for (int j = 0; j < NotesCount; j++) {	//ノーツ
+
+			int knd = ctoi(notes[i][j]);
+
+			if (knd != 0) {
+
+				if (knd == Don || knd == Katsu || knd == BigDon || knd == BigKatsu) {
+					if (knd == BigDon || knd == BigKatsu) special = 2.0;
+					else special = 1.0;
+					combo++;
+					init_cnt += 1 * gogo * special;
+
+					if (scoremode == 1) {		//旧配点
+
+						if (combo > 100) DiffTmp = 10;
+						else DiffTmp = combo / 10;
+					}
+					else if (scoremode == 2) {	//新配点
+
+						if (combo >= 1 && combo <= 9) DiffTmp = 0;
+						else if (combo >= 10 && combo <= 29) DiffTmp = 1;
+						else if (combo >= 30 && combo <= 49) DiffTmp = 2;
+						else if (combo >= 50 && combo <= 99) DiffTmp = 4;
+						else if (combo >= 100) DiffTmp = 8;
+					}
+
+					diff_cnt += DiffTmp * gogo * special;
+
+					PerfectNotesCount++;
+				}
+				else if (knd == Balloon) {		//風船
+
+					TmpBaseCeilingPoint -= (TJA_Header.balloon[BalloonCnt] * 300 + 5000) * gogo;
+					BalloonCnt++;
+				}
+				else if (knd == Roll) {			//連打
+
+					roll_start_time = Measure[i].judge_time + 60.0 / Measure[i].bpm * 4 * Measure[i].measure * i / NotesCountMax;
+					RollKnd = Roll;
+				}
+				else if (knd == BigRoll) {		//大連打
+
+					roll_start_time = Measure[i].judge_time + 60.0 / Measure[i].bpm * 4 * Measure[i].measure * i / NotesCountMax;
+					RollKnd = BigRoll;
+				}
+				else if (knd == RollEnd) {
+
+					if (roll_start_time != 0) {
+
+						roll_end_time = Measure[i].judge_time + 60.0 / Measure[i].bpm * 4 * Measure[i].measure * i / NotesCountMax;
+						RollCnt = (int)((roll_end_time - roll_start_time) / (1.0 / 12.0));
+
+						if (RollKnd == Roll) {
+							if (scoremode == 1) {
+								if (gogo == true) TmpBaseCeilingPoint -= RollCnt * 360;
+								else TmpBaseCeilingPoint -= RollCnt * 300;
+							}
+							if (scoremode == 2) {
+								if (gogo == true) TmpBaseCeilingPoint -= RollCnt * 120;
+								else TmpBaseCeilingPoint -= RollCnt * 100;
+							}
+						}
+						else if (RollKnd == BigRoll) {
+							if (scoremode == 1) {
+								if (gogo == true) TmpBaseCeilingPoint -= RollCnt * 430 * gogo;
+								else TmpBaseCeilingPoint -= RollCnt * 360 * gogo;
+							}
+							if (scoremode == 1) {
+								if (gogo == true) TmpBaseCeilingPoint -= RollCnt * 240 * gogo;
+								else TmpBaseCeilingPoint -= RollCnt * 200 * gogo;
+							}
+						}
+						roll_start_time = 0;
+						roll_end_time = 0;
+						RollCnt = 0;
+					}
+				}
+			}
+		}
+		i++;
+	}
+
+
+	if ((TJA_Header.scoreinit == -1 || TJA_Header.scorediff == -1) && (scoremode == 1 || scoremode == 2)) {	//新配点と旧配点
 		diff = (TmpBaseCeilingPoint - (int)(combo / 100) * 10000) / (init_cnt * 4 + diff_cnt);
 		init = diff * 4;
 	}
 	else if (scoremode == 0) {
 		init = 1000;
 		diff = 1000;
+	}
+
+	Gauge.perfect = 10000 / PerfectNotesCount;
+
+	switch (TJA_Header.course) {	//ゲージの伸び率の計算
+	case 0:		//かんたん
+		Gauge.nice = Gauge.perfect * 3 / 4;
+		Gauge.bad = Gauge.perfect / 2;
+		if (level <= 1) {
+			Gauge.norma = 3600;
+			Gauge.soul = 6000;
+		}
+		else if (level <= 3) {
+			Gauge.norma = 3800;
+			Gauge.soul = 6333;
+		}
+		else if (level >= 4) {
+			Gauge.norma = 4400;
+			Gauge.soul = 7333;
+		}
+		break;
+
+	case 1:		//ふつう
+		Gauge.nice = Gauge.perfect * 3 / 4;
+		if (level <= 2) {
+			Gauge.bad = Gauge.perfect / 2;
+			Gauge.norma = 4595;
+			Gauge.soul = 6560;
+		}
+		else if (level == 3) {
+			Gauge.bad = Gauge.perfect / 2;
+			Gauge.norma = 4868;
+			Gauge.soul = 6955;
+		}
+		else if (level == 4) {
+			Gauge.bad = Gauge.perfect * 3 / 4;
+			Gauge.norma = 4925;
+			Gauge.soul = 7035;
+		}
+		else if (level >= 5) {
+			Gauge.bad = Gauge.perfect;
+			Gauge.norma = 5250;
+			Gauge.soul = 7500;
+		}
+		break;
+
+	case 2:		//むずかしい
+		Gauge.nice = Gauge.perfect * 3 / 4;
+		if (level <= 2) {
+			Gauge.bad = Gauge.perfect / 2;
+			Gauge.norma = 5450;
+			Gauge.soul = 7750;
+		}
+		else if (level == 3) {
+			Gauge.bad = Gauge.perfect;
+			Gauge.norma = 5080;
+			Gauge.soul = 7250;
+		}
+		else if (level <= 4) {
+			Gauge.bad = Gauge.perfect * 7 / 6;
+			Gauge.norma = 4840;
+			Gauge.soul = 6910;
+		}
+		else if (level <= 5) {
+			Gauge.bad = Gauge.perfect * 5 / 4;
+			Gauge.norma = 4724;
+			Gauge.soul = 6750;
+		}
+		else if (level >= 6) {
+			Gauge.bad = Gauge.perfect * 5 / 4;
+			Gauge.norma = 4812;
+			Gauge.soul = 6875;
+		}
+		break;
+
+	case 3:		//おに
+	default:
+		Gauge.nice = Gauge.perfect / 2;
+		if (level <= 7) {
+			Gauge.bad = Gauge.perfect  * 8/ 5;
+			Gauge.norma = 5660;
+			Gauge.soul = 7075;
+		}
+		else if (level == 8) {
+			Gauge.bad = Gauge.perfect * 2;
+			Gauge.norma = 5600;
+			Gauge.soul = 7000;
+		}
+		else if (level >= 9) {
+			Gauge.bad = Gauge.perfect * 2;
+			Gauge.norma = 6000;
+			Gauge.soul = 7500;
+		}
+		break;
 	}
 	//score_init_after();
 }
