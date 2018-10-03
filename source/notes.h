@@ -50,6 +50,8 @@ enum Sprite_Notes_knd {	//スプライト用
 	eFfect_special_perfect,
 	eFfect_nice,
 	eFfect_special_nice,
+	sOul_on,
+	sOul_off,
 };
 
 enum Command_knd {
