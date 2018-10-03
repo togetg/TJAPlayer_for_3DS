@@ -295,7 +295,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 	notes_draw(sprites);
 
-	C2D_DrawRectangle(0, 86, 0, 62, 58, C2D_Color32f(0, 0, 1, 1), C2D_Color32f(0, 0, 1, 1), C2D_Color32f(0, 0, 1, 1), C2D_Color32f(0, 0, 1, 1));
+	C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(0, 0, 1, 1));
 
 	draw_judge(NowTime, sprites);
 
