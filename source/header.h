@@ -6,6 +6,7 @@
 #include <3ds.h>
 #include <citro2d.h>
 #include <limits.h>
+#include <math.h>
 
 #define File_Name "百花繚乱"
 
@@ -20,7 +21,7 @@
 #define BOTTOM_WIDTH  320
 #define BOTTOM_HEIGHT 240
 
-#define Sprite_Number 34
+#define Sprite_Number 45
 
 #define Notes_Max 512
 #define BarLine_Max 64
