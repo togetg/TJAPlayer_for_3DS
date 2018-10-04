@@ -52,6 +52,17 @@ enum Sprite_Notes_knd {	//スプライト用
 	eFfect_special_nice,
 	sOul_on,
 	sOul_off,
+	eFfect_gogo,
+	sCore_0,
+	sCore_1,
+	sCore_2,
+	sCore_3,
+	sCore_4,
+	sCore_5,
+	sCore_6,
+	sCore_7,
+	sCore_8,
+	sCore_9,
 };
 
 enum Command_knd {
