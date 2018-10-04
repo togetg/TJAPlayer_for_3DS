@@ -29,3 +29,4 @@ void branch_section_init();
 int branch_start(int knd, double x, double y);
 void draw_lane(C2D_Sprite  sprites[Sprite_Number]);
 void draw_gauge(C2D_Sprite  sprites[Sprite_Number]);
+void draw_score(C2D_Sprite  sprites[Sprite_Number]);
