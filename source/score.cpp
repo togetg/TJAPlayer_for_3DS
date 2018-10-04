@@ -232,13 +232,26 @@ void scoer_debug() {
 	}
 }
 
+void draw_score(C2D_Sprite  sprites[Sprite_Number]) {
+
+
+	for (int i = 0; i < 7; i++) {
+
+		if (TotalScore / (int)pow(10, i) > 0) {
+			int n = TotalScore / (int)pow(10, i) % 10;
+			C2D_SpriteSetPos(&sprites[sCore_0 + n], 110 - i * 10, 75);
+			C2D_DrawSprite(&sprites[sCore_0 + n]);
+		}
+	}
+}
+
 void draw_gauge(C2D_Sprite  sprites[Sprite_Number]) {
 	
-	double gauge = 1.0 * Gauge.score / Gauge.soul;
+	double gauge = 1.0 * (Gauge.score/200)*200 / Gauge.soul;
 	if (gauge > 1.0) gauge = 1.0;
 
 	//赤
-	C2D_DrawRectSolid(123, 76, 0, 250.0*Gauge.norma/Gauge.soul, 8, C2D_Color32f(102.0/255, 0, 0, 1));
+	C2D_DrawRectSolid(123, 76, 0, 250.0*Gauge.norma/Gauge.soul, 8, C2D_Color32f(102.0/255, 0, 0, 1) );
 	C2D_DrawRectSolid(123, 76, 0, 250.0*gauge, 8, C2D_Color32f(1, 0, 0, 1));
 
 	//黄
@@ -247,7 +260,7 @@ void draw_gauge(C2D_Sprite  sprites[Sprite_Number]) {
 	C2D_DrawRectSolid(123 + 250.0*Gauge.norma / Gauge.soul, 67, 0, 250 * gauge - (250.0*Gauge.norma / Gauge.soul), 17, C2D_Color32f(1, 1, 12.0/255, 1));
 
 	//魂
-	if (Gauge.score >= Gauge.soul) C2D_DrawSprite(&sprites[sOul_on]);
+	if ((Gauge.score/200)*200 >= Gauge.soul) C2D_DrawSprite(&sprites[sOul_on]);
 	else C2D_DrawSprite(&sprites[sOul_off]);
 }
 
@@ -283,6 +296,12 @@ void draw_lane(C2D_Sprite  sprites[Sprite_Number]) {
 
 	C2D_SpriteSetPos(&sprites[jUdge_circle], Notes_Judge, 109);
 	C2D_DrawSprite(&sprites[jUdge_circle]);
+
+	if (isGOGO == true) {
+		C2D_ImageTint Tint;
+		C2D_AlphaImageTint(&Tint, 0.8);
+		C2D_DrawSpriteTinted(&sprites[eFfect_gogo], &Tint);
+	}
 }
 
 int branch_start(int knd,double x,double y) {	//分岐
