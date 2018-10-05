@@ -115,7 +115,6 @@ int main() {
 
 		draw_fps();
 		draw_lane(sprites);
-		draw_score(sprites);
 		draw_gauge(sprites);
 
 		debug_draw(200, 20, buf_main);
@@ -173,7 +172,8 @@ int main() {
 			tja_to_notes(isDon, isKatsu, notes_cnt,sprites);
 			notes_cnt++;
 		}
-		scoer_debug();
+		draw_score(sprites);
+		//score_debug();
 
 		C2D_TargetClear(bottom, C2D_Color32(0x00, 0x00, 0x00, 0xFF));	//下画面
 		C2D_SceneBegin(bottom);
