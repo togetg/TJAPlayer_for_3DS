@@ -214,7 +214,7 @@ void score_update(int knd) {
 	else CurrentPrecision = 0;
 }
 
-void scoer_debug() {
+void score_debug() {
 
 	snprintf(buf_score, sizeof(buf_score), "Scoremode:%d   Init:%d   Diff:%d", TJA_Header.scoremode, init, diff);
 	debug_draw(0, 10, buf_score);
@@ -234,13 +234,26 @@ void scoer_debug() {
 
 void draw_score(C2D_Sprite  sprites[Sprite_Number]) {
 
-
 	for (int i = 0; i < 7; i++) {
 
 		if (TotalScore / (int)pow(10, i) > 0) {
 			int n = TotalScore / (int)pow(10, i) % 10;
-			C2D_SpriteSetPos(&sprites[sCore_0 + n], 110 - i * 10, 75);
+			C2D_SpriteSetPos(&sprites[sCore_0 + n], 80 - i * 10, 70);
 			C2D_DrawSprite(&sprites[sCore_0 + n]);
+		}
+	}
+
+	int j;
+	for (j = 0; j < 4; j++) {
+		if (combo / (int)pow(10, j) == 0) break;
+	}
+
+	for (int i = 0; i < 4; i++) {
+
+		if (combo >= 10 && combo / (int)pow(10, i) > 0) {
+			int n = combo / (int)pow(10, i) % 10;
+			C2D_SpriteSetPos(&sprites[cOmbo_0 + n],  22 + j*8  - i * 16, 110);
+			C2D_DrawSprite(&sprites[cOmbo_0 + n]);
 		}
 	}
 }
