@@ -299,6 +299,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 	draw_judge(NowTime, sprites);
 
+	/*
 	snprintf(buf_notes, sizeof(buf_notes), "cnt :%d", cnt);
 	debug_draw(100, 0, buf_notes);
 
@@ -310,12 +311,15 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 	int n = 1;
 	snprintf(buf_notes, sizeof(buf_notes), "%d:%.1f:%s", n, Measure[n].judge_time, tja_notes[Measure[n].notes]);
 	debug_draw(0, 60, buf_notes);
+	*/
 
 	if (isAuto == true) debug_draw(0, 200, "Auto");
 	else debug_draw(0, 200, "Manual");
 
+	/*
 	snprintf(buf_notes, sizeof(buf_notes), "%s", tja_notes[4]);
 	debug_draw(0, 210, buf_notes);
+	*/
 }
 
 int find_notes_id() {
