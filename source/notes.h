@@ -63,6 +63,16 @@ enum Sprite_Notes_knd {	//スプライト用
 	sCore_7,
 	sCore_8,
 	sCore_9,
+	cOmbo_0,
+	cOmbo_1,
+	cOmbo_2,
+	cOmbo_3,
+	cOmbo_4,
+	cOmbo_5,
+	cOmbo_6,
+	cOmbo_7,
+	cOmbo_8,
+	cOmbo_9,
 };
 
 enum Command_knd {
