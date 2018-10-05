@@ -20,7 +20,7 @@ enum Judge_Knd {
 };
 
 void score_init();
-void scoer_debug();
+void score_debug();
 void score_update(int knd);
 void send_gogotime(bool temp);
 int round_down(int arg);
