@@ -15,6 +15,7 @@ enum Judge_Knd {
 	THROUGH,
 	ROLL,
 	BIG_ROLL,
+	ROLL_END,
 	BALLOON,
 	BALLOON_BREAK,
 };
@@ -30,3 +31,4 @@ int branch_start(int knd, double x, double y);
 void draw_lane(C2D_Sprite  sprites[Sprite_Number]);
 void draw_gauge(C2D_Sprite  sprites[Sprite_Number]);
 void draw_score(C2D_Sprite  sprites[Sprite_Number]);
+void balloon_count_update(int arg);
