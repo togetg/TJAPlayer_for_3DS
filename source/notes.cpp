@@ -33,7 +33,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 	double NowTime = time_now(0) + Measure[0].create_time;
 
 
-	snprintf(buf_notes, sizeof(buf_notes), "time:%.2f:%d", NowTime, Branch.wait);
+	snprintf(buf_notes, sizeof(buf_notes), "time:%.2f", NowTime);
 	debug_draw(0, 0, buf_notes);
 
 	if (cnt >= 0 && isNotesLoad == true) {
@@ -295,7 +295,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 	notes_draw(sprites);
 
-	C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(0, 0, 1, 1));
+	C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(1, 0, 0, 1));
 
 	draw_judge(NowTime, sprites);
 
@@ -611,7 +611,7 @@ void notes_judge(double NowTime, bool isDon, bool isKatsu, int cnt) {
 		else delete_notes(BalloonNotes[JudgeBalloonState].start_id);
 
 		music_play(2);
-		make_balloon_break();
+		balloon_count_update(0);
 	}
 }
 
@@ -787,6 +787,9 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 					C2D_SpriteSetPos(&sprites[bAlloon_5], Notes[i].x, notes_y);
 					C2D_DrawSprite(&sprites[bAlloon_5]);
 				}
+
+				if (BalloonNotes[Notes[i].roll_id].current_hit >= 1) balloon_count_update(BalloonNotes[Notes[i].roll_id].need_hit - BalloonNotes[Notes[i].roll_id].current_hit);
+
 				snprintf(buf_notes, sizeof(buf_notes), "%d", BalloonNotes[Notes[i].roll_id].need_hit - BalloonNotes[Notes[i].roll_id].current_hit);
 				debug_draw(Notes[i].x, 132, buf_notes);
 				break;
@@ -801,8 +804,8 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 			default:
 				break;
 			}
-			snprintf(buf_notes, sizeof(buf_notes), "%d", i);
-			debug_draw(Notes[i].x, 132, buf_notes);
+			//snprintf(buf_notes, sizeof(buf_notes), "%d", i);
+			//debug_draw(Notes[i].x, 132, buf_notes);
 		}
 	}
 
@@ -1009,6 +1012,8 @@ void delete_notes(int i) {
 
 		delete_notes(RollNotes[Notes[i].roll_id].start_id);
 		delete_roll(Notes[i].roll_id);
+		score_update(ROLL_END);
+
 	}
 
 	if (i >= 0 &&
@@ -1019,6 +1024,7 @@ void delete_notes(int i) {
 
 			if (BalloonNotes[Notes[i].roll_id].start_id != -1) delete_notes(BalloonNotes[Notes[i].roll_id].start_id);
 			delete_balloon(Notes[i].roll_id);
+			balloon_count_update(0);
 		}
 		else if (Notes[i].knd == Balloon) {
 
