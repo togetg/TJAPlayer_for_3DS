@@ -5,8 +5,9 @@
 #include "score.h"
 
 bool isGOGO;
-int combo,init,diff,DiffMul,scoremode,HitScore,ScoreDiff,BaseCeilingPoint;
-int CurrentScore,TotalScore,CurrentRollCount, TotalRollCount,TotalPerfectCount,TotalNiceCount,TotalBadCount, CurrentPerfectCount, CurrentNiceCount, CurrentBadCount;
+int combo,init,diff,DiffMul,scoremode,HitScore,ScoreDiff,BaseCeilingPoint,
+CurrentScore,TotalScore,CurrentTotalRollCount, CurrentRollCount, TotalRollCount,TotalPerfectCount,
+TotalNiceCount,TotalBadCount, CurrentPerfectCount, CurrentNiceCount, CurrentBadCount, CurrentBalloonCount;
 double tmp,Precision,CurrentPrecision;
 TJA_HEADER_T TJA_Header;
 char buf_score[160];
@@ -36,6 +37,7 @@ void score_init() {
 	CurrentScore = 0;
 	TotalScore = 0;
 	CurrentRollCount = 0;
+	CurrentTotalRollCount = 0;
 	TotalRollCount = 0;
 	TotalPerfectCount = 0;
 	TotalNiceCount = 0;
@@ -45,6 +47,7 @@ void score_init() {
 	CurrentBadCount = 0;
 	Precision = 0;
 	CurrentPrecision = 0;
+	CurrentBalloonCount = 0;
 	guage_structure_init();
 }
 
@@ -156,8 +159,12 @@ void score_update(int knd) {
 					CurrentScore += 300;
 				}
 			}
-			CurrentRollCount++;
-			TotalRollCount++;
+
+			if (knd == ROLL) {
+				CurrentRollCount++;
+				CurrentTotalRollCount++;
+				TotalRollCount++;
+			}
 			break;
 
 		case BIG_ROLL:
@@ -181,8 +188,9 @@ void score_update(int knd) {
 					CurrentScore += 200;
 				}
 			}
-			CurrentRollCount++;
+			CurrentTotalRollCount++;
 			TotalRollCount++;
+			CurrentRollCount++;
 			break;
 
 		case BALLOON_BREAK:
@@ -194,6 +202,10 @@ void score_update(int knd) {
 				TotalScore += 5000;
 				CurrentScore += 5000;
 			}
+			break;
+
+		case ROLL_END:
+			CurrentRollCount = 0;
 			break;
 
 		default:
@@ -222,7 +234,7 @@ void score_debug() {
 	debug_draw(0, 30, buf_score);
 	snprintf(buf_score, sizeof(buf_score), "Score:%d    %dCombo    diff:%d",TotalScore, combo, ScoreDiff);
 	debug_draw(0, 150, buf_score);
-	snprintf(buf_score, sizeof(buf_score), "Current   Score:%d    Roll:%d    Precision:%.1f", CurrentScore, CurrentRollCount, CurrentPrecision);
+	snprintf(buf_score, sizeof(buf_score), "Current   Score:%d    Roll:%d    Precision:%.1f", CurrentScore, CurrentTotalRollCount, CurrentPrecision);
 	debug_draw(0, 160, buf_score);
 	snprintf(buf_score, sizeof(buf_score), "良:%d 可:%d 不可:%d ゲージ%d",Gauge.perfect,Gauge.nice,Gauge.bad,Gauge.score);
 	debug_draw(0, 170, buf_score);
@@ -234,6 +246,7 @@ void score_debug() {
 
 void draw_score(C2D_Sprite  sprites[Sprite_Number]) {
 
+	//スコア
 	for (int i = 0; i < 7; i++) {
 
 		if (TotalScore / (int)pow(10, i) > 0) {
@@ -244,16 +257,53 @@ void draw_score(C2D_Sprite  sprites[Sprite_Number]) {
 	}
 
 	int j;
-	for (j = 0; j < 4; j++) {
+
+	//コンボ
+	for (j = 0; j < 5; j++) {
 		if (combo / (int)pow(10, j) == 0) break;
 	}
-
 	for (int i = 0; i < 4; i++) {
 
 		if (combo >= 10 && combo / (int)pow(10, i) > 0) {
 			int n = combo / (int)pow(10, i) % 10;
 			C2D_SpriteSetPos(&sprites[cOmbo_0 + n],  22 + j*8  - i * 16, 110);
 			C2D_DrawSprite(&sprites[cOmbo_0 + n]);
+		}
+	}
+
+	//連打
+	for (j = 0; j < 4; j++) {
+		if (CurrentRollCount / (int)pow(10, j) == 0) break;
+	}
+	if (CurrentRollCount > 0) {
+		C2D_SpriteSetPos(&sprites[rOll_count], 110, 35);
+		C2D_DrawSprite(&sprites[rOll_count]);
+	}
+	for (int i = 0; i < 4; i++) {
+
+		if (CurrentRollCount / (int)pow(10, i) > 0) {
+
+			int n = CurrentRollCount / (int)pow(10, i) % 10;
+			C2D_SpriteSetPos(&sprites[rOll_0 + n], 95 + j * 10 - i * 20,30);
+			C2D_DrawSprite(&sprites[rOll_0 + n]);
+		}
+	}
+
+	//風船
+	for (j = 0; j < 4; j++) {
+		if (CurrentBalloonCount / (int)pow(10, j) == 0) break;
+	}
+	if (CurrentBalloonCount > 0) {
+		C2D_SpriteSetPos(&sprites[bAlloon_count], 110, 35);
+		C2D_DrawSprite(&sprites[bAlloon_count]);
+	}
+	for (int i = 0; i < 4; i++) {
+
+		if (CurrentBalloonCount / (int)pow(10, i) > 0) {
+
+			int n = CurrentBalloonCount / (int)pow(10, i) % 10;
+			C2D_SpriteSetPos(&sprites[rOll_0 + n], 97 + j * 10 - i * 20, 30);
+			C2D_DrawSprite(&sprites[rOll_0 + n]);
 		}
 	}
 }
@@ -322,8 +372,8 @@ int branch_start(int knd,double x,double y) {	//分岐
 	int branch;
 	switch (knd) {
 	case 0:	//連打
-		if (y <= CurrentRollCount) branch = M;
-		else if (x <= CurrentRollCount) branch = E;
+		if (y <= CurrentTotalRollCount) branch = M;
+		else if (x <= CurrentTotalRollCount) branch = E;
 		else branch = N;
 		break;
 	case 1:	//精度
@@ -345,7 +395,7 @@ int branch_start(int knd,double x,double y) {	//分岐
 
 void branch_section_init() {	//#SECTION
 
-	CurrentRollCount = 0;
+	CurrentTotalRollCount = 0;
 	CurrentPerfectCount = 0;
 	CurrentNiceCount = 0;
 	CurrentBadCount = 0;
@@ -619,4 +669,8 @@ void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max
 		break;
 	}
 	//score_init_after();
+}
+
+void balloon_count_update(int arg) {
+	CurrentBalloonCount = arg;
 }
