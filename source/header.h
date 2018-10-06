@@ -8,7 +8,7 @@
 #include <limits.h>
 #include <math.h>
 
-#define File_Name "百花繚乱"
+#define File_Name "dokimune"
 
 #define Max_Notes_Measure 130	//一小節の最大ノーツ数+1
 #define Measure_Max 4096
@@ -21,7 +21,7 @@
 #define BOTTOM_WIDTH  320
 #define BOTTOM_HEIGHT 240
 
-#define Sprite_Number 55
+#define Sprite_Number 67
 
 #define Notes_Max 512
 #define BarLine_Max 64
