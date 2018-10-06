@@ -73,6 +73,18 @@ enum Sprite_Notes_knd {	//スプライト用
 	cOmbo_7,
 	cOmbo_8,
 	cOmbo_9,
+	rOll_0,
+	rOll_1,
+	rOll_2,
+	rOll_3,
+	rOll_4,
+	rOll_5,
+	rOll_6,
+	rOll_7,
+	rOll_8,
+	rOll_9,
+	rOll_count,
+	bAlloon_count,
 };
 
 enum Command_knd {
