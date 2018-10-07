@@ -69,12 +69,12 @@ void music_load() {
 			printf("null\n");
 			while (1);
 		}
-		printf("rate:%f\n", music[i].rate);
+		/*printf("rate:%f\n", music[i].rate);
 		printf("channels:%ld\n", music[i].channels);
 		printf("encoding:%ld\n", music[i].encoding);
 		printf("nsamples:%ld\n", music[i].nsamples);
 		printf("size:%ld\n", music[i].size);
-		printf("Now Loading...");
+		printf("Now Loading...");*/
 		int offset = 0;
 		int eof = 0;
 		int currentSection;
