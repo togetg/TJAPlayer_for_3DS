@@ -2,6 +2,7 @@
 #include "notes.h"
 #include "tja.h"
 #include "score.h"
+#include "main.h"
 
 
 char tja_notes[Measure_Max][Max_Notes_Measure];
