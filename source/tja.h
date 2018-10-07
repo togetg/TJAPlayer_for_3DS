@@ -19,6 +19,12 @@ typedef struct {
 }TJA_HEADER_T;
 
 typedef struct {
+
+	int knd;
+	char* val;
+}HEADER_T;
+
+typedef struct {
 	double judge_time, create_time, pop_time,
 		bpm, speed,measure,scroll;
 	int notes,firstmeasure,start_measure_count,max_notes,notes_count,command,branch,
@@ -27,8 +33,8 @@ typedef struct {
 	
 } MEASURE_T;
 
-void tja_head_load();
-void tja_notes_load();
+void tja_head_load(int course);
+void tja_notes_load(int course);
 void tja_to_notes(bool isDnon, bool isKatsu, int count, C2D_Sprite sprites[Sprite_Number]);
 void get_command_value(char* buf, COMMAND_T *Command);
 void get_tja_header(TJA_HEADER_T *TJA_Header);
