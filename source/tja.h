@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <citro2d.h>
 #include "header.h"
 
 typedef struct {
