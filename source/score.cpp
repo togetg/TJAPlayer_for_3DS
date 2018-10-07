@@ -213,6 +213,8 @@ void score_update(int knd) {
 		}
 	//}
 
+	if (Gauge.score < 0) Gauge.score = 0;
+
 	if (scoremode == 2) {	//100コンボ毎のボーナス(新配点のみ)
 		if (isCombo == true && combo % 100 == 0) {
 			TotalScore += 10000;
