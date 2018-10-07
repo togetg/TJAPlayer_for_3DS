@@ -514,7 +514,11 @@ void notes_judge(double NowTime, bool isDon, bool isKatsu, int cnt) {
 				music_play(0);
 				BalloonNotes[JudgeBalloonState].current_hit++;
 
-				if (BalloonNotes[JudgeBalloonState].current_hit >= BalloonNotes[JudgeBalloonState].need_hit) score_update(BALLOON_BREAK);	//破裂
+				if (BalloonNotes[JudgeBalloonState].current_hit >= BalloonNotes[JudgeBalloonState].need_hit) {
+
+					score_update(BALLOON_BREAK);	//破裂
+					make_balloon_break();
+				}
 				else score_update(BALLOON);
 			}
 		}
@@ -552,7 +556,7 @@ void notes_judge(double NowTime, bool isDon, bool isKatsu, int cnt) {
 				}
 			}
 			else if (CurrentJudgeNotesLag[0] <= 0.150) {	//不可
-				make_judge(2, NowTime);
+				make_judge(BAD, NowTime);
 				delete_notes(CurrentJudgeNotes[0]);
 				score_update(BAD);
 			}
@@ -560,8 +564,8 @@ void notes_judge(double NowTime, bool isDon, bool isKatsu, int cnt) {
 
 		if (isKatsu == true && CurrentJudgeNotes[1] != -1) {	//カツ
 
-			if (CurrentJudgeNotesLag[0] <= 0.034) {			//良
-				delete_notes(CurrentJudgeNotes[0]);
+			if (CurrentJudgeNotesLag[1] <= 0.034) {			//良
+				delete_notes(CurrentJudgeNotes[1]);
 				if (isBig == true) {
 					make_judge(SPECIAL_PERFECT, NowTime);
 					score_update(SPECIAL_PERFECT);
@@ -571,9 +575,9 @@ void notes_judge(double NowTime, bool isDon, bool isKatsu, int cnt) {
 					score_update(PERFECT);
 				}
 			}
-			else if (CurrentJudgeNotesLag[0] <= 0.117) {	//可
+			else if (CurrentJudgeNotesLag[1] <= 0.117) {	//可
 				make_judge(1, NowTime);
-				delete_notes(CurrentJudgeNotes[0]);
+				delete_notes(CurrentJudgeNotes[1]);
 				if (isBig == true) {
 					make_judge(SPECIAL_NICE, NowTime);
 					score_update(SPECIAL_NICE);
@@ -583,9 +587,9 @@ void notes_judge(double NowTime, bool isDon, bool isKatsu, int cnt) {
 					score_update(NICE);
 				}
 			}
-			else if (CurrentJudgeNotesLag[0] <= 0.150) {	//不可
-				make_judge(2, NowTime);
-				delete_notes(CurrentJudgeNotes[0]);
+			else if (CurrentJudgeNotesLag[1] <= 0.150) {	//不可
+				make_judge(BAD, NowTime);
+				delete_notes(CurrentJudgeNotes[1]);
 				score_update(BAD);
 			}
 		}
@@ -606,7 +610,11 @@ void notes_judge(double NowTime, bool isDon, bool isKatsu, int cnt) {
 
 			BalloonNotes[JudgeBalloonState].current_hit++;
 
-			if (BalloonNotes[JudgeBalloonState].current_hit >= BalloonNotes[JudgeBalloonState].need_hit) score_update(BALLOON_BREAK);	//破裂
+			if (BalloonNotes[JudgeBalloonState].current_hit >= BalloonNotes[JudgeBalloonState].need_hit) {
+
+				score_update(BALLOON_BREAK);	//破裂
+				make_balloon_break();
+			}
 			else score_update(BALLOON);
 		}
 	}
