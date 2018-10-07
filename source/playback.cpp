@@ -1,5 +1,4 @@
-﻿#include <unistd.h>
-#include <cstdio>
+﻿#include <cstdio>
 
 #include "header.h"
 #include "vorbis.h"
