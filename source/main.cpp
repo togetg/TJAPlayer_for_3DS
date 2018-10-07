@@ -5,6 +5,7 @@
 #include "audio.h"
 #include "playback.h"
 #include "score.h"
+#include "select.h"
 
 C2D_Sprite sprites[Sprite_Number];			//画像用
 static C2D_SpriteSheet spriteSheet;
@@ -76,7 +77,7 @@ int main() {
 	C2D_SpriteSetPos(&sprites[1], BOTTOM_WIDTH / 2, BOTTOM_HEIGHT / 2);
 
 	tja_init();
-	tja_head_load(EASY);
+	tja_head_load(Score_Course);
 	music_load();
 	init_main_music();
 	get_tja_header(&TJA_Header);
@@ -84,7 +85,7 @@ int main() {
 	notes_init(TJA_Header);
 
 
-	int cnt = 0, notes_cnt = 0;
+	int cnt = 0, notes_cnt = 0, scene_state = SelectSong;
 	bool isNotesStart = false, isMusicStart = false;
 	double FirstMeasureTime = INT_MAX,
 		offset = TJA_Header.offset,
@@ -102,92 +103,117 @@ int main() {
 
 		C2D_TargetClear(top, C2D_Color32(0x00, 0x00, 0x00, 0xFF));	//上画面
 		C2D_SceneBegin(top);
-		C2D_DrawSprite(&sprites[0]);
 
-		NowTime = time_now(1);
-		bool isPlayMain;
+		switch (scene_state) {
 
-		if (cnt == 0) {
-
-			FirstMeasureTime = get_FirstMeasureTime();
-			play_main_music(&isPlayMain);
-		}
-
-		draw_fps();
-		draw_lane(sprites);
-		draw_gauge(sprites);
-
-		debug_draw(200, 20, buf_main);
-		debug_draw(50, 200, "日本語テスト");
-
-		
-		//譜面が先
-		if (offset > 0 && (isNotesStart == false || isMusicStart == false)) {
-			if (NowTime >= 0 && isNotesStart == false) isNotesStart = true;
-			if (NowTime >= offset + FirstMeasureTime && isMusicStart == false) {
-				isPlayMain = true;
-				isMusicStart = true;
+		case SelectSong:	//選曲
+			//debug_draw(0, 0, "Press Select to start");
+			//debug_draw(200, 0, "Press Start to exit");
+			
+			C2D_DrawSprite(&sprites[dOn]);
+			if (cnt == 0) {
+				load_file_list();
 			}
-		}
 
-		//音が先
-		else if (offset <= 0 && (isNotesStart == false || isMusicStart == false)) {
-
-			if (NowTime >= FirstMeasureTime && isPlayMain == false) {
-				isPlayMain = true;
-				isMusicStart = true;
+			disp_file_list();
+			
+			if (key & KEY_SELECT) {
+				scene_state =  MainGame;
+				cnt = -1;
 			}
-			if (NowTime >= (-1.0) * offset && isNotesStart == false) {
-				isNotesStart = true;
+
+			C2D_TargetClear(bottom, C2D_Color32(0x00, 0x00, 0x00, 0xFF));	//下画面
+			C2D_SceneBegin(bottom);
+			C2D_DrawSprite(&sprites[bOttom]);
+
+			break;
+
+		case MainGame:		//メイン
+
+			C2D_DrawSprite(&sprites[tOp]);
+
+			NowTime = time_now(1);
+			bool isPlayMain;
+
+			if (cnt == 0) {
+
+				FirstMeasureTime = get_FirstMeasureTime();
+				play_main_music(&isPlayMain);
 			}
-		}
-		
-		bool isDon = false, isKatsu = false;
-		if ((((tp.px - 160)*(tp.px - 160) + (tp.py - 145)*(tp.py - 145)) <= 105 * 105 && key & KEY_TOUCH) ||
-		key & KEY_B ||
-		key & KEY_Y ||
-		key & KEY_RIGHT ||
-		key & KEY_DOWN ||
-		key & KEY_CSTICK_LEFT ||
-		key & KEY_CSTICK_DOWN) {//ドン
-		isDon = true;
-		}
-		else if (key & KEY_TOUCH ||
-		key & KEY_A ||
-		key & KEY_X ||
-		key & KEY_LEFT ||
-		key & KEY_UP ||
-		key & KEY_CSTICK_RIGHT ||
-		key & KEY_CSTICK_UP ||
-		key & KEY_R ||
-		key & KEY_L ||
-		key & KEY_ZR ||
-		key & KEY_ZL) {//カツ
-		isKatsu = true;
+
+			//譜面が先
+			if (offset > 0 && (isNotesStart == false || isMusicStart == false)) {
+				if (NowTime >= 0 && isNotesStart == false) isNotesStart = true;
+				if (NowTime >= offset + FirstMeasureTime && isMusicStart == false) {
+					isPlayMain = true;
+					isMusicStart = true;
+				}
+			}
+
+			//音が先
+			else if (offset <= 0 && (isNotesStart == false || isMusicStart == false)) {
+
+				if (NowTime >= FirstMeasureTime && isPlayMain == false) {
+					isPlayMain = true;
+					isMusicStart = true;
+				}
+				if (NowTime >= (-1.0) * offset && isNotesStart == false) {
+					isNotesStart = true;
+				}
+			}
+
+			bool isDon = false, isKatsu = false;
+			if ((((tp.px - 160)*(tp.px - 160) + (tp.py - 145)*(tp.py - 145)) <= 105 * 105 && key & KEY_TOUCH) ||
+				key & KEY_B ||
+				key & KEY_Y ||
+				key & KEY_RIGHT ||
+				key & KEY_DOWN ||
+				key & KEY_CSTICK_LEFT ||
+				key & KEY_CSTICK_DOWN) {//ドン
+				isDon = true;
+			}
+			else if (key & KEY_TOUCH ||
+				key & KEY_A ||
+				key & KEY_X ||
+				key & KEY_LEFT ||
+				key & KEY_UP ||
+				key & KEY_CSTICK_RIGHT ||
+				key & KEY_CSTICK_UP ||
+				key & KEY_R ||
+				key & KEY_L ||
+				key & KEY_ZR ||
+				key & KEY_ZL) {//カツ
+				isKatsu = true;
+			}
+
+			if (key & KEY_SELECT) toggle_auto();
+
+			draw_fps();
+			draw_lane(sprites);
+			draw_gauge(sprites);
+
+			if (isNotesStart == true) {
+				tja_to_notes(isDon, isKatsu, notes_cnt, sprites);
+				notes_cnt++;
+			}
+			draw_score(sprites);
+			//score_debug();
+
+			C2D_TargetClear(bottom, C2D_Color32(0x00, 0x00, 0x00, 0xFF));	//下画面
+			C2D_SceneBegin(bottom);
+			C2D_DrawSprite(&sprites[bOttom]);
+
+			if (isDon == true) {	//ドン
+				music_play(0);
+			}
+			if (isKatsu == true) {		//カツ
+				music_play(1);
+			}
+			break;
 		}
 
-		if (key & KEY_SELECT) toggle_auto();
-
-		if (isNotesStart == true) {
-			tja_to_notes(isDon, isKatsu, notes_cnt,sprites);
-			notes_cnt++;
-		}
-		draw_score(sprites);
-		//score_debug();
-
-		C2D_TargetClear(bottom, C2D_Color32(0x00, 0x00, 0x00, 0xFF));	//下画面
-		C2D_SceneBegin(bottom);
-		C2D_DrawSprite(&sprites[1]);
-		
-		if (isDon == true) {	//ドン
-		music_play(0);
-		}
-		if (isKatsu == true) {		//カツ
-		music_play(1);
-		}
-		
-		C3D_FrameEnd(0);
-		cnt++;
+			C3D_FrameEnd(0);
+			cnt++;
 	}
 
 	main_exit();
