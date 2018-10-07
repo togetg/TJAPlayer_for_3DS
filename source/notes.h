@@ -3,6 +3,7 @@
 #include <citro2d.h>
 
 enum Notes_knd {
+
 	Rest = 0,		//休符
 	Don,			//ドン
 	Katsu,			//カツ
@@ -18,6 +19,7 @@ enum Notes_knd {
 };
 
 enum Sprite_Notes_knd {	//スプライト用
+
 	tOp = 0,
 	bOttom,
 	dOn,
@@ -88,6 +90,7 @@ enum Sprite_Notes_knd {	//スプライト用
 };
 
 enum Command_knd {
+
 	STart = 1,
 	ENd,
 	BPmchange,
@@ -107,6 +110,36 @@ enum Command_knd {
 	HBscroll,
 	BArlineoff,
 	BArlineon,
+};
+
+enum Header_knd {
+
+	TITle,
+	SUBtitle,
+	BPM,
+	WAVe,
+	OFFset,
+	BALloon,
+	SONgvol,
+	SEVol,
+	SCOreinit,
+	SCOrediff,
+	COUrse,
+	STYle,
+	LIFe,
+	DEMostart,
+	SIDe,
+	SCOremode,
+	TOTal,
+};
+
+enum Course_knd {
+	
+	EASY = 0,
+	NORMAL,
+	HARD,
+	ONI,
+	EDIT,
 };
 
 typedef struct {
