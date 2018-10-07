@@ -24,7 +24,7 @@ BRANCH_T Branch;
 
 int MeasureCount, RollState, NotesCount, JudgeDispknd, JudgeRollState, BalloonBreakCount, BranchCourse,
 NotesNumber;	//何番目のノーツか
-bool  isNotesLoad = true, isAuto = false, isJudgeDisp = false, isBalloonBreakDisp = false, isGOGOTime = false;;	//要初期化
+bool  isNotesLoad = true, isAuto = false, isJudgeDisp = false, isBalloonBreakDisp = false, isGOGOTime = false, isLevelHold = false;	//要初期化
 double JudgeMakeTime, JudgeY,JudgeEffectCnt;
 
 void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_Measure], MEASURE_T Measure[Measure_Max], int cnt, C2D_Sprite  sprites[Sprite_Number]) {
@@ -73,10 +73,14 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 						isNotesLoad = false;
 						break;
 					case BRanchstart:
-						Branch.knd = Command.val[0];
-						Branch.x = Command.val[1];
-						Branch.y = Command.val[2];
-						Branch.wait = true;
+
+						if (isLevelHold == false) {
+
+							Branch.knd = Command.val[0];
+							Branch.x = Command.val[1];
+							Branch.y = Command.val[2];
+							Branch.wait = true;
+						}
 						break;
 					case BRanchend:
 						Branch.course = -1;
@@ -276,13 +280,16 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 					break;
 				case BRanchstart:
 
-					if (Branch.knd != 0 || JudgeRollState == -1) {	//連打分岐の時は連打が無くなってから分岐
+					if (isLevelHold == false && (Branch.knd != 0 || JudgeRollState == -1) ) {	//連打分岐の時は連打が無くなってから分岐
 
 						Branch.course = branch_start(Branch.knd, Branch.x, Branch.y);
 						Branch.next = true;
 						Branch.wait = false;
 					}
 					else NotFalse = true;
+					break;
+				case LEvelhold:
+					isLevelHold = true;
 					break;
 				default:
 					break;
@@ -1066,7 +1073,7 @@ void notes_init(TJA_HEADER_T TJA_Header) {
 	notes_structure_init();
 	roll_notes_init();
 	balloon_notes_init();
-	tja_notes_load(EASY);
+	tja_notes_load(Score_Course);
 	Command.data[0] = 0; Command.data[1] = 0; Command.data[2] = 0;
 	Command.knd = 0;
 	Command.val[0] = 0;
@@ -1098,4 +1105,5 @@ void notes_init(TJA_HEADER_T TJA_Header) {
 	Branch.course = -1;
 	Branch.next = false;
 	Branch.wait = false;
+	isLevelHold = false;
 }
