@@ -76,7 +76,7 @@ int main() {
 	C2D_SpriteSetPos(&sprites[1], BOTTOM_WIDTH / 2, BOTTOM_HEIGHT / 2);
 
 	tja_init();
-	tja_head_load();
+	tja_head_load(EASY);
 	music_load();
 	init_main_music();
 	get_tja_header(&TJA_Header);

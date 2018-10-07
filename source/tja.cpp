@@ -44,10 +44,11 @@ void tja_init() {
 	isBranch = false;
 }
 
-void tja_head_load() {
+void tja_head_load(int course) {
 
 	FILE *fp;
 	char buf[128];
+	bool isCourseMatch = true;
 
 	if ((fp = fopen("sdmc:/tjafiles/" File_Name "/" File_Name ".tja", "r")) != NULL) {
 
@@ -75,7 +76,7 @@ void tja_head_load() {
 			temp = (char *)malloc((strlen(buf) + 1));
 
 
-			if (strstr(buf, "#START") == buf) {
+			if (isCourseMatch == true && strstr(buf, "#START") == buf) {
 				break;
 			}
 
@@ -160,6 +161,10 @@ void tja_head_load() {
 				else if (strcmp(temp, "Hard") == 0) Current_Header.course = 2;
 				else if (strcmp(temp, "Oni") == 0) Current_Header.course = 3;
 				else if (strcmp(temp, "Edit") == 0) Current_Header.course = 4;
+				
+				if (Current_Header.course == course) isCourseMatch = true;
+				else isCourseMatch = false;
+
 				continue;
 			}
 
@@ -222,11 +227,11 @@ void MeasureInsertionSort(MEASURE_T t[], int array_size) {
 	}
 }
 
-void tja_notes_load() {
+void tja_notes_load(int course) {
 
 	int FirstMultiMeasure = -1,	//複数行の小節の最初の小節id 複数出ない場合は-1
-		NotesCount = 0,BranchCourse = -1;
-	bool isStart = false, isEnd = false, isDispBarLine = true, isNoComma = false;
+		NotesCount = 0, BranchCourse = -1;
+	bool isStart = false, isEnd = false, isDispBarLine = true, isNoComma = false,isCourseMatch = false;
 	FILE *fp;
 	COMMAND_T Command;
 	double bpm = Current_Header.bpm,
@@ -247,7 +252,7 @@ void tja_notes_load() {
 	if ((fp = fopen("sdmc:/tjafiles/" File_Name  "/" File_Name ".tja", "r")) != NULL) {
 
 		tja_cnt = 0;
-		int MeasureCount = 0;
+		int MeasureCount = 0,CurrentCourse = -1;
 		double PreJudge = 0, FirstMeasureTime = 0;
 
 		FirstMeasureTime = (60.0 / bpm * 4 * measure)*(Notes_Judge_Range / Notes_Area) - 60.0 / bpm * 4 * measure;
@@ -259,13 +264,33 @@ void tja_notes_load() {
 			isEnd == false
 			) {
 
-			if (isStart == false && strstr(tja_notes[tja_cnt], "#START") == tja_notes[tja_cnt]) {
+			if (strstr(tja_notes[tja_cnt], "COURSE:") == tja_notes[tja_cnt]) {
+
+				char* temp = NULL;
+				temp = (char *)malloc((strlen(tja_notes[tja_cnt]) + 1));
+
+				strlcpy(temp, tja_notes[tja_cnt] + 7, strlen(tja_notes[tja_cnt]) - 8);
+				if (strlen(temp) == 1) CurrentCourse = atoi(temp);		//数字表記
+				else if (strcmp(temp, "Easy") == 0) CurrentCourse = 0;	//文字表記
+				else if (strcmp(temp, "Normal") == 0) CurrentCourse = 1;
+				else if (strcmp(temp, "Hard") == 0) CurrentCourse = 2;
+				else if (strcmp(temp, "Oni") == 0) CurrentCourse = 3;
+				else if (strcmp(temp, "Edit") == 0) CurrentCourse = 4;
+
+				free(temp);
+
+				if (course == CurrentCourse) isCourseMatch = true;
+
+				continue;
+			}
+
+			if (isStart == false && isCourseMatch == true && strstr(tja_notes[tja_cnt], "#START") == tja_notes[tja_cnt]) {
 
 				isStart = true;
 				continue;
 			}
 
-			if (isStart == true) {
+			if (isStart == true && isCourseMatch == true) {
 
 				//一文字目がコメントアウトの時スキップ
 				if (strstr(tja_notes[tja_cnt], "//") == tja_notes[tja_cnt] || strstr(tja_notes[tja_cnt], "\r") == tja_notes[tja_cnt]) {
@@ -452,6 +477,7 @@ void tja_notes_load() {
 		}
 
 		//基本天井点を計算
+
 		calc_base_score(Measure, tja_notes);
 
 		fclose(fp);

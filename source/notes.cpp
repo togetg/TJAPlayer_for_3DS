@@ -790,8 +790,8 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 
 				if (BalloonNotes[Notes[i].roll_id].current_hit >= 1) balloon_count_update(BalloonNotes[Notes[i].roll_id].need_hit - BalloonNotes[Notes[i].roll_id].current_hit);
 
-				snprintf(buf_notes, sizeof(buf_notes), "%d", BalloonNotes[Notes[i].roll_id].need_hit - BalloonNotes[Notes[i].roll_id].current_hit);
-				debug_draw(Notes[i].x, 132, buf_notes);
+				//snprintf(buf_notes, sizeof(buf_notes), "%d", BalloonNotes[Notes[i].roll_id].need_hit - BalloonNotes[Notes[i].roll_id].current_hit);
+				//debug_draw(Notes[i].x, 132, buf_notes);
 				break;
 			case RollEnd:
 				C2D_SpriteSetPos(&sprites[rOll_end], Notes[i].x, notes_y);
@@ -1066,7 +1066,7 @@ void notes_init(TJA_HEADER_T TJA_Header) {
 	notes_structure_init();
 	roll_notes_init();
 	balloon_notes_init();
-	tja_notes_load();
+	tja_notes_load(EASY);
 	Command.data[0] = 0; Command.data[1] = 0; Command.data[2] = 0;
 	Command.knd = 0;
 	Command.val[0] = 0;
