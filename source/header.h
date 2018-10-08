@@ -12,6 +12,7 @@
 #include <citro2d.h>
 
 #define File_Name "シャルル"
+#define DEFAULT_DIR	"sdmc:/tjafiles/"
 
 #define Max_Notes_Measure 130	//一小節の最大ノーツ数+1
 #define Measure_Max 4096
