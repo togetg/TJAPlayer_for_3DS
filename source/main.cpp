@@ -86,7 +86,7 @@ int main() {
 
 
 	int cnt = 0, notes_cnt = 0, scene_state = SelectSong;
-	bool isNotesStart = false, isMusicStart = false;
+	bool isNotesStart = false, isMusicStart = false, isPlayMain = false;
 	double FirstMeasureTime = INT_MAX,
 		offset = TJA_Header.offset,
 		NowTime;
@@ -107,12 +107,9 @@ int main() {
 		switch (scene_state) {
 
 		case SelectSong:	//選曲
-			//debug_draw(0, 0, "Press Select to start");
-			//debug_draw(200, 0, "Press Start to exit");
-			
-			C2D_DrawSprite(&sprites[dOn]);
+
 			if (cnt == 0) {
-				load_file_list();
+				load_file_main();
 			}
 
 			disp_file_list();
@@ -133,7 +130,6 @@ int main() {
 			C2D_DrawSprite(&sprites[tOp]);
 
 			NowTime = time_now(1);
-			bool isPlayMain;
 
 			if (cnt == 0) {
 
