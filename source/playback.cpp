@@ -2,6 +2,7 @@
 
 #include "header.h"
 #include "vorbis.h"
+#include "main.h"
 
 #define delete(ptr) \
 	free((void*) ptr); ptr = NULL
@@ -212,7 +213,6 @@ err:
 	goto out;
 }
 
-#define DEFAULT_DIR		"sdmc:/tjafiles/"
 struct playbackInfo_t playbackInfo;
 
 int changeFile(const char* ep_file, struct playbackInfo_t* playbackInfo, bool *p_isPlayMain){
@@ -220,6 +220,7 @@ int changeFile(const char* ep_file, struct playbackInfo_t* playbackInfo, bool *p
 	static Thread thread = NULL;
 
 	if (ep_file != NULL && getFileType(ep_file) == FILE_TYPE_ERROR) return -1;
+	
 	if (thread != NULL) {
 		stopPlayback();
 
@@ -236,7 +237,7 @@ int changeFile(const char* ep_file, struct playbackInfo_t* playbackInfo, bool *p
 
 	svcGetThreadPriority(&prio, CUR_THREAD_HANDLE);
 	thread = threadCreate(playFile, playbackInfo, 32 * 1024, prio - 1, -2, false);
-
+	
 	return 0;
 }
 
@@ -258,5 +259,4 @@ void stop_main_music() {
 
 void init_main_music() {
 	playbackInfo.file = NULL;
-	//chdir(DEFAULT_DIR);
 }
