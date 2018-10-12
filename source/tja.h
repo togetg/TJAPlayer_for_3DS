@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "header.h"
+#include "select.h"
 
 typedef struct {
 
@@ -41,3 +42,4 @@ void tja_init();
 double get_FirstMeasureTime();
 int MeasureIdFromOriginalId(int id);
 bool get_isBranch();
+void tja_head_load_simple(LIST_T *List);
