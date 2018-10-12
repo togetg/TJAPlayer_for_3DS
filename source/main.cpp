@@ -101,7 +101,7 @@ int main() {
 
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
-		C2D_TargetClear(top, C2D_Color32(0x00, 0x00, 0x00, 0xFF));	//上画面
+		C2D_TargetClear(top, C2D_Color32(0x42, 0x42, 0x42, 0xFF));	//上画面
 		C2D_SceneBegin(top);
 
 		switch (scene_state) {
@@ -111,6 +111,11 @@ int main() {
 			if (cnt == 0) {
 				load_file_main();
 			}
+
+			if (key & KEY_UP)    cursor_update(0);
+			if (key & KEY_DOWN)  cursor_update(1);
+			if (key & KEY_RIGHT) cursor_update(2);
+			if (key & KEY_LEFT)  cursor_update(3);
 
 			disp_file_list();
 			
