@@ -3,6 +3,7 @@
 #include "tja.h"
 #include "score.h"
 #include "main.h"
+#include "select.h"
 
 
 char tja_notes[Measure_Max][Max_Notes_Measure];
@@ -51,25 +52,25 @@ void tja_head_load(int course) {
 	char buf[128];
 	bool isCourseMatch = true;
 
-	if ((fp = fopen("sdmc:/tjafiles/" File_Name "/" File_Name ".tja", "r")) != NULL) {
+	Current_Header.title = (char*)"No title";
+	Current_Header.subtitle = (char*)"";
+	Current_Header.level = 0;
+	Current_Header.bpm = 60.0;
+	Current_Header.wave = (char*)"audio.ogg";
+	Current_Header.offset = 0;
+	Current_Header.balloon[0] = 5;
+	Current_Header.songvol = 100;
+	Current_Header.sevol = 100;
+	Current_Header.scoreinit = -1;
+	Current_Header.scorediff = -1;
+	Current_Header.course = 3;
+	Current_Header.style = 1;
+	Current_Header.life = -1;
+	Current_Header.demostart = 0;
+	Current_Header.side = 3;
+	Current_Header.scoremode = 1;
 
-		Current_Header.title = (char*)"No title";
-		Current_Header.subtitle = (char*)"";
-		Current_Header.level = 0;
-		Current_Header.bpm = 60.0;
-		Current_Header.wave = (char*)"audio.ogg";
-		Current_Header.offset = 0;
-		Current_Header.balloon[0] = 5;
-		Current_Header.songvol = 100;
-		Current_Header.sevol = 100;
-		Current_Header.scoreinit = -1;
-		Current_Header.scorediff = -1;
-		Current_Header.course = 3;
-		Current_Header.style = 1;
-		Current_Header.life = -1;
-		Current_Header.demostart = 0;
-		Current_Header.side = 3;
-		Current_Header.scoremode = 1;
+	if ((fp = fopen("sdmc:/tjafiles/" File_Name "/" File_Name ".tja", "r")) != NULL) {
 
 		char* temp = NULL;
 		while (fgets(buf, 128, fp) != NULL) {
@@ -157,11 +158,11 @@ void tja_head_load(int course) {
 			if (strstr(buf, "COURSE:") == buf) {
 				strlcpy(temp, buf + 7, strlen(buf) - 8);
 				if (strlen(temp) == 1) Current_Header.course = atoi(temp);		//数字表記
-				else if (strcmp(temp, "Easy") == 0) Current_Header.course = 0;	//文字表記
-				else if (strcmp(temp, "Normal") == 0) Current_Header.course = 1;
-				else if (strcmp(temp, "Hard") == 0) Current_Header.course = 2;
-				else if (strcmp(temp, "Oni") == 0) Current_Header.course = 3;
-				else if (strcmp(temp, "Edit") == 0) Current_Header.course = 4;
+				else if (strcmp(temp, "Easy") == 0) Current_Header.course = EASY;	//文字表記
+				else if (strcmp(temp, "Normal") == 0) Current_Header.course = NORMAL;
+				else if (strcmp(temp, "Hard") == 0) Current_Header.course = HARD;
+				else if (strcmp(temp, "Oni") == 0) Current_Header.course = ONI;
+				else if (strcmp(temp, "Edit") == 0) Current_Header.course = EDIT;
 				
 				if (Current_Header.course == course) isCourseMatch = true;
 				else isCourseMatch = false;
@@ -209,6 +210,68 @@ void tja_head_load(int course) {
 	else {
 		//tjaファイルが開けなかった時
 	}
+}
+
+void tja_head_load_simple(LIST_T *List) {		//選曲用のヘッダ取得
+
+
+	snprintf(List->title, sizeof(List->title), "No Title");
+	snprintf(List->wave, sizeof(List->title), "audio.ogg");
+	for (int i = 0; i < 5; i++) {
+		List->level[i] = 0;
+		List->course[i] = false;
+	}
+
+	FILE *fp;
+	char buf[128],*temp = NULL;;
+	int course = ONI;
+
+	chdir(List->path);
+
+	if ((fp = fopen(List->tja, "r")) != NULL) {
+
+		while (fgets(buf, 128, fp) != NULL) {
+
+			temp = (char *)malloc((strlen(buf) + 1));
+
+			if (strstr(buf, "TITLE:") == buf) {
+
+				strlcpy(List->title, buf + 6, strlen(buf) - 7);
+				continue;
+			}
+
+			if (strstr(buf, "WAVE:") == buf) {
+
+				strlcpy(List->wave, buf + 5, strlen(buf) - 6);
+				continue;
+			}
+
+			if (strstr(buf, "COURSE:") == buf) {
+
+				strlcpy(temp, buf + 7, strlen(buf) - 8);
+				if (strlen(temp) == 1) course = atoi(temp);			//数字表記
+				else if (strcmp(temp, "Easy") == 0) course = EASY;	//文字表記
+				else if (strcmp(temp, "Normal") == 0) course = NORMAL;
+				else if (strcmp(temp, "Hard") == 0) course = HARD;
+				else if (strcmp(temp, "Oni") == 0) course = ONI;
+				else if (strcmp(temp, "Edit") == 0) course = EDIT;
+
+				List->course[course] = true;
+
+				continue;
+			}
+
+			if (strstr(buf, "LEVEL:") == buf) {
+				strlcpy(temp, buf + 6, strlen(buf) - 7);
+				List->level[course] = atoi(temp);
+				continue;
+			}
+		}
+	}
+
+
+	free(temp);
+	fclose(fp);
 }
 
 void MeasureInsertionSort(MEASURE_T t[], int array_size) {
@@ -272,11 +335,11 @@ void tja_notes_load(int course) {
 
 				strlcpy(temp, tja_notes[tja_cnt] + 7, strlen(tja_notes[tja_cnt]) - 8);
 				if (strlen(temp) == 1) CurrentCourse = atoi(temp);		//数字表記
-				else if (strcmp(temp, "Easy") == 0) CurrentCourse = 0;	//文字表記
-				else if (strcmp(temp, "Normal") == 0) CurrentCourse = 1;
-				else if (strcmp(temp, "Hard") == 0) CurrentCourse = 2;
-				else if (strcmp(temp, "Oni") == 0) CurrentCourse = 3;
-				else if (strcmp(temp, "Edit") == 0) CurrentCourse = 4;
+				else if (strcmp(temp, "Easy") == 0) CurrentCourse = EASY;	//文字表記
+				else if (strcmp(temp, "Normal") == 0) CurrentCourse = NORMAL;
+				else if (strcmp(temp, "Hard") == 0) CurrentCourse = HARD;
+				else if (strcmp(temp, "Oni") == 0) CurrentCourse = ONI;
+				else if (strcmp(temp, "Edit") == 0) CurrentCourse = EDIT;
 
 				free(temp);
 
