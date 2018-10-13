@@ -121,13 +121,15 @@ void tja_head_load(int course,LIST_T Song) {
 			}
 
 			if (strstr(buf, "BALLOON:") == buf) {
-				strlcpy(temp, buf + 8, strlen(buf) - 9);
-				char *tp = strtok(temp, ",");
-				Current_Header.balloon[0] = atoi(tp);
-				int cnt = 1;
-				while ((tp = strtok(NULL, ","))) {
-					Current_Header.balloon[cnt] = atoi(tp);
-					cnt++;
+				if (isdigit(buf[8]) == true) {		//値が空
+					strlcpy(temp, buf + 8, strlen(buf) - 9);
+					char *tp = strtok(temp, ",");
+					Current_Header.balloon[0] = atoi(tp);
+					int cnt = 1;
+					while ((tp = strtok(NULL, ","))) {
+						Current_Header.balloon[cnt] = atoi(tp);
+						cnt++;
+					}
 				}
 				continue;
 			}
