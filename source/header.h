@@ -10,6 +10,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <citro2d.h>
+#include <ctype.h>
 
 #define File_Name "シャルル"
 #define DEFAULT_DIR	"sdmc:/tjafiles/"
