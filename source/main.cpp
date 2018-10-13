@@ -13,6 +13,8 @@ C2D_TextBuf g_dynamicBuf;
 char buf_main[160];
 C2D_Text dynText;
 
+void sprites_load();
+
 void debug_draw(float x, float y, const char *text) {
 
 	C2D_TextBufClear(g_dynamicBuf);
@@ -28,7 +30,6 @@ void main_init() {
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
 	C2D_Prepare();
-	init_main_music();
 }
 
 void main_exit() {
@@ -52,43 +53,16 @@ int main() {
 	C3D_RenderTarget* bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
 
 	TJA_HEADER_T TJA_Header;
+	LIST_T SelectedSong;
 
 	g_dynamicBuf = C2D_TextBufNew(4096);
-
-	spriteSheet = C2D_SpriteSheetLoad("romfs:/gfx/sprites.t3x");
-	if (!spriteSheet) svcBreak(USERBREAK_PANIC);
-
-	for (int i = 0; i < Sprite_Number; i++) {
-		C2D_SpriteFromSheet(&sprites[i], spriteSheet, i);
-		C2D_SpriteSetCenter(&sprites[i], 0.5f, 0.5f);
-	}
-	C2D_SpriteSetCenterRaw(&sprites[bAlloon], 13, 13);
-	C2D_SpriteSetCenterRaw(&sprites[bAlloon_1], 9, 12);
-	C2D_SpriteSetCenterRaw(&sprites[bAlloon_2], 9, 26);
-	C2D_SpriteSetCenterRaw(&sprites[bAlloon_3], 9, 31);
-	C2D_SpriteSetCenterRaw(&sprites[bAlloon_4], 9, 45);
-	C2D_SpriteSetCenterRaw(&sprites[bAlloon_5], 9, 51);
-	C2D_SpriteSetCenterRaw(&sprites[bAlloon_6], 9, 59);
-	for (int i = 0; i < 4;i++) C2D_SpriteSetPos(&sprites[eFfect_perfect + i], 93, 109);
-	for (int i = 0; i < 2;i++) C2D_SpriteSetPos(&sprites[sOul_on + i], 385, 75);
-	C2D_SpriteSetPos(&sprites[eFfect_gogo], 110, 92);
-
-	C2D_SpriteSetPos(&sprites[0], TOP_WIDTH / 2, TOP_HEIGHT / 2);
-	C2D_SpriteSetPos(&sprites[1], BOTTOM_WIDTH / 2, BOTTOM_HEIGHT / 2);
-
-	tja_init();
-	tja_head_load(Score_Course);
+	sprites_load();	
 	music_load();
-	init_main_music();
-	get_tja_header(&TJA_Header);
-	score_init();
-	notes_init(TJA_Header);
-
 
 	int cnt = 0, notes_cnt = 0, scene_state = SelectSong;
 	bool isNotesStart = false, isMusicStart = false, isPlayMain = false;
 	double FirstMeasureTime = INT_MAX,
-		offset = TJA_Header.offset,
+		offset=0,
 		NowTime;
 
 	while (aptMainLoop()) {
@@ -122,14 +96,33 @@ int main() {
 			disp_file_list();
 			
 			if (key & KEY_SELECT) {
-				scene_state =  MainGame;
+				scene_state =  MainLoad;
 				cnt = -1;
 			}
+			get_SelectedId(&SelectedSong);
 
 			C2D_TargetClear(bottom, C2D_Color32(0x00, 0x00, 0x00, 0xFF));	//下画面
 			C2D_SceneBegin(bottom);
-			C2D_DrawSprite(&sprites[bOttom]);
+			//C2D_DrawSprite(&sprites[bOttom]);
+			debug_draw(0, 0, SelectedSong.path);
+			debug_draw(0, 10, SelectedSong.tja);
+			debug_draw(0, 20, SelectedSong.wave);
+			debug_draw(0, 30, SelectedSong.title);
 
+			break;
+
+		case MainLoad:
+
+			tja_init();
+			tja_head_load(Score_Course);
+			init_main_music();
+			get_tja_header(&TJA_Header);
+			score_init();
+			notes_init(TJA_Header);
+			offset = TJA_Header.offset;
+
+			scene_state = MainGame;
+			cnt = -1;
 			break;
 
 		case MainGame:		//メイン
@@ -141,7 +134,7 @@ int main() {
 			if (cnt == 0) {
 
 				FirstMeasureTime = get_FirstMeasureTime();
-				play_main_music(&isPlayMain);
+				play_main_music(&isPlayMain,SelectedSong);
 			}
 
 			//譜面が先
@@ -221,4 +214,28 @@ int main() {
 
 	main_exit();
 	return 0;
+}
+
+void sprites_load(){
+
+	spriteSheet = C2D_SpriteSheetLoad("romfs:/gfx/sprites.t3x");
+	if (!spriteSheet) svcBreak(USERBREAK_PANIC);
+
+	for (int i = 0; i < Sprite_Number; i++) {
+		C2D_SpriteFromSheet(&sprites[i], spriteSheet, i);
+		C2D_SpriteSetCenter(&sprites[i], 0.5f, 0.5f);
+	}
+	C2D_SpriteSetCenterRaw(&sprites[bAlloon], 13, 13);
+	C2D_SpriteSetCenterRaw(&sprites[bAlloon_1], 9, 12);
+	C2D_SpriteSetCenterRaw(&sprites[bAlloon_2], 9, 26);
+	C2D_SpriteSetCenterRaw(&sprites[bAlloon_3], 9, 31);
+	C2D_SpriteSetCenterRaw(&sprites[bAlloon_4], 9, 45);
+	C2D_SpriteSetCenterRaw(&sprites[bAlloon_5], 9, 51);
+	C2D_SpriteSetCenterRaw(&sprites[bAlloon_6], 9, 59);
+	for (int i = 0; i < 4; i++) C2D_SpriteSetPos(&sprites[eFfect_perfect + i], 93, 109);
+	for (int i = 0; i < 2; i++) C2D_SpriteSetPos(&sprites[sOul_on + i], 385, 75);
+	C2D_SpriteSetPos(&sprites[eFfect_gogo], 110, 92);
+
+	C2D_SpriteSetPos(&sprites[tOp], TOP_WIDTH / 2, TOP_HEIGHT / 2);
+	C2D_SpriteSetPos(&sprites[bOttom], BOTTOM_WIDTH / 2, BOTTOM_HEIGHT / 2);
 }
