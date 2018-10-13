@@ -338,11 +338,11 @@ void tja_notes_load(int course, LIST_T Song) {
 
 				strlcpy(temp, tja_notes[tja_cnt] + 7, strlen(tja_notes[tja_cnt]) - 8);
 				if (strlen(temp) == 1) CurrentCourse = atoi(temp);		//数字表記
-				else if (strcmp(temp, "Easy") ==   0 || strcmp(temp, "easy"))   CurrentCourse = EASY;	//文字表記
-				else if (strcmp(temp, "Normal") == 0 || strcmp(temp, "normal")) CurrentCourse = NORMAL;
-				else if (strcmp(temp, "Hard") ==   0 || strcmp(temp, "hard"))   CurrentCourse = HARD;
-				else if (strcmp(temp, "Oni") ==    0 || strcmp(temp, "oni"))    CurrentCourse = ONI;
-				else if (strcmp(temp, "Edit") ==   0 || strcmp(temp, "edit"))   CurrentCourse = EDIT;
+				else if (strcmp(temp, "Easy") ==   0 || strcmp(temp, "easy") == 0)   CurrentCourse = EASY;	//文字表記
+				else if (strcmp(temp, "Normal") == 0 || strcmp(temp, "normal") == 0) CurrentCourse = NORMAL;
+				else if (strcmp(temp, "Hard") ==   0 || strcmp(temp, "hard") == 0)   CurrentCourse = HARD;
+				else if (strcmp(temp, "Oni") ==    0 || strcmp(temp, "oni") == 0)    CurrentCourse = ONI;
+				else if (strcmp(temp, "Edit") ==   0 || strcmp(temp, "edit") == 0)   CurrentCourse = EDIT;
 
 				free(temp);
 
