@@ -1081,7 +1081,6 @@ void notes_init(TJA_HEADER_T TJA_Header) {
 	notes_structure_init();
 	roll_notes_init();
 	balloon_notes_init();
-	tja_notes_load(Score_Course);
 	Command.data[0] = 0; Command.data[1] = 0; Command.data[2] = 0;
 	Command.knd = 0;
 	Command.val[0] = 0;

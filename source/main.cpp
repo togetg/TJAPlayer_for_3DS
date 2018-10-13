@@ -114,11 +114,12 @@ int main() {
 		case MainLoad:
 
 			tja_init();
-			tja_head_load(Score_Course);
+			tja_head_load(Score_Course,SelectedSong);
 			init_main_music();
 			get_tja_header(&TJA_Header);
 			score_init();
 			notes_init(TJA_Header);
+			tja_notes_load(Score_Course,SelectedSong);
 			offset = TJA_Header.offset;
 
 			scene_state = MainGame;

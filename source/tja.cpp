@@ -39,6 +39,7 @@ void measure_structure_init() {
 }
 
 void tja_init() {
+
 	measure_structure_init();
 	tja_cnt = 0;
 	MeasureMaxNumber = 0;
@@ -46,7 +47,7 @@ void tja_init() {
 	isBranch = false;
 }
 
-void tja_head_load(int course) {
+void tja_head_load(int course,LIST_T Song) {
 
 	FILE *fp;
 	char buf[128];
@@ -70,7 +71,8 @@ void tja_head_load(int course) {
 	Current_Header.side = 3;
 	Current_Header.scoremode = 1;
 
-	if ((fp = fopen("sdmc:/tjafiles/" File_Name "/" File_Name ".tja", "r")) != NULL) {
+	chdir(Song.path);
+	if ((fp = fopen(Song.tja, "r")) != NULL) {
 
 		char* temp = NULL;
 		while (fgets(buf, 128, fp) != NULL) {
@@ -291,7 +293,7 @@ void MeasureInsertionSort(MEASURE_T t[], int array_size) {
 	}
 }
 
-void tja_notes_load(int course) {
+void tja_notes_load(int course, LIST_T Song) {
 
 	int FirstMultiMeasure = -1,	//複数行の小節の最初の小節id 複数出ない場合は-1
 		NotesCount = 0, BranchCourse = -1;
@@ -313,7 +315,8 @@ void tja_notes_load(int course) {
 		BeforeBranchMeasure = 0,
 		BeforeBranchScroll = 1;
 
-	if ((fp = fopen("sdmc:/tjafiles/" File_Name  "/" File_Name ".tja", "r")) != NULL) {
+	chdir(Song.path);
+	if ((fp = fopen(Song.tja, "r")) != NULL) {
 
 		tja_cnt = 0;
 		int MeasureCount = 0,CurrentCourse = -1;
@@ -335,11 +338,11 @@ void tja_notes_load(int course) {
 
 				strlcpy(temp, tja_notes[tja_cnt] + 7, strlen(tja_notes[tja_cnt]) - 8);
 				if (strlen(temp) == 1) CurrentCourse = atoi(temp);		//数字表記
-				else if (strcmp(temp, "Easy") == 0) CurrentCourse = EASY;	//文字表記
-				else if (strcmp(temp, "Normal") == 0) CurrentCourse = NORMAL;
-				else if (strcmp(temp, "Hard") == 0) CurrentCourse = HARD;
-				else if (strcmp(temp, "Oni") == 0) CurrentCourse = ONI;
-				else if (strcmp(temp, "Edit") == 0) CurrentCourse = EDIT;
+				else if (strcmp(temp, "Easy") ==   0 || strcmp(temp, "easy"))   CurrentCourse = EASY;	//文字表記
+				else if (strcmp(temp, "Normal") == 0 || strcmp(temp, "normal")) CurrentCourse = NORMAL;
+				else if (strcmp(temp, "Hard") ==   0 || strcmp(temp, "hard"))   CurrentCourse = HARD;
+				else if (strcmp(temp, "Oni") ==    0 || strcmp(temp, "oni"))    CurrentCourse = ONI;
+				else if (strcmp(temp, "Edit") ==   0 || strcmp(temp, "edit"))   CurrentCourse = EDIT;
 
 				free(temp);
 
