@@ -12,3 +12,5 @@ void load_file_list_tjafiles();
 void disp_file_list();
 void load_file_main();
 void cursor_update(int knd);
+void get_SelectedId(LIST_T *TMP);
+void select_draw(float x, float y, const char *text);
