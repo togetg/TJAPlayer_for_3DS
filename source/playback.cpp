@@ -3,6 +3,7 @@
 #include "header.h"
 #include "vorbis.h"
 #include "main.h"
+#include "select.h"
 
 #define delete(ptr) \
 	free((void*) ptr); ptr = NULL
@@ -241,9 +242,10 @@ int changeFile(const char* ep_file, struct playbackInfo_t* playbackInfo, bool *p
 	return 0;
 }
 
-void play_main_music(bool *p_isPlayMain) {
-	char file[] = DEFAULT_DIR File_Name "/" File_Name ".ogg";
-	changeFile(file, &playbackInfo, p_isPlayMain);
+void play_main_music(bool *p_isPlayMain,LIST_T Song) {
+	//char file[] = DEFAULT_DIR File_Name "/" File_Name ".ogg";
+	chdir(Song.path);
+	changeFile(Song.wave, &playbackInfo, p_isPlayMain);
 }
 
 void pasue_main_music() {

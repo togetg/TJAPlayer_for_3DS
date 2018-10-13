@@ -1,5 +1,6 @@
-﻿#ifndef playback_h
-#define playback_h
+﻿#pragma once
+
+#include "select.h"
 
 #define CHANNEL 5
 
@@ -33,8 +34,7 @@ int getFileType(const char *file);
 void playFile(void* infoIn);
 
 int changeFile(const char* ep_file, struct playbackInfo_t* playbackInfo,bool *p_isPlayMain);
-void play_main_music(bool *p_isPlayMain);
+void play_main_music(bool *p_isPlayMain, LIST_T Song);
 void pasue_main_music();
 void stop_main_music();
 void init_main_music();
-#endif
