@@ -51,6 +51,7 @@ void load_file_list_tjafiles() {	//バグがおこるため再帰は使わない
 			chdir("../");
 		}
 	}
+	closedir(dir);
 	SongNumber = count;
 }
 
@@ -205,14 +206,14 @@ void cursor_update(int knd) {
 
 void load_file_list(const char *path) {
 
-	DIR* d;
+	DIR* dir;
 	struct dirent *dp;
 
-	if ((d = opendir(path)) != NULL) {
+	if ((dir = opendir(path)) != NULL) {
 
 		DIR* db;
 		char filename[512];
-		while ((dp = readdir(d)) != NULL) {
+		while ((dp = readdir(dir)) != NULL) {
 
 			chdir(path);
 
@@ -242,8 +243,10 @@ void load_file_list(const char *path) {
 				load_file_list(dp->d_name);
 				chdir("../");
 			}
+			closedir(db);
 		}
 	}
+	closedir(dir);
 }
 
 C2D_TextBuf g_SelectText = C2D_TextBufNew(4096);
