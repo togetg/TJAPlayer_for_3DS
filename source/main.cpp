@@ -112,10 +112,12 @@ int main() {
 				load_file_main();
 			}
 
-			if (key & KEY_UP)    cursor_update(0);
-			if (key & KEY_DOWN)  cursor_update(1);
-			if (key & KEY_RIGHT) cursor_update(2);
-			if (key & KEY_LEFT)  cursor_update(3);
+			if (key & KEY_UP)		cursor_update(KEY_UP);
+			if (key & KEY_DOWN)		cursor_update(KEY_DOWN);
+			if (key & KEY_RIGHT)	cursor_update(KEY_RIGHT);
+			if (key & KEY_LEFT)		cursor_update(KEY_LEFT);
+			if (key & KEY_A)		cursor_update(KEY_A);
+			if (key & KEY_B)		cursor_update(KEY_B);
 
 			disp_file_list();
 			
