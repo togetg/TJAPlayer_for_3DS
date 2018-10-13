@@ -179,6 +179,7 @@ enum Course_knd {
 enum Scene_state {
 
 	SelectSong = 0,
+	MainLoad = 50,
 	MainGame = 100,
 	ResultGame = 110,
 };
