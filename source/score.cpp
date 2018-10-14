@@ -253,7 +253,7 @@ void draw_score(C2D_Sprite  sprites[Sprite_Number]) {
 
 		if (TotalScore / (int)pow(10, i) > 0) {
 			int n = TotalScore / (int)pow(10, i) % 10;
-			C2D_SpriteSetPos(&sprites[sCore_0 + n], 80 - i * 10, 70);
+			C2D_SpriteSetPos(&sprites[sCore_0 + n], 80 - i * 12, 70);
 			C2D_DrawSprite(&sprites[sCore_0 + n]);
 		}
 	}
@@ -267,9 +267,17 @@ void draw_score(C2D_Sprite  sprites[Sprite_Number]) {
 	for (int i = 0; i < 4; i++) {
 
 		if (combo >= 10 && combo / (int)pow(10, i) > 0) {
+
 			int n = combo / (int)pow(10, i) % 10;
-			C2D_SpriteSetPos(&sprites[cOmbo_0 + n],  22 + j*8  - i * 16, 110);
-			C2D_DrawSprite(&sprites[cOmbo_0 + n]);
+
+			if (combo < 100) {
+				C2D_SpriteSetPos(&sprites[cOmbo_0 + n], 22 + j * 8 - i * 16, 110);
+				C2D_DrawSprite(&sprites[cOmbo_0 + n]);
+			}
+			else {
+				C2D_SpriteSetPos(&sprites[cOmbo_0_red + n], 22 + j * 8 - i * 16, 110);
+				C2D_DrawSprite(&sprites[cOmbo_0_red + n]);
+			}
 		}
 	}
 
@@ -325,7 +333,12 @@ void draw_gauge(C2D_Sprite  sprites[Sprite_Number]) {
 	C2D_DrawRectSolid(123 + 250.0*Gauge.norma / Gauge.soul, 67, 0, 250 * gauge - (250.0*Gauge.norma / Gauge.soul), 17, C2D_Color32f(1, 1, 12.0/255, 1));
 
 	//魂
-	if ((Gauge.score/200)*200 >= Gauge.soul) C2D_DrawSprite(&sprites[sOul_on]);
+	if ((Gauge.score / 200) * 200 >= Gauge.soul) {
+		C2D_ImageTint Tint;
+		C2D_AlphaImageTint(&Tint, 0.8);
+		C2D_DrawSpriteTinted(&sprites[sOul_effect], &Tint);
+		C2D_DrawSprite(&sprites[sOul_on]);
+	}
 	else C2D_DrawSprite(&sprites[sOul_off]);
 }
 
@@ -675,4 +688,30 @@ void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max
 
 void balloon_count_update(int arg) {
 	CurrentBalloonCount = arg;
+}
+
+void draw_emblem(C2D_Sprite  sprites[Sprite_Number]) {
+
+	switch (TJA_Header.course) {
+	case EASY:
+		C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(1, 51.0/255.0, 0, 1));
+		C2D_DrawSprite(&sprites[eMblem_easy]);
+		break;
+	case NORMAL:
+		C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(136.0/255.0, 204.0/255.0, 34.0/255.0, 1));
+		C2D_DrawSprite(&sprites[eMblem_normal]);
+		break;
+	case HARD:
+		C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(51.0 / 255.0, 170.0 / 255.0, 187.0 / 255.0, 1));
+		C2D_DrawSprite(&sprites[eMblem_hard]);
+		break;
+	case ONI:
+		C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(1, 34.0 / 255.0, 204.0/255.0, 1));
+		C2D_DrawSprite(&sprites[eMblem_oni]);
+		break;
+	case EDIT:
+		C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(136.0/255.0, 34.0/255.0, 1, 1));
+		C2D_DrawSprite(&sprites[eMblem_edit]);
+		break;
+	}
 }
