@@ -20,13 +20,13 @@ enum Judge_Knd {
 	BALLOON_BREAK,
 };
 
-void score_init();
+void init_score();
 void score_debug();
 void score_update(int knd);
 void send_gogotime(bool temp);
 int round_down(int arg);
 void calc_base_score(MEASURE_T Measure[Measure_Max], char tja_notes[Measure_Max][Max_Notes_Measure]);
-void branch_section_init();
+void init_branch_section();
 int branch_start(int knd, double x, double y);
 void draw_lane(C2D_Sprite  sprites[Sprite_Number]);
 void draw_gauge(C2D_Sprite  sprites[Sprite_Number]);

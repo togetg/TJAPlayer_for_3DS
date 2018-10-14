@@ -65,5 +65,5 @@ void draw_fps() {
 		fps_sum = 0;
 	}
 	snprintf(buf_time, sizeof(buf_time), "%.1ffps", fps);
-	debug_draw(300, 0, buf_time);
+	draw_debug(300, 0, buf_time);
 }

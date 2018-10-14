@@ -24,7 +24,7 @@ typedef struct {
 Music music[3];
 ndspWaveBuf waveBuf[3];
 
-void music_load() {
+void load_music() {
 
 	ndspInit();
 	ndspSetOutputMode(NDSP_OUTPUT_STEREO);

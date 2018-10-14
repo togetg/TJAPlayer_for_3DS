@@ -17,7 +17,7 @@ MEASURE_T Measure[Measure_Max];
 
 void get_command_value(char* buf, COMMAND_T *Command);
 
-void measure_structure_init() {
+void init_measure_structure() {
 
 	for (int i = 0; i < Measure_Max; i++) {
 
@@ -38,16 +38,16 @@ void measure_structure_init() {
 	}
 }
 
-void tja_init() {
+void init_tja() {
 
-	measure_structure_init();
+	init_measure_structure();
 	tja_cnt = 0;
 	MeasureMaxNumber = 0;
 	MainFirstMeasureTime = 0;
 	isBranch = false;
 }
 
-void tja_head_load(int course,LIST_T Song) {
+void load_tja_head(int course,LIST_T Song) {
 
 	FILE *fp;
 	char buf[128];
@@ -216,7 +216,7 @@ void tja_head_load(int course,LIST_T Song) {
 	}
 }
 
-void tja_head_load_simple(LIST_T *List) {		//選曲用のヘッダ取得
+void load_tja_head_simple(LIST_T *List) {		//選曲用のヘッダ取得
 
 
 	snprintf(List->title, sizeof(List->title), "No Title");
@@ -295,7 +295,7 @@ void MeasureInsertionSort(MEASURE_T t[], int array_size) {
 	}
 }
 
-void tja_notes_load(int course, LIST_T Song) {
+void load_tja_notes(int course, LIST_T Song) {
 
 	int FirstMultiMeasure = -1,	//複数行の小節の最初の小節id 複数出ない場合は-1
 		NotesCount = 0, BranchCourse = -1;

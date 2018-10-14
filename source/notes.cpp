@@ -12,7 +12,7 @@ char buf_notes[160];
 
 int find_notes_id(), find_line_id(), make_roll_start(int NotesId), make_roll_end(int NotesId), make_balloon_start(int NotesId), make_balloon_end(int NotesId);
 void notes_calc(bool isDon, bool isKatsu, double bpm, double NowTime, int cnt, C2D_Sprite sprites[Sprite_Number]);
-void notes_draw(C2D_Sprite sprites[Sprite_Number]), notes_sort(), delete_roll(int i), notes_init(TJA_HEADER_T TJA_Header), delete_notes(int i), make_balloon_break();
+void notes_draw(C2D_Sprite sprites[Sprite_Number]), notes_sort(), delete_roll(int i), init_notes(TJA_HEADER_T TJA_Header), delete_notes(int i), make_balloon_break();
 void draw_judge(double NowTime, C2D_Sprite sprites[Sprite_Number]);
 
 NOTES_T Notes[Notes_Max];
@@ -34,7 +34,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 
 	snprintf(buf_notes, sizeof(buf_notes), "time:%.2f", NowTime);
-	debug_draw(0, 0, buf_notes);
+	draw_debug(0, 0, buf_notes);
 
 	if (cnt >= 0 && isNotesLoad == true) {
 
@@ -248,7 +248,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 			if (BarLine[i].isDisp == true) {
 				C2D_DrawRectangle(BarLine[i].x, 86, 0, 1, 46, C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1));
 				//snprintf(buf_notes, sizeof(buf_notes), "%d", BarLine[i].measure);
-				//debug_draw(BarLine[i].x - 10, 133, buf_notes);
+				//draw_debug(BarLine[i].x - 10, 133, buf_notes);
 			}
 
 			if (BarLine[i].x < 62) BarLine[i].flag = false;
@@ -276,7 +276,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 					isGOGOTime = false;
 					break;
 				case SEction:
-					branch_section_init();
+					init_branch_section();
 					break;
 				case BRanchstart:
 
@@ -308,24 +308,24 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 	/*
 	snprintf(buf_notes, sizeof(buf_notes), "cnt :%d", cnt);
-	debug_draw(100, 0, buf_notes);
+	draw_debug(100, 0, buf_notes);
 
 	snprintf(buf_notes, sizeof(buf_notes), "Bpm:%.1f     Measure:%.1f     Scroll:%.1f", Measure[MeasureCount].bpm, Measure[MeasureCount].measure, Measure[MeasureCount].scroll);
-	debug_draw(0, 20, buf_notes);
+	draw_debug(0, 20, buf_notes);
 
 	snprintf(buf_notes, sizeof(buf_notes), "%d:%.1f:%s", MeasureCount - 1,Measure[MeasureCount-1].judge_time, tja_notes[MeasureCount - 1]);
-	debug_draw(0, 50, buf_notes);
+	draw_debug(0, 50, buf_notes);
 	int n = 1;
 	snprintf(buf_notes, sizeof(buf_notes), "%d:%.1f:%s", n, Measure[n].judge_time, tja_notes[Measure[n].notes]);
-	debug_draw(0, 60, buf_notes);
+	draw_debug(0, 60, buf_notes);
 	*/
 
-	if (isAuto == true) debug_draw(0, 200, "Auto");
-	else debug_draw(0, 200, "Manual");
+	if (isAuto == true) draw_debug(0, 200, "Auto");
+	else draw_debug(0, 200, "Manual");
 
 	/*
 	snprintf(buf_notes, sizeof(buf_notes), "%s", tja_notes[4]);
-	debug_draw(0, 210, buf_notes);
+	draw_debug(0, 210, buf_notes);
 	*/
 }
 
@@ -401,7 +401,7 @@ void draw_judge(double NowTime, C2D_Sprite sprites[Sprite_Number]) {
 
 		}
 		//snprintf(buf_notes, sizeof(buf_notes), "%f", JudgeY);
-		//debug_draw(92, JudgeY, buf_notes);
+		//draw_debug(92, JudgeY, buf_notes);
 		if (NowTime - JudgeMakeTime >= 0.5) isJudgeDisp = false;
 	}
 
@@ -806,7 +806,7 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 				if (BalloonNotes[Notes[i].roll_id].current_hit >= 1) balloon_count_update(BalloonNotes[Notes[i].roll_id].need_hit - BalloonNotes[Notes[i].roll_id].current_hit);
 
 				//snprintf(buf_notes, sizeof(buf_notes), "%d", BalloonNotes[Notes[i].roll_id].need_hit - BalloonNotes[Notes[i].roll_id].current_hit);
-				//debug_draw(Notes[i].x, 132, buf_notes);
+				//draw_debug(Notes[i].x, 132, buf_notes);
 				break;
 			case RollEnd:
 				C2D_SpriteSetPos(&sprites[rOll_end], Notes[i].x, notes_y);
@@ -820,7 +820,7 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 				break;
 			}
 			//snprintf(buf_notes, sizeof(buf_notes), "%d", i);
-			//debug_draw(Notes[i].x, 132, buf_notes);
+			//draw_debug(Notes[i].x, 132, buf_notes);
 		}
 	}
 
@@ -894,7 +894,7 @@ void delete_roll(int i) {
 	}
 }
 
-void roll_notes_init() {
+void init_roll__notes() {
 
 	for (int i = 0; i < Roll_Max - 1; i++) {
 		delete_roll(i);
@@ -965,7 +965,7 @@ void delete_balloon(int i) {
 	}
 }
 
-void balloon_notes_init() {
+void init_balloon_notes() {
 
 	for (int i = 0; i < Balloon_Max - 1; i++) {
 		delete_balloon(i);
@@ -1069,18 +1069,18 @@ void delete_notes(int i) {
 	}
 }
 
-void notes_structure_init() {
+void init_notes_structure() {
 
 	for (int i = 0; i < Notes_Max - 1; i++) {
 		delete_notes(i);
 	}
 }
 
-void notes_init(TJA_HEADER_T TJA_Header) {
+void init_notes(TJA_HEADER_T TJA_Header) {
 
-	notes_structure_init();
-	roll_notes_init();
-	balloon_notes_init();
+	init_notes_structure();
+	init_roll__notes();
+	init_balloon_notes();
 	Command.data[0] = 0; Command.data[1] = 0; Command.data[2] = 0;
 	Command.knd = 0;
 	Command.val[0] = 0;

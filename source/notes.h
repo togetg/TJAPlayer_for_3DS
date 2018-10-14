@@ -47,4 +47,4 @@ void notes_main(
 void toggle_auto();
 int ctoi(char c);
 int get_branch_course();
-void notes_init(TJA_HEADER_T TJA_Header);
+void init_notes(TJA_HEADER_T TJA_Header);

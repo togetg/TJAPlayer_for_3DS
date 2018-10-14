@@ -33,13 +33,13 @@ typedef struct {
 	
 } MEASURE_T;
 
-void tja_head_load(int course, LIST_T Song);
-void tja_notes_load(int course, LIST_T Song);
+void load_tja_head(int course, LIST_T Song);
+void load_tja_notes(int course, LIST_T Song);
 void tja_to_notes(bool isDnon, bool isKatsu, int count, C2D_Sprite sprites[Sprite_Number]);
 void get_command_value(char* buf, COMMAND_T *Command);
 void get_tja_header(TJA_HEADER_T *TJA_Header);
-void tja_init();
+void init_tja();
 double get_FirstMeasureTime();
 int MeasureIdFromOriginalId(int id);
 bool get_isBranch();
-void tja_head_load_simple(LIST_T *List);
+void load_tja_head_simple(LIST_T *List);

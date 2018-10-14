@@ -13,7 +13,7 @@ TJA_HEADER_T TJA_Header;
 char buf_score[160];
 GAUGE_T Gauge;
 
-void guage_structure_init() {
+void init_guage_structure() {
 
 	Gauge.perfect = 0;
 	Gauge.nice = 0;
@@ -23,7 +23,7 @@ void guage_structure_init() {
 	Gauge.soul = 0;
 }
 
-void score_init() {
+void init_score() {
 
 	combo = 0;
 	get_tja_header(&TJA_Header);
@@ -48,7 +48,7 @@ void score_init() {
 	Precision = 0;
 	CurrentPrecision = 0;
 	CurrentBalloonCount = 0;
-	guage_structure_init();
+	init_guage_structure();
 }
 
 
@@ -231,18 +231,18 @@ void score_update(int knd) {
 void score_debug() {
 
 	snprintf(buf_score, sizeof(buf_score), "Scoremode:%d   Init:%d   Diff:%d", TJA_Header.scoremode, init, diff);
-	debug_draw(0, 10, buf_score);
+	draw_debug(0, 10, buf_score);
 	snprintf(buf_score, sizeof(buf_score), "%s %s    Course:%d    Level:%d    %s" ,TJA_Header.title, TJA_Header.subtitle,TJA_Header.course, TJA_Header.level,TJA_Header.wave);
-	debug_draw(0, 30, buf_score);
+	draw_debug(0, 30, buf_score);
 	snprintf(buf_score, sizeof(buf_score), "Score:%d    %dCombo    diff:%d",TotalScore, combo, ScoreDiff);
-	debug_draw(0, 150, buf_score);
+	draw_debug(0, 150, buf_score);
 	snprintf(buf_score, sizeof(buf_score), "Current   Score:%d    Roll:%d    Precision:%.1f", CurrentScore, CurrentTotalRollCount, CurrentPrecision);
-	debug_draw(0, 160, buf_score);
+	draw_debug(0, 160, buf_score);
 	snprintf(buf_score, sizeof(buf_score), "良:%d 可:%d 不可:%d ゲージ%d",Gauge.perfect,Gauge.nice,Gauge.bad,Gauge.score);
-	debug_draw(0, 170, buf_score);
+	draw_debug(0, 170, buf_score);
 	if (isGOGO == true) {
 		snprintf(buf_score, sizeof(buf_score), "GOGOTIME");
-		debug_draw(0, 190, buf_score);
+		draw_debug(0, 190, buf_score);
 	}
 }
 
@@ -395,7 +395,7 @@ int branch_start(int knd,double x,double y) {	//分岐
 	return branch;
 }
 
-void branch_section_init() {	//#SECTION
+void init_branch_section() {	//#SECTION
 
 	CurrentTotalRollCount = 0;
 	CurrentPerfectCount = 0;
@@ -670,7 +670,7 @@ void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max
 		}
 		break;
 	}
-	//score_init_after();
+	//init_score_after();
 }
 
 void balloon_count_update(int arg) {
