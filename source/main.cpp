@@ -109,7 +109,7 @@ int main() {
 			}
 			get_SelectedId(&SelectedSong,&course);
 
-			C2D_TargetClear(bottom, C2D_Color32(0x00, 0x00, 0x00, 0xFF));	//下画面
+			C2D_TargetClear(bottom, C2D_Color32(0x42, 0x42, 0x42, 0xFF));	//下画面
 			C2D_SceneBegin(bottom);
 			//C2D_DrawSprite(&sprites[bOttom]);
 			draw_debug(0, 0, SelectedSong.path);
@@ -142,6 +142,8 @@ int main() {
 		case MainGame:		//メイン
 
 			C2D_DrawSprite(&sprites[tOp]);
+			//C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(1, 0, 0, 1));
+			draw_emblem(sprites);
 
 			NowTime = time_now(1);
 
@@ -174,7 +176,7 @@ int main() {
 			}
 
 			bool isDon = false, isKatsu = false;
-			if ((((tp.px - 160)*(tp.px - 160) + (tp.py - 145)*(tp.py - 145)) <= 105 * 105 && key & KEY_TOUCH) ||
+			if ((((tp.px - 160)*(tp.px - 160) + (tp.py - 135)*(tp.py - 135)) <= 105 * 105 && key & KEY_TOUCH) ||
 				key & KEY_B ||
 				key & KEY_Y ||
 				key & KEY_RIGHT ||
@@ -210,7 +212,7 @@ int main() {
 			draw_score(sprites);
 			//score_debug();
 
-			C2D_TargetClear(bottom, C2D_Color32(0x00, 0x00, 0x00, 0xFF));	//下画面
+			C2D_TargetClear(bottom, C2D_Color32(0x42, 0x42, 0x42, 0xFF));	//下画面
 			C2D_SceneBegin(bottom);
 			C2D_DrawSprite(&sprites[bOttom]);
 
@@ -249,8 +251,10 @@ void load_sprites(){
 	C2D_SpriteSetCenterRaw(&sprites[bAlloon_6], 9, 59);
 	for (int i = 0; i < 4; i++) C2D_SpriteSetPos(&sprites[eFfect_perfect + i], 93, 109);
 	for (int i = 0; i < 2; i++) C2D_SpriteSetPos(&sprites[sOul_on + i], 385, 75);
+	C2D_SpriteSetPos(&sprites[sOul_effect], 395, 65);
 	C2D_SpriteSetPos(&sprites[eFfect_gogo], 110, 92);
 
 	C2D_SpriteSetPos(&sprites[tOp], TOP_WIDTH / 2, TOP_HEIGHT / 2);
 	C2D_SpriteSetPos(&sprites[bOttom], BOTTOM_WIDTH / 2, BOTTOM_HEIGHT / 2);
+	for (int i = 0;i<5;i++)C2D_SpriteSetPos(&sprites[eMblem_easy + i], 31, 113);
 }
