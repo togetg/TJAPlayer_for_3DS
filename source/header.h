@@ -26,7 +26,7 @@
 #define BOTTOM_WIDTH  320
 #define BOTTOM_HEIGHT 240
 
-#define Sprite_Number 67
+#define Sprite_Number 83
 
 #define Notes_Max 512
 #define BarLine_Max 64
@@ -89,6 +89,7 @@ enum Sprite_Notes_knd {	//スプライト用
 	eFfect_special_nice,
 	sOul_on,
 	sOul_off,
+	sOul_effect,
 	eFfect_gogo,
 	sCore_0,
 	sCore_1,
@@ -110,6 +111,16 @@ enum Sprite_Notes_knd {	//スプライト用
 	cOmbo_7,
 	cOmbo_8,
 	cOmbo_9,
+	cOmbo_0_red,
+	cOmbo_1_red,
+	cOmbo_2_red,
+	cOmbo_3_red,
+	cOmbo_4_red,
+	cOmbo_5_red,
+	cOmbo_6_red,
+	cOmbo_7_red,
+	cOmbo_8_red,
+	cOmbo_9_red,
 	rOll_0,
 	rOll_1,
 	rOll_2,
@@ -122,6 +133,11 @@ enum Sprite_Notes_knd {	//スプライト用
 	rOll_9,
 	rOll_count,
 	bAlloon_count,
+	eMblem_easy,
+	eMblem_normal,
+	eMblem_hard,
+	eMblem_oni,
+	eMblem_edit,
 };
 
 enum Command_knd {
