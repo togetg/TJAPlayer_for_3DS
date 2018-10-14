@@ -13,9 +13,9 @@ C2D_TextBuf g_dynamicBuf;
 char buf_main[160];
 C2D_Text dynText;
 
-void sprites_load();
+void load_sprites();
 
-void debug_draw(float x, float y, const char *text) {
+void draw_debug(float x, float y, const char *text) {
 
 	C2D_TextBufClear(g_dynamicBuf);
 	C2D_TextParse(&dynText, g_dynamicBuf, text);
@@ -23,13 +23,14 @@ void debug_draw(float x, float y, const char *text) {
 	C2D_DrawText(&dynText, C2D_WithColor, x, y, 0.5f, 0.5f, 0.5f, C2D_Color32f(0.0f, 1.0f, 0.0f, 1.0f));
 }
 
-void main_init() {
+void init_main() {
 
 	romfsInit();
 	gfxInitDefault();
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
 	C2D_Prepare();
+	g_dynamicBuf = C2D_TextBufNew(4096);
 }
 
 void main_exit() {
@@ -45,7 +46,7 @@ void main_exit() {
 
 int main() {
 
-	main_init();
+	init_main();
 
 	touchPosition tp;	//下画面タッチした座標
 
@@ -55,11 +56,10 @@ int main() {
 	TJA_HEADER_T TJA_Header;
 	LIST_T SelectedSong;
 
-	g_dynamicBuf = C2D_TextBufNew(4096);
-	sprites_load();	
-	music_load();
+	load_sprites();	
+	load_music();
 
-	int cnt = 0, notes_cnt = 0, scene_state = SelectSong;
+	int cnt = 0, notes_cnt = 0, scene_state = SelectLoad,course = ONI;
 	bool isNotesStart = false, isMusicStart = false, isPlayMain = false;
 	double FirstMeasureTime = INT_MAX,
 		offset=0,
@@ -80,6 +80,14 @@ int main() {
 
 		switch (scene_state) {
 
+		case SelectLoad:
+
+			draw_select(30, 0, "Now Loading...");
+
+			scene_state = SelectSong;
+			cnt = -1;
+			break;
+
 		case SelectSong:	//選曲
 
 			if (cnt == 0) {
@@ -95,32 +103,37 @@ int main() {
 
 			disp_file_list();
 			
-			if (key & KEY_SELECT) {
+			if (get_isGameStart() == true) {
 				scene_state =  MainLoad;
 				cnt = -1;
 			}
-			get_SelectedId(&SelectedSong);
+			get_SelectedId(&SelectedSong,&course);
 
 			C2D_TargetClear(bottom, C2D_Color32(0x00, 0x00, 0x00, 0xFF));	//下画面
 			C2D_SceneBegin(bottom);
 			//C2D_DrawSprite(&sprites[bOttom]);
-			debug_draw(0, 0, SelectedSong.path);
-			debug_draw(0, 10, SelectedSong.tja);
-			debug_draw(0, 20, SelectedSong.wave);
-			debug_draw(0, 30, SelectedSong.title);
+			draw_debug(0, 0, SelectedSong.path);
+			draw_debug(0, 10, SelectedSong.tja);
+			draw_debug(0, 20, SelectedSong.wave);
+			draw_debug(0, 30, SelectedSong.title);
+			snprintf(buf_main, sizeof(buf_main), "難易度:%d", course);
+			draw_debug(0, 40, buf_main);
 
 			break;
 
 		case MainLoad:
 
-			tja_init();
-			tja_head_load(Score_Course,SelectedSong);
+			init_tja();
+			load_tja_head(course,SelectedSong);
 			init_main_music();
 			get_tja_header(&TJA_Header);
-			score_init();
-			notes_init(TJA_Header);
-			tja_notes_load(Score_Course,SelectedSong);
+			init_score();
+			init_notes(TJA_Header);
+			load_tja_notes(course,SelectedSong);
 			offset = TJA_Header.offset;
+			notes_cnt = 0;
+			isNotesStart = false, isMusicStart = false, isPlayMain = false;
+			FirstMeasureTime = INT_MAX;
 
 			scene_state = MainGame;
 			cnt = -1;
@@ -140,6 +153,7 @@ int main() {
 
 			//譜面が先
 			if (offset > 0 && (isNotesStart == false || isMusicStart == false)) {
+
 				if (NowTime >= 0 && isNotesStart == false) isNotesStart = true;
 				if (NowTime >= offset + FirstMeasureTime && isMusicStart == false) {
 					isPlayMain = true;
@@ -147,7 +161,7 @@ int main() {
 				}
 			}
 
-			//音が先
+			//音楽が先
 			else if (offset <= 0 && (isNotesStart == false || isMusicStart == false)) {
 
 				if (NowTime >= FirstMeasureTime && isPlayMain == false) {
@@ -166,7 +180,7 @@ int main() {
 				key & KEY_RIGHT ||
 				key & KEY_DOWN ||
 				key & KEY_CSTICK_LEFT ||
-				key & KEY_CSTICK_DOWN) {//ドン
+				key & KEY_CSTICK_DOWN) {	//ドン
 				isDon = true;
 			}
 			else if (key & KEY_TOUCH ||
@@ -179,7 +193,7 @@ int main() {
 				key & KEY_R ||
 				key & KEY_L ||
 				key & KEY_ZR ||
-				key & KEY_ZL) {//カツ
+				key & KEY_ZL) {				//カツ
 				isKatsu = true;
 			}
 
@@ -217,7 +231,7 @@ int main() {
 	return 0;
 }
 
-void sprites_load(){
+void load_sprites(){
 
 	spriteSheet = C2D_SpriteSheetLoad("romfs:/gfx/sprites.t3x");
 	if (!spriteSheet) svcBreak(USERBREAK_PANIC);
