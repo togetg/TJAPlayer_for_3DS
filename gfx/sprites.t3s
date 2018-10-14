@@ -33,6 +33,7 @@ effect_nice.png
 effect_special_nice.png
 soul_on.png
 soul_off.png
+soul_effect.png
 effect_gogo.png
 score_0.png
 score_1.png
@@ -54,6 +55,16 @@ combo_6.png
 combo_7.png
 combo_8.png
 combo_9.png
+combo_0_red.png
+combo_1_red.png
+combo_2_red.png
+combo_3_red.png
+combo_4_red.png
+combo_5_red.png
+combo_6_red.png
+combo_7_red.png
+combo_8_red.png
+combo_9_red.png
 roll_0.png
 roll_1.png
 roll_2.png
@@ -66,3 +77,8 @@ roll_8.png
 roll_9.png
 roll_count.png
 balloon_count.png
+emblem_easy.png
+emblem_normal.png
+emblem_hard.png
+emblem_oni.png
+emblem_edit.png
