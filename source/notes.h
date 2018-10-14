@@ -21,7 +21,7 @@ typedef struct {
 	double start_x, end_x;
 	bool flag;
 
-}Roll_T;
+}ROLL_T;
 
 typedef struct {
 	int id, start_id, end_id,
