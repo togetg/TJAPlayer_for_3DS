@@ -1067,6 +1067,10 @@ void delete_notes(int i) {
 	}
 }
 
+bool get_isAuto() {
+	return isAuto;
+}
+
 void init_notes_structure() {
 
 	for (int i = 0; i < Notes_Max - 1; i++) {
@@ -1099,7 +1103,7 @@ void init_notes(TJA_HEADER_T TJA_Header) {
 	JudgeDispknd = -1;
 	JudgeY = 70;
 	JudgeRollState = -1;
-	isAuto = true;	//要変更
+	//isAuto = true;	//要変更
 	BalloonCount = 0;
 	BalloonBreakCount = 0;
 	isBalloonBreakDisp = false;
