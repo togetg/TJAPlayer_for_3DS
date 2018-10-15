@@ -3,11 +3,13 @@
 #include "select.h"
 #include "tja.h"
 #include "audio.h"
+#include "notes.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 
 void load_file_list(const char *path);
 void draw_select(float x, float y, const char *text);
+void draw_option_text(float x, float y, const char *text, bool state);
 
 LIST_T List[List_Max];
 char buf_select[256];
@@ -190,6 +192,7 @@ void disp_file_list() {
 	draw_select(10, 60, ">>");
 	//snprintf(buf_select, sizeof(buf_select), "%d",course);
 	//draw_select(0, 60, buf_select);
+
 }
 
 void cursor_update(int knd) {
@@ -278,6 +281,27 @@ void draw_select(float x, float y, const char *text) {
 	C2D_TextParse(&SelectText, g_SelectText, text);
 	C2D_TextOptimize(&SelectText);
 	C2D_DrawText(&SelectText, C2D_WithColor, x, y, 0.5f, 0.5f, 0.5f, C2D_Color32f(1.0f, 1.0f, 1.0f, 1.0f));
+}
+
+void draw_option_text(float x, float y, const char *text,bool state) {
+
+	C2D_TextBufClear(g_SelectText);
+	C2D_TextParse(&SelectText, g_SelectText, text);
+	C2D_TextOptimize(&SelectText);
+	float size = 1.3;
+	if (state == false) {
+		C2D_DrawText(&SelectText, C2D_WithColor, x, y, 1.0f, size, size, C2D_Color32f(100.0 / 255.0, 100.0 / 255.0, 100.0 / 255.0, 1.0f));
+	}
+	else if (state == true) {
+		C2D_DrawText(&SelectText, C2D_WithColor, x, y, 1.0f, size, size, C2D_Color32f(1.0f, 1.0f, 1.0f, 1.0f));
+	}
+}
+
+void draw_option(u16 px, u16 py, unsigned int key) {
+
+	if ((102 < py && 132 > py && 125 < px && 205 > px) && key & KEY_TOUCH) toggle_auto();
+	//C2D_DrawRectSolid(125, 102, 0, 80, 30, C2D_Color32f(1, 34.0 / 255.0, 204.0 / 255.0, 1));
+	draw_option_text(130, 100, "Auto", get_isAuto());
 }
 
 void get_SelectedId(LIST_T *TMP,int *arg) {
