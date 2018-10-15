@@ -63,7 +63,7 @@ int main() {
 	bool isNotesStart = false, isMusicStart = false, isPlayMain = false;
 	double FirstMeasureTime = INT_MAX,
 		offset=0,
-		NowTime;
+		NowTime=-1000;
 
 	while (aptMainLoop()) {
 
@@ -112,11 +112,7 @@ int main() {
 			C2D_TargetClear(bottom, C2D_Color32(0x42, 0x42, 0x42, 0xFF));	//下画面
 			C2D_SceneBegin(bottom);
 			//C2D_DrawSprite(&sprites[bOttom]);
-			draw_debug(0, 0, SelectedSong.path);
-			draw_debug(0, 10, SelectedSong.tja);
-			draw_debug(0, 20, SelectedSong.wave);
-			draw_debug(0, 30, SelectedSong.title);
-			snprintf(buf_main, sizeof(buf_main), "難易度:%d", course);
+			draw_option(tp.px,tp.py,key);
 			draw_debug(0, 40, buf_main);
 
 			break;
@@ -136,7 +132,7 @@ int main() {
 			FirstMeasureTime = INT_MAX;
 
 			scene_state = MainGame;
-			cnt = -1;
+			cnt = -120;
 			break;
 
 		case MainGame:		//メイン
@@ -145,7 +141,8 @@ int main() {
 			//C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(1, 0, 0, 1));
 			draw_emblem(sprites);
 
-			NowTime = time_now(1);
+			.
+			if (cnt >= 0) NowTime = time_now(1);
 
 			if (cnt == 0) {
 
