@@ -63,7 +63,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 			while (isNotesLoad == true && tja_notes[Measure[MeasureCount].notes][NotesCount] != ',' && tja_notes[Measure[MeasureCount].notes][NotesCount] != '\n' && tja_notes[Measure[MeasureCount].notes][NotesCount] != '/') {
 
 				//生成時に発動する命令
-				if (NotesCount == 0 && tja_notes[Measure[MeasureCount].notes][0] == '#') {
+				if (NotesCount == 0 && tja_notes[Measure[MeasureCount].notes][0] == '#' && Measure[MeasureCount].branch == Branch.course) {
 
 					get_command_value(tja_notes[Measure[MeasureCount].notes], &Command);
 					Command.notes = tja_notes[Measure[MeasureCount].notes];
@@ -102,7 +102,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 			//小節線
 			int BarLineId = find_line_id();
-			if (BarLineId != -1) {
+			if (BarLineId != -1 && Measure[MeasureCount].branch == Branch.course) {
 				BarLine[BarLineId].flag = true;
 				BarLine[BarLineId].scroll = Measure[MeasureCount].scroll;
 				BarLine[BarLineId].x = BarLine[BarLineId].x_ini;
@@ -127,7 +127,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 				int id = find_notes_id();
 
-				if (id != -1 && ctoi(tja_notes[Measure[MeasureCount].notes][i]) != 0) {
+				if (id != -1 && ctoi(tja_notes[Measure[MeasureCount].notes][i]) != 0 && Measure[MeasureCount].branch == Branch.course) {
 
 					Notes[id].flag = true;
 					Notes[id].notes_max = NotesCount;
@@ -247,7 +247,8 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 			if (BarLine[i].isDisp == true) {
 				C2D_DrawRectangle(BarLine[i].x, 86, 0, 1, 46, C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1));
-				//snprintf(buf_notes, sizeof(buf_notes), "%d", BarLine[i].measure);
+
+				//snprintf(buf_notes, sizeof(buf_notes), "%d", Measure[BarLine[i].measure].branch);
 				//draw_debug(BarLine[i].x - 10, 133, buf_notes);
 			}
 
@@ -259,10 +260,10 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 	send_gogotime(isGOGOTime);
 
 	notes_calc(isDon, isKatsu, bpm, NowTime, cnt, sprites);
-
+	
 	for (int i = 0; i < Measure_Max - 1; i++) {	//判定時に発動する命令
 
-		if (Measure[i].flag == true) {
+		if ((Measure[i].branch == Branch.course || Measure[i].branch == -1) && Measure[i].flag == true) {
 
 			bool NotFalse = false;
 
@@ -299,7 +300,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 			if (NotFalse == false && Measure[i].judge_time <= NowTime) Measure[i].flag = false;
 		}
 	}
-
+	
 	notes_draw(sprites);
 	draw_emblem(sprites);
 	draw_judge(NowTime, sprites);
@@ -865,7 +866,6 @@ int notes_cmp(const void *p, const void *q) {	//比較用
 
 	int pp = ((NOTES_T*)p)->judge_time * 10000;
 	int qq = ((NOTES_T*)q)->judge_time * 10000;
-
 
 	//if (((NOTES_T*)p)->flag == false) pp = INT_MAX;
 	//if (((NOTES_T*)p)->flag == false) qq = INT_MAX;
