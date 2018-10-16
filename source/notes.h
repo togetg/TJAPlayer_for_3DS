@@ -49,3 +49,4 @@ int ctoi(char c);
 int get_branch_course();
 void init_notes(TJA_HEADER_T TJA_Header);
 bool get_isAuto();
+bool get_notes_finish();
