@@ -22,10 +22,11 @@ ROLL_T RollNotes[Roll_Max];
 BALLOON_T BalloonNotes[Balloon_Max];
 BRANCH_T Branch;
 
-int MeasureCount, RollState, NotesCount, JudgeDispknd, JudgeRollState, BalloonBreakCount, BranchCourse,
+int MeasureCount, RollState, NotesCount, JudgeDispknd, JudgeRollState, BalloonBreakCount,
 NotesNumber;	//何番目のノーツか
 bool  isNotesLoad = true, isAuto = false, isJudgeDisp = false, isBalloonBreakDisp = false, isGOGOTime = false, isLevelHold = false;	//要初期化
 double JudgeMakeTime, JudgeY,JudgeEffectCnt;
+
 
 void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_Measure], MEASURE_T Measure[Measure_Max], int cnt, C2D_Sprite  sprites[Sprite_Number]) {
 
@@ -63,7 +64,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 			while (isNotesLoad == true && tja_notes[Measure[MeasureCount].notes][NotesCount] != ',' && tja_notes[Measure[MeasureCount].notes][NotesCount] != '\n' && tja_notes[Measure[MeasureCount].notes][NotesCount] != '/') {
 
 				//生成時に発動する命令
-				if (NotesCount == 0 && tja_notes[Measure[MeasureCount].notes][0] == '#' && Measure[MeasureCount].branch == Branch.course) {
+				if (NotesCount == 0 && tja_notes[Measure[MeasureCount].notes][0] == '#' && (Measure[MeasureCount].branch == Branch.course || Measure[MeasureCount].branch == -1)) {
 
 					get_command_value(tja_notes[Measure[MeasureCount].notes], &Command);
 					Command.notes = tja_notes[Measure[MeasureCount].notes];
@@ -314,9 +315,9 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 	snprintf(buf_notes, sizeof(buf_notes), "%d:%.1f:%s", MeasureCount - 1,Measure[MeasureCount-1].judge_time, tja_notes[MeasureCount - 1]);
 	draw_debug(0, 50, buf_notes);
-	int n = 1;
-	snprintf(buf_notes, sizeof(buf_notes), "%d:%.1f:%s", n, Measure[n].judge_time, tja_notes[Measure[n].notes]);
-	draw_debug(0, 60, buf_notes);
+	int n = 273;
+	snprintf(buf_notes, sizeof(buf_notes), "%d:%s:%f:%d:%d", n, tja_notes[Measure[n].notes],Measure[n].create_time,Measure[n].branch,Branch.course);
+	draw_debug(0, 30, buf_notes);
 	*/
 
 	if (isAuto == true) draw_debug(0, 200, "Auto");
@@ -1071,6 +1072,15 @@ bool get_isAuto() {
 	return isAuto;
 }
 
+bool get_notes_finish() {
+
+	if (isNotesLoad == true) return false;
+	for (int i = 0; i < Notes_Max - 1; i++) {
+
+		if (Notes[i].flag == true) return false;
+	}
+	return true;
+}
 void init_notes_structure() {
 
 	for (int i = 0; i < Notes_Max - 1; i++) {
