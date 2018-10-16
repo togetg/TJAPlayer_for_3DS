@@ -20,13 +20,6 @@ bool isSelectCourse = false,isGameStart = false;
 void load_file_main() {
 
 	load_file_list_tjafiles();
-	cursor = 0;
-	course_cursor = 0;
-	course_count = 0;
-	SelectedId = 0;
-	course = ONI;
-	isSelectCourse = false;
-	isGameStart = false;
 }
 
 void load_file_list_tjafiles() {	//バグがおこるため再帰は使わない
@@ -319,4 +312,14 @@ void get_SelectedId(LIST_T *TMP,int *arg) {
 
 bool get_isGameStart() {
 	return isGameStart;
+}
+
+void select_ini() {
+	cursor = 0;
+	//course_cursor = 0;
+	course_count = 0;
+	SelectedId = 0;
+	course = ONI;
+	isSelectCourse = false;
+	isGameStart = false;
 }
