@@ -34,21 +34,6 @@ double time_now(int id) {
 	return sec[id]+msec[id][DiFF]/1000000.0;
 }
 
-void time_ini() {
-
-	for (int i = 0; i < 5; i++) {
-
-		for (int n = 0; n < 4; n++) {
-			msec[i][n] = 0;
-
-		}
-
-		sec[i] = 0;
-		cnt[i] = 0;
-
-	}
-}
-
 #define Fps_Sample 60
 double fps_time[2],fps_cnt,fps_sum,fps;	//要初期化
 void draw_fps() {
@@ -66,4 +51,24 @@ void draw_fps() {
 	}
 	snprintf(buf_time, sizeof(buf_time), "%.1ffps", fps);
 	draw_debug(300, 0, buf_time);
+}
+
+void time_ini() {
+
+	for (int i = 0; i < 5; i++) {
+
+		for (int n = 0; n < 4; n++) {
+			msec[i][n] = 0;
+
+		}
+
+		sec[i] = 0;
+		cnt[i] = 0;
+
+	}
+	fps_time[0] = 0;
+	fps_time[1] = 0;
+	fps_cnt = 0;
+	fps_sum = 0;
+	fps = 0;
 }
