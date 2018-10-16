@@ -162,11 +162,11 @@ void load_tja_head(int course,LIST_T Song) {
 			if (strstr(buf, "COURSE:") == buf) {
 				strlcpy(temp, buf + 7, strlen(buf) - 8);
 				if (strlen(temp) == 1) Current_Header.course = atoi(temp);		//数字表記
-				else if (strcmp(temp, "Easy") == 0) Current_Header.course = EASY;	//文字表記
-				else if (strcmp(temp, "Normal") == 0) Current_Header.course = NORMAL;
-				else if (strcmp(temp, "Hard") == 0) Current_Header.course = HARD;
-				else if (strcmp(temp, "Oni") == 0) Current_Header.course = ONI;
-				else if (strcmp(temp, "Edit") == 0) Current_Header.course = EDIT;
+				else if (strcmp(temp, "Easy") == 0 || strcmp(temp, "easy") == 0)   course = EASY;	//文字表記
+				else if (strcmp(temp, "Normal") == 0 || strcmp(temp, "normal") == 0) course = NORMAL;
+				else if (strcmp(temp, "Hard") == 0 || strcmp(temp, "hard") == 0)   course = HARD;
+				else if (strcmp(temp, "Oni") == 0 || strcmp(temp, "oni") == 0)    course = ONI;
+				else if (strcmp(temp, "Edit") == 0 || strcmp(temp, "edit") == 0)   course = EDIT;
 				
 				if (Current_Header.course == course) isCourseMatch = true;
 				else isCourseMatch = false;
@@ -254,11 +254,12 @@ void load_tja_head_simple(LIST_T *List) {		//選曲用のヘッダ取得
 
 				strlcpy(temp, buf + 7, strlen(buf) - 8);
 				if (strlen(temp) == 1) course = atoi(temp);			//数字表記
-				else if (strcmp(temp, "Easy") == 0) course = EASY;	//文字表記
-				else if (strcmp(temp, "Normal") == 0) course = NORMAL;
-				else if (strcmp(temp, "Hard") == 0) course = HARD;
-				else if (strcmp(temp, "Oni") == 0) course = ONI;
-				else if (strcmp(temp, "Edit") == 0) course = EDIT;
+				else if (strcmp(temp, "Easy") == 0 || strcmp(temp, "easy") == 0)   course = EASY;	//文字表記
+				else if (strcmp(temp, "Normal") == 0 || strcmp(temp, "normal") == 0) course = NORMAL;
+				else if (strcmp(temp, "Hard") == 0 || strcmp(temp, "hard") == 0)   course = HARD;
+				else if (strcmp(temp, "Oni") == 0 || strcmp(temp, "oni") == 0)    course = ONI;
+				else if (strcmp(temp, "Edit") == 0 || strcmp(temp, "edit") == 0)   course = EDIT;
+
 
 				List->course[course] = true;
 
