@@ -86,12 +86,13 @@ int main() {
 
 			scene_state = SelectSong;
 			cnt = -1;
+			load_file_main();
 			break;
 
 		case SelectSong:	//選曲
 
 			if (cnt == 0) {
-				load_file_main();
+				select_ini();
 			}
 
 			if (key & KEY_UP)		cursor_update(KEY_UP);
@@ -126,10 +127,12 @@ int main() {
 			init_score();
 			init_notes(TJA_Header);
 			load_tja_notes(course,SelectedSong);
+			time_ini();
 			offset = TJA_Header.offset;
 			notes_cnt = 0;
 			isNotesStart = false, isMusicStart = false, isPlayMain = false;
 			FirstMeasureTime = INT_MAX;
+			NowTime = -1000;
 
 			scene_state = MainGame;
 			cnt = -120;
@@ -141,7 +144,6 @@ int main() {
 			//C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(1, 0, 0, 1));
 			draw_emblem(sprites);
 
-			.
 			if (cnt >= 0) NowTime = time_now(1);
 
 			if (cnt == 0) {
@@ -219,6 +221,15 @@ int main() {
 			if (isKatsu == true) {		//カツ
 				music_play(1);
 			}
+
+			snprintf(buf_main, sizeof(buf_main), "%d:%d", get_notes_finish(),ndspChnIsPlaying(CHANNEL));
+			draw_debug(0, 0, buf_main);
+
+			if (get_notes_finish() == true && ndspChnIsPlaying(CHANNEL) == false) {
+				scene_state = SelectSong;
+				cnt = -1;
+			}
+
 			break;
 		}
 
