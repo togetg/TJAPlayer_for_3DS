@@ -85,43 +85,55 @@ void load_tja_head(int course,LIST_T Song) {
 			}
 
 			if (strstr(buf, "TITLE:") == buf) {
-				strlcpy(temp, buf + 6, strlen(buf) - 7);
-				Current_Header.title = temp;
+				if (buf[6] != '\n' && buf[6] != '\r') {
+					strlcpy(temp, buf + 6, strlen(buf) - 7);
+					Current_Header.title = temp;
+				}
 				continue;
 			}
 
 			if (strstr(buf, "SUBTITLE:") == buf) {
-				strlcpy(temp, buf + 9, strlen(buf) - 10);
-				Current_Header.subtitle = temp;
+				if (buf[9] != '\n' && buf[9] != '\r') {
+					strlcpy(temp, buf + 9, strlen(buf) - 10);
+					Current_Header.subtitle = temp;
+				}
 				continue;
 			}
 
 			if (strstr(buf, "LEVEL:") == buf) {
+				if (buf[6] != '\n' && buf[6] != '\r') {
 				strlcpy(temp, buf + 6, strlen(buf) - 7);
 				Current_Header.level = atoi(temp);
+			}
 				continue;
 			}
 
 			if (strstr(buf, "BPM:") == buf) {
-				strlcpy(temp, buf + 4, strlen(buf) - 5);
-				Current_Header.bpm = atof(temp);
+				if (buf[4] != '\n' && buf[4] != '\r') {
+					strlcpy(temp, buf + 4, strlen(buf) - 5);
+					Current_Header.bpm = atof(temp);
+				}
 				continue;
 			}
 
 			if (strstr(buf, "WAVE:") == buf) {
-				strlcpy(temp, buf + 5, strlen(buf) - 6);
-				Current_Header.wave = temp;
+				if (buf[5] != '\n' && buf[5] != '\r') {
+					strlcpy(temp, buf + 5, strlen(buf) - 6);
+					Current_Header.wave = temp;
+				}
 				continue;
 			}
 
 			if (strstr(buf, "OFFSET:") == buf) {
-				strlcpy(temp, buf + 7, strlen(buf) - 8);
-				Current_Header.offset = atof(temp);
+				if (buf[7] != '\n' && buf[7] != '\r') {
+					strlcpy(temp, buf + 7, strlen(buf) - 8);
+					Current_Header.offset = atof(temp);
+				}
 				continue;
 			}
 
 			if (strstr(buf, "BALLOON:") == buf) {
-				if (isdigit(buf[8]) == true) {		//値が空
+				if (buf[8] != '\n' && buf[8] != '\r') {
 					strlcpy(temp, buf + 8, strlen(buf) - 9);
 					char *tp = strtok(temp, ",");
 					Current_Header.balloon[0] = atoi(tp);
@@ -135,72 +147,91 @@ void load_tja_head(int course,LIST_T Song) {
 			}
 
 			if (strstr(buf, "SONGVOL:") == buf) {
-				strlcpy(temp, buf + 8, strlen(buf) - 9);
-				Current_Header.songvol = atoi(temp);
+				if (buf[8] != '\n' && buf[8] != '\r') {
+					strlcpy(temp, buf + 8, strlen(buf) - 9);
+					Current_Header.songvol = atoi(temp);
+				}
 				continue;
 			}
 
 			if (strstr(buf, "SEVOL:") == buf) {
-				strlcpy(temp, buf + 6, strlen(buf) - 7);
-				Current_Header.sevol = atoi(temp);
+				if (buf[6] != '\n' && buf[6] != '\r') {
+					strlcpy(temp, buf + 6, strlen(buf) - 7);
+					Current_Header.sevol = atoi(temp);
+				}
 				continue;
 			}
 
 			if (strstr(buf, "SCOREINIT:") == buf) {
-				strlcpy(temp, buf + 10, strlen(buf) - 11);
-				Current_Header.scoreinit = atoi(temp);
+				if (buf[10] != '\n' && buf[10] != '\r') {
+					strlcpy(temp, buf + 10, strlen(buf) - 11);
+					Current_Header.scoreinit = atoi(temp);
+				}
 				continue;
 			}
 
 			if (strstr(buf, "SCOREDIFF:") == buf) {
-				strlcpy(temp, buf + 10, strlen(buf) - 11);
-				Current_Header.scorediff = atoi(temp);
+				if (buf[10] != '\n' && buf[10] != '\r') {
+					strlcpy(temp, buf + 10, strlen(buf) - 11);
+					Current_Header.scorediff = atoi(temp);
+				}
 				continue;
 			}
 
 
 			if (strstr(buf, "COURSE:") == buf) {
-				strlcpy(temp, buf + 7, strlen(buf) - 8);
-				if (strlen(temp) == 1) Current_Header.course = atoi(temp);		//数字表記
-				else if (strcmp(temp, "Easy") == 0 || strcmp(temp, "easy") == 0)   course = EASY;	//文字表記
-				else if (strcmp(temp, "Normal") == 0 || strcmp(temp, "normal") == 0) course = NORMAL;
-				else if (strcmp(temp, "Hard") == 0 || strcmp(temp, "hard") == 0)   course = HARD;
-				else if (strcmp(temp, "Oni") == 0 || strcmp(temp, "oni") == 0)    course = ONI;
-				else if (strcmp(temp, "Edit") == 0 || strcmp(temp, "edit") == 0)   course = EDIT;
-				
-				if (Current_Header.course == course) isCourseMatch = true;
-				else isCourseMatch = false;
+				if (buf[7] != '\n' && buf[7] != '\r') {
+					strlcpy(temp, buf + 7, strlen(buf) - 8);
+					if (strlen(temp) == 1) Current_Header.course = atoi(temp);		//数字表記
+					else if (strcmp(temp, "Easy") == 0 || strcmp(temp, "easy") == 0)   course = EASY;	//文字表記
+					else if (strcmp(temp, "Normal") == 0 || strcmp(temp, "normal") == 0) course = NORMAL;
+					else if (strcmp(temp, "Hard") == 0 || strcmp(temp, "hard") == 0)   course = HARD;
+					else if (strcmp(temp, "Oni") == 0 || strcmp(temp, "oni") == 0)    course = ONI;
+					else if (strcmp(temp, "Edit") == 0 || strcmp(temp, "edit") == 0)   course = EDIT;
 
+					if (Current_Header.course == course) isCourseMatch = true;
+					else isCourseMatch = false;
+				}
 				continue;
 			}
 
 			if (strstr(buf, "STYLE:") == buf) {
-				strlcpy(temp, buf + 6, strlen(buf) - 7);
-				Current_Header.style = atoi(temp);
+				if (buf[6] != '\n' && buf[6] != '\r') {
+					strlcpy(temp, buf + 6, strlen(buf) - 7);
+					Current_Header.style = atoi(temp);
+				}
 				continue;
 			}
 
 			if (strstr(buf, "LIFE:") == buf) {
-				strlcpy(temp, buf + 5, strlen(buf) - 6);
-				Current_Header.life = atoi(temp);
+				if (buf[5] != '\n' && buf[5] != '\r') {
+					strlcpy(temp, buf + 5, strlen(buf) - 6);
+					Current_Header.life = atoi(temp);
+				}
 				continue;
 			}
 
 			if (strstr(buf, "DEMOSTART:") == buf) {
-				strlcpy(temp, buf + 10, strlen(buf) - 11);
-				Current_Header.demostart = atof(temp);
+				if (buf[10] != '\n' && buf[10] != '\r') {
+					strlcpy(temp, buf + 10, strlen(buf) - 11);
+					Current_Header.demostart = atof(temp);
+				}
 				continue;
 			}
 
 			if (strstr(buf, "SIDE:") == buf) {
-				strlcpy(temp, buf + 5, strlen(buf) - 6);
-				Current_Header.side = atoi(temp);
+				if (buf[5] != '\n' && buf[5] != '\r') {
+					strlcpy(temp, buf + 5, strlen(buf) - 6);
+					Current_Header.side = atoi(temp);
+				}
 				continue;
 			}
 
 			if (strstr(buf, "SCOREMODE:") == buf) {
-				strlcpy(temp, buf + 10, strlen(buf) - 11);
-				Current_Header.scoremode = atoi(temp);
+				if (buf[10] != '\n' && buf[10] != '\r') {
+					strlcpy(temp, buf + 10, strlen(buf) - 11);
+					Current_Header.scoremode = atoi(temp);
+				}
 				continue;
 			}
 
@@ -239,36 +270,41 @@ void load_tja_head_simple(LIST_T *List) {		//選曲用のヘッダ取得
 			temp = (char *)malloc((strlen(buf) + 1));
 
 			if (strstr(buf, "TITLE:") == buf) {
-
-				strlcpy(List->title, buf + 6, strlen(buf) - 7);
+				if (buf[6] != '\n' && buf[6] != '\r') {
+					strlcpy(List->title, buf + 6, strlen(buf) - 7);
+				}
 				continue;
 			}
 
 			if (strstr(buf, "WAVE:") == buf) {
-
-				strlcpy(List->wave, buf + 5, strlen(buf) - 6);
+				if (buf[5] != '\n' && buf[5] != '\r') {
+					strlcpy(List->wave, buf + 5, strlen(buf) - 6);
+				}
 				continue;
 			}
 
 			if (strstr(buf, "COURSE:") == buf) {
+				if (buf[7] != '\n' && buf[7] != '\r') {
+					strlcpy(temp, buf + 7, strlen(buf) - 8);
+					if (strlen(temp) == 1) course = atoi(temp);			//数字表記
+					else if (strcmp(temp, "Easy") == 0 || strcmp(temp, "easy") == 0)   course = EASY;	//文字表記
+					else if (strcmp(temp, "Normal") == 0 || strcmp(temp, "normal") == 0) course = NORMAL;
+					else if (strcmp(temp, "Hard") == 0 || strcmp(temp, "hard") == 0)   course = HARD;
+					else if (strcmp(temp, "Oni") == 0 || strcmp(temp, "oni") == 0)    course = ONI;
+					else if (strcmp(temp, "Edit") == 0 || strcmp(temp, "edit") == 0)   course = EDIT;
 
-				strlcpy(temp, buf + 7, strlen(buf) - 8);
-				if (strlen(temp) == 1) course = atoi(temp);			//数字表記
-				else if (strcmp(temp, "Easy") == 0 || strcmp(temp, "easy") == 0)   course = EASY;	//文字表記
-				else if (strcmp(temp, "Normal") == 0 || strcmp(temp, "normal") == 0) course = NORMAL;
-				else if (strcmp(temp, "Hard") == 0 || strcmp(temp, "hard") == 0)   course = HARD;
-				else if (strcmp(temp, "Oni") == 0 || strcmp(temp, "oni") == 0)    course = ONI;
-				else if (strcmp(temp, "Edit") == 0 || strcmp(temp, "edit") == 0)   course = EDIT;
 
-
-				List->course[course] = true;
+					List->course[course] = true;
+				}
 
 				continue;
 			}
 
 			if (strstr(buf, "LEVEL:") == buf) {
-				strlcpy(temp, buf + 6, strlen(buf) - 7);
-				List->level[course] = atoi(temp);
+				if (buf[6] != '\n' && buf[6] != '\r') {
+					strlcpy(temp, buf + 6, strlen(buf) - 7);
+					List->level[course] = atoi(temp);
+				}
 				continue;
 			}
 		}
