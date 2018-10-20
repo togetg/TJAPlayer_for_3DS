@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "header.h"
 #include "select.h"
 
 typedef struct {
@@ -13,7 +12,7 @@ typedef struct {
 
 	char *title, *subtitle,*wave;
 	int level,balloon[256],songvol,sevol,scoreinit,scorediff,
-		course,style,life,side,scoremode,total;
+		course,style,life,side,scoremode,total,subtitle_state;
 	double bpm, offset, demostart;
 
 }TJA_HEADER_T;
