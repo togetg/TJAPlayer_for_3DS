@@ -135,6 +135,8 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 					int knd = ctoi(tja_notes[Measure[MeasureCount].notes][i]);
 
+					if (knd == Potato) knd = Don;	//イモ連打はドンに置換
+
 					if (Option.random > 0) {		//ランダム(きまぐれ,でたらめ)
 						if (rand() % 100 < Option.random * 100) {
 							switch (knd) {
@@ -730,8 +732,17 @@ void notes_calc(bool isDon, bool isKatsu, double bpm, double NowTime, int cnt, C
 
 	for (int i = 0; i < Notes_Max - 1; i++) {	//連打のバグ回避のためノーツの削除は一番最後
 
-		if (Notes[i].x <= 20 &&
-			Notes[i].knd != Roll && Notes[i].knd != BigRoll) delete_notes(i);
+		if (Notes[i].flag == true &&
+			Notes[i].x <= 20 &&
+			Notes[i].knd != Roll && Notes[i].knd != BigRoll) {
+
+			if (Notes[i].isThrough == false && 
+				(Notes[i].knd == Don || Notes[i].knd == Katsu || Notes[i].knd == BigDon || Notes[i].knd == BigKatsu)) {
+				score_update(THROUGH);
+				Notes[i].isThrough = true;
+			}
+			delete_notes(i);
+		}
 	}
 
 	notes_judge(NowTime, isDon, isKatsu, cnt);
