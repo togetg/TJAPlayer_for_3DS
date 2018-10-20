@@ -5,6 +5,7 @@
 #include "tja.h"
 #include "notes.h"
 #include "score.h"
+#include "option.h"
 
 int balloon[256], BalloonCount;
 double bpm, offset;
@@ -24,15 +25,17 @@ BRANCH_T Branch;
 
 int MeasureCount, RollState, NotesCount, JudgeDispknd, JudgeRollState, BalloonBreakCount,
 NotesNumber;	//何番目のノーツか
-bool  isNotesLoad = true, isAuto = false, isJudgeDisp = false, isBalloonBreakDisp = false, isGOGOTime = false, isLevelHold = false;	//要初期化
+bool  isNotesLoad = true, isJudgeDisp = false, isBalloonBreakDisp = false, isGOGOTime = false, isLevelHold = false;	//要初期化
 double JudgeMakeTime, JudgeY,JudgeEffectCnt;
 
 
 void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_Measure], MEASURE_T Measure[Measure_Max], int cnt, C2D_Sprite  sprites[Sprite_Number]) {
 
+	OPTION_T Option;
+	get_option(&Option);
+
 	//最初の小節のcreate_timeがマイナスだった時用に調整
 	double NowTime = time_now(0) + Measure[0].create_time;
-
 
 	snprintf(buf_notes, sizeof(buf_notes), "time:%.2f", NowTime);
 	draw_debug(0, 0, buf_notes);
@@ -320,7 +323,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 	draw_debug(0, 30, buf_notes);
 	*/
 
-	if (isAuto == true) draw_debug(0, 200, "Auto");
+	if (Option.isAuto == true) draw_debug(0, 200, "Auto");
 	else draw_debug(0, 200, "Manual");
 
 	/*
@@ -409,6 +412,9 @@ void draw_judge(double NowTime, C2D_Sprite sprites[Sprite_Number]) {
 
 void notes_judge(double NowTime, bool isDon, bool isKatsu, int cnt) {
 
+	OPTION_T Option;
+	get_option(&Option);
+
 	int CurrentJudgeNotes[2] = { -1,-1 };		//現在判定すべきノーツ ドン,カツ
 	double CurrentJudgeNotesLag[2] = { -1,-1 };	//判定すべきノーツの誤差(s)
 
@@ -462,7 +468,7 @@ void notes_judge(double NowTime, bool isDon, bool isKatsu, int cnt) {
 		}
 	}
 
-	if (isAuto == true) {	//オート
+	if (Option.isAuto == true) {	//オート
 
 		for (int i = 0; i < Notes_Max - 1; i++) {
 
@@ -524,7 +530,7 @@ void notes_judge(double NowTime, bool isDon, bool isKatsu, int cnt) {
 		}
 	}
 
-	else if (isAuto == false) {			//手動
+	else if (Option.isAuto == false) {			//手動
 
 		bool isBig;
 		if (Notes[CurrentJudgeNotes[0]].knd == BigDon || Notes[CurrentJudgeNotes[0]].knd == BigKatsu) isBig = true;
@@ -836,11 +842,6 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 
 }
 
-void toggle_auto() {
-
-	isAuto = !isAuto;
-}
-
 int get_branch_course() {
 
 	return Branch.course;
@@ -1067,11 +1068,6 @@ void delete_notes(int i) {
 		Notes[i].isThrough = false;
 	}
 }
-
-bool get_isAuto() {
-	return isAuto;
-}
-
 bool get_notes_finish() {
 
 	if (isNotesLoad == true) return false;
