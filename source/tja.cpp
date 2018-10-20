@@ -55,6 +55,7 @@ void load_tja_head(int course,LIST_T Song) {
 
 	Current_Header.title = (char*)"No title";
 	Current_Header.subtitle = (char*)"";
+	Current_Header.subtitle_state = 0;
 	Current_Header.level = 0;
 	Current_Header.bpm = 60.0;
 	Current_Header.wave = (char*)"audio.ogg";
@@ -95,6 +96,11 @@ void load_tja_head(int course,LIST_T Song) {
 			if (strstr(buf, "SUBTITLE:") == buf) {
 				if (buf[9] != '\n' && buf[9] != '\r') {
 					strlcpy(temp, buf + 9, strlen(buf) - 10);
+					if (strstr(temp, "--") == temp) Current_Header.subtitle_state = 1;
+					else if (strstr(temp, "++") == temp) Current_Header.subtitle_state = 2;
+					if (Current_Header.subtitle_state != 0) {
+						strlcpy(temp, buf + 9 + 2, strlen(buf) - 10 - 2);
+					}
 					Current_Header.subtitle = temp;
 				}
 				continue;
