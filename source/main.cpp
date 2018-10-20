@@ -7,6 +7,7 @@
 #include "score.h"
 #include "select.h"
 #include "option.h"
+#include "result.h"
 
 C2D_Sprite sprites[Sprite_Number];			//画像用
 static C2D_SpriteSheet spriteSheet;
@@ -57,22 +58,24 @@ int main() {
 	TJA_HEADER_T TJA_Header;
 	LIST_T SelectedSong;
 
-	load_sprites();	
+	load_sprites();
 	load_music();
 
-	int cnt = 0, notes_cnt = 0, scene_state = SelectLoad,course = ONI;
-	bool isNotesStart = false, isMusicStart = false, isPlayMain = false;
+	int cnt = 0, notes_cnt = 0, scene_state = SelectLoad, course = ONI;
+	bool isNotesStart = false, isMusicStart = false, isPlayMain = false,isExit = false;
 	double FirstMeasureTime = INT_MAX,
-		offset=0,
-		NowTime=-1000;
+		offset = 0,
+		NowTime = -1000;
 
 	while (aptMainLoop()) {
 
 		hidScanInput();
 		hidTouchRead(&tp);
-
 		unsigned int key = hidKeysDown();
-		if (key & KEY_START) break;
+
+		if (isExit == true) break;
+
+		bool isDon = false, isKatsu = false;
 
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
@@ -83,7 +86,7 @@ int main() {
 
 		case SelectLoad:
 
-			draw_select(30, 0, "Now Loading...");
+			draw_select_text(30, 0, "Now Loading...");
 
 			scene_state = SelectSong;
 			cnt = -1;
@@ -92,6 +95,8 @@ int main() {
 			break;
 
 		case SelectSong:	//選曲
+
+			if (key & KEY_START) isExit = true;
 
 			if (cnt == 0) {
 				select_ini();
@@ -105,17 +110,17 @@ int main() {
 			if (key & KEY_B)		cursor_update(KEY_B);
 
 			disp_file_list();
-			
+
 			if (get_isGameStart() == true) {
-				scene_state =  MainLoad;
+				scene_state = MainLoad;
 				cnt = -1;
 			}
-			get_SelectedId(&SelectedSong,&course);
+			get_SelectedId(&SelectedSong, &course);
 
 			C2D_TargetClear(bottom, C2D_Color32(0x42, 0x42, 0x42, 0xFF));	//下画面
 			C2D_SceneBegin(bottom);
 			//C2D_DrawSprite(&sprites[bOttom]);
-			draw_option(tp.px,tp.py,key);
+			draw_option(tp.px, tp.py, key);
 			draw_debug(0, 40, buf_main);
 
 			break;
@@ -123,12 +128,12 @@ int main() {
 		case MainLoad:
 
 			init_tja();
-			load_tja_head(course,SelectedSong);
+			load_tja_head(course, SelectedSong);
 			init_main_music();
 			get_tja_header(&TJA_Header);
 			init_score();
 			init_notes(TJA_Header);
-			load_tja_notes(course,SelectedSong);
+			load_tja_notes(course, SelectedSong);
 			time_ini();
 			offset = TJA_Header.offset;
 			notes_cnt = 0;
@@ -142,6 +147,8 @@ int main() {
 
 		case MainGame:		//メイン
 
+			if (key & KEY_START) isExit = true;
+
 			C2D_DrawSprite(&sprites[tOp]);
 			//C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(1, 0, 0, 1));
 			draw_emblem(sprites);
@@ -151,7 +158,7 @@ int main() {
 			if (cnt == 0) {
 
 				FirstMeasureTime = get_FirstMeasureTime();
-				play_main_music(&isPlayMain,SelectedSong);
+				play_main_music(&isPlayMain, SelectedSong);
 			}
 
 			//譜面が先
@@ -176,7 +183,6 @@ int main() {
 				}
 			}
 
-			bool isDon = false, isKatsu = false;
 			if ((((tp.px - 160)*(tp.px - 160) + (tp.py - 135)*(tp.py - 135)) <= 105 * 105 && key & KEY_TOUCH) ||
 				key & KEY_B ||
 				key & KEY_Y ||
@@ -199,6 +205,8 @@ int main() {
 				key & KEY_ZL) {				//カツ
 				isKatsu = true;
 			}
+			if (isDon == true) music_play(0);		//ドン
+			if (isKatsu == true) music_play(1);		//カツ
 
 			if (key & KEY_SELECT) toggle_auto();
 
@@ -217,30 +225,32 @@ int main() {
 			C2D_SceneBegin(bottom);
 			C2D_DrawSprite(&sprites[bOttom]);
 
-			if (isDon == true) {	//ドン
-				music_play(0);
-			}
-			if (isKatsu == true) {		//カツ
-				music_play(1);
-			}
-
 			if (get_notes_finish() == true && ndspChnIsPlaying(CHANNEL) == false) {
-				scene_state = SelectSong;
+				scene_state = ResultGame;
 				cnt = -1;
 			}
+			break;
 
+		case ResultGame:
+
+			if (key & KEY_START) {
+				cnt = -1;
+				scene_state = SelectSong;
+			}
+			draw_gauge_result(sprites);
+			draw_result();
 			break;
 		}
 
-			C3D_FrameEnd(0);
-			cnt++;
+		C3D_FrameEnd(0);
+		cnt++;
 	}
 
 	main_exit();
 	return 0;
 }
 
-void load_sprites(){
+void load_sprites() {
 
 	spriteSheet = C2D_SpriteSheetLoad("romfs:/gfx/sprites.t3x");
 	if (!spriteSheet) svcBreak(USERBREAK_PANIC);
@@ -257,11 +267,10 @@ void load_sprites(){
 	C2D_SpriteSetCenterRaw(&sprites[bAlloon_5], 9, 51);
 	C2D_SpriteSetCenterRaw(&sprites[bAlloon_6], 9, 59);
 	for (int i = 0; i < 4; i++) C2D_SpriteSetPos(&sprites[eFfect_perfect + i], 93, 109);
-	for (int i = 0; i < 2; i++) C2D_SpriteSetPos(&sprites[sOul_on + i], 385, 75);
-	C2D_SpriteSetPos(&sprites[sOul_effect], 395, 65);
+
 	C2D_SpriteSetPos(&sprites[eFfect_gogo], 110, 92);
 
 	C2D_SpriteSetPos(&sprites[tOp], TOP_WIDTH / 2, TOP_HEIGHT / 2);
 	C2D_SpriteSetPos(&sprites[bOttom], BOTTOM_WIDTH / 2, BOTTOM_HEIGHT / 2);
-	for (int i = 0;i<5;i++)C2D_SpriteSetPos(&sprites[eMblem_easy + i], 31, 113);
+	for (int i = 0; i < 5; i++)C2D_SpriteSetPos(&sprites[eMblem_easy + i], 31, 113);
 }
