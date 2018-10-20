@@ -14,6 +14,7 @@ static C2D_SpriteSheet spriteSheet;
 C2D_TextBuf g_dynamicBuf;
 char buf_main[160];
 C2D_Text dynText;
+bool isPause = false;
 
 void load_sprites();
 
@@ -122,6 +123,7 @@ int main() {
 			//C2D_DrawSprite(&sprites[bOttom]);
 			draw_option(tp.px, tp.py, key);
 			draw_debug(0, 40, buf_main);
+			isPause = false;
 
 			break;
 
@@ -208,15 +210,20 @@ int main() {
 			if (isDon == true) music_play(0);		//ドン
 			if (isKatsu == true) music_play(1);		//カツ
 
-			if (key & KEY_SELECT) toggle_auto();
-
+			//if (key & KEY_SELECT) toggle_auto();
+			if (key & KEY_SELECT) {
+				togglePlayback();
+				toggle_time(0);
+				toggle_time(1);
+				isPause = !isPause;
+			}
 			draw_fps();
 			draw_lane(sprites);
 			draw_gauge(sprites);
 
 			if (isNotesStart == true) {
 				tja_to_notes(isDon, isKatsu, notes_cnt, sprites);
-				notes_cnt++;
+				if (isPause == false) notes_cnt++;
 			}
 			draw_score(sprites);
 			//score_debug();
@@ -243,7 +250,7 @@ int main() {
 		}
 
 		C3D_FrameEnd(0);
-		cnt++;
+		if (isPause == false) cnt++;
 	}
 
 	main_exit();
@@ -273,4 +280,8 @@ void load_sprites() {
 	C2D_SpriteSetPos(&sprites[tOp], TOP_WIDTH / 2, TOP_HEIGHT / 2);
 	C2D_SpriteSetPos(&sprites[bOttom], BOTTOM_WIDTH / 2, BOTTOM_HEIGHT / 2);
 	for (int i = 0; i < 5; i++)C2D_SpriteSetPos(&sprites[eMblem_easy + i], 31, 113);
+}
+
+bool get_isPause() {
+	return isPause;
 }
