@@ -15,5 +15,5 @@ void cursor_update(int knd);
 void get_SelectedId(LIST_T *TMP, int *arg);
 void draw_select(float x, float y, const char *text);
 bool get_isGameStart();
-void draw_option(u16 px, u16 py, unsigned int key);
 void select_ini();
+void draw_option_text(float x, float y, const char *text, bool state, float *width, float *height);
