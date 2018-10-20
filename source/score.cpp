@@ -3,11 +3,12 @@
 #include "tja.h"
 #include "main.h"
 #include "score.h"
+#include "result.h"
 
 bool isGOGO;
 int combo,init,diff,DiffMul,scoremode,HitScore,ScoreDiff,BaseCeilingPoint,
-CurrentScore,TotalScore,CurrentTotalRollCount, CurrentRollCount, TotalRollCount,TotalPerfectCount,
-TotalNiceCount,TotalBadCount, CurrentPerfectCount, CurrentNiceCount, CurrentBadCount, CurrentBalloonCount;
+CurrentScore,TotalScore,CurrentTotalRollCount, CurrentRollCount, TotalRollCount,TotalPerfectCount,TotalNiceCount,TotalBadCount, 
+CurrentPerfectCount, CurrentNiceCount, CurrentBadCount, CurrentBalloonCount,MaxComboCount;
 double tmp,Precision,CurrentPrecision;
 TJA_HEADER_T TJA_Header;
 char buf_score[160];
@@ -48,6 +49,7 @@ void init_score() {
 	Precision = 0;
 	CurrentPrecision = 0;
 	CurrentBalloonCount = 0;
+	MaxComboCount = 0;
 	init_guage_structure();
 }
 
@@ -59,160 +61,161 @@ void score_update(int knd) {
 
 	//if (scoremode == 1 || scoremode == 2) {
 
-		double GOGOMul;
-		if (isGOGO == true) GOGOMul = 1.2;
-		else GOGOMul = 1.0;
+	double GOGOMul;
+	if (isGOGO == true) GOGOMul = 1.2;
+	else GOGOMul = 1.0;
 
-		if (scoremode == 0) {	//ドンダフル配点
-			if (combo < 200) DiffMul = 0;
-			else DiffMul = 1;
-		}
-		else if (scoremode == 2) {	//新配点
-			if (0 <= combo && combo < 9) DiffMul = 0;
-			else if (9 <= combo && combo < 29) DiffMul = 1;
-			else if (29 <= combo && combo < 49) DiffMul = 2;
-			else if (49 <= combo && combo < 99) DiffMul = 4;
-			else if (99 <= combo) DiffMul = 8;
-		}
-		else if (scoremode == 1) {	//旧配点
-			DiffMul = (combo+1)/10;
-			if (combo > 100) DiffMul = 10;
-		}
+	if (scoremode == 0) {	//ドンダフル配点
+		if (combo < 200) DiffMul = 0;
+		else DiffMul = 1;
+	}
+	else if (scoremode == 2) {	//新配点
+		if (0 <= combo && combo < 9) DiffMul = 0;
+		else if (9 <= combo && combo < 29) DiffMul = 1;
+		else if (29 <= combo && combo < 49) DiffMul = 2;
+		else if (49 <= combo && combo < 99) DiffMul = 4;
+		else if (99 <= combo) DiffMul = 8;
+	}
+	else if (scoremode == 1) {	//旧配点
+		DiffMul = (combo + 1) / 10;
+		if (combo > 100) DiffMul = 10;
+	}
 
-		HitScore = init + diff * DiffMul;
+	HitScore = init + diff * DiffMul;
 
-		switch (knd) {
+	switch (knd) {
 
-		case PERFECT:
-			TotalScore += round_down(HitScore*GOGOMul);
-			CurrentScore += round_down(HitScore*GOGOMul);
-			combo++;
-			isCombo = true;
-			TotalPerfectCount++;
-			CurrentPerfectCount++;
-			Gauge.score += Gauge.perfect;
-			break;
+	case PERFECT:
+		TotalScore += round_down(HitScore*GOGOMul);
+		CurrentScore += round_down(HitScore*GOGOMul);
+		combo++;
+		isCombo = true;
+		TotalPerfectCount++;
+		CurrentPerfectCount++;
+		Gauge.score += Gauge.perfect;
+		break;
 
-		case SPECIAL_PERFECT:
-			TotalScore += round_down(HitScore * GOGOMul) * 2;
-			CurrentScore += round_down(HitScore * GOGOMul) * 2;
-			combo++;
-			isCombo = true;
-			TotalPerfectCount++;
-			CurrentPerfectCount++;
-			Gauge.score += Gauge.perfect;
-			break;
+	case SPECIAL_PERFECT:
+		TotalScore += round_down(HitScore * GOGOMul) * 2;
+		CurrentScore += round_down(HitScore * GOGOMul) * 2;
+		combo++;
+		isCombo = true;
+		TotalPerfectCount++;
+		CurrentPerfectCount++;
+		Gauge.score += Gauge.perfect;
+		break;
 
-		case NICE:
-			TotalScore += round_down(HitScore / 2);
-			CurrentScore += round_down(HitScore / 2);
-			combo++;
-			isCombo = true;
-			TotalNiceCount++;
-			CurrentNiceCount++;
-			Gauge.score += Gauge.nice;
-			break;
+	case NICE:
+		TotalScore += round_down(HitScore / 2);
+		CurrentScore += round_down(HitScore / 2);
+		combo++;
+		isCombo = true;
+		TotalNiceCount++;
+		CurrentNiceCount++;
+		Gauge.score += Gauge.nice;
+		break;
 
-		case SPECIAL_NICE:
-			TotalScore += round_down(HitScore - 10);
-			CurrentScore += round_down(HitScore - 10);
-			combo++;
-			isCombo = true;
-			TotalNiceCount++;
-			CurrentNiceCount++;
-			Gauge.score += Gauge.nice;
-			break;
+	case SPECIAL_NICE:
+		TotalScore += round_down(HitScore - 10);
+		CurrentScore += round_down(HitScore - 10);
+		combo++;
+		isCombo = true;
+		TotalNiceCount++;
+		CurrentNiceCount++;
+		Gauge.score += Gauge.nice;
+		break;
 
-		case BAD:
-			combo = 0;
-			TotalBadCount++;
-			CurrentBadCount++;
-			Gauge.score -= Gauge.bad;
-			break;
+	case BAD:
+		combo = 0;
+		TotalBadCount++;
+		CurrentBadCount++;
+		Gauge.score -= Gauge.bad;
+		break;
 
-		case THROUGH:
-			combo = 0;
-			TotalBadCount++;
-			CurrentBadCount++;
-			Gauge.score -= Gauge.bad;
-			break;
+	case THROUGH:
+		combo = 0;
+		TotalBadCount++;
+		CurrentBadCount++;
+		Gauge.score -= Gauge.bad;
+		break;
 
-		case BALLOON:
-		case ROLL:
-			if (scoremode == 0 || scoremode == 1) {	//旧配点
-				if (isGOGO == true) {
-					TotalScore += 120;
-					CurrentScore += 120;
-				}
-				else {
-					TotalScore += 100;
-					CurrentScore += 100;
-				}
-			}
-			else if (scoremode == 2) {	//新配点
-				if (isGOGO == true) {
-					TotalScore += 360;
-					CurrentScore += 360;
-				}
-				else {
-					TotalScore += 300;
-					CurrentScore += 300;
-				}
-			}
-
-			if (knd == ROLL) {
-				CurrentRollCount++;
-				CurrentTotalRollCount++;
-				TotalRollCount++;
-			}
-			break;
-
-		case BIG_ROLL:
-			if (scoremode == 0 || scoremode == 1) {	//旧配点
-				if (isGOGO == true) {
-					TotalScore += 430;
-					CurrentScore += 430;
-				}
-				else {
-					TotalScore += 360;
-					CurrentScore += 360;
-				}
-			}
-			else if (scoremode == 2) {	//新配点
-				if (isGOGO == true) {
-					TotalScore += 240;
-					CurrentScore += 240;
-				}
-				else {
-					TotalScore += 200;
-					CurrentScore += 200;
-				}
-			}
-			CurrentTotalRollCount++;
-			TotalRollCount++;
-			CurrentRollCount++;
-			break;
-
-		case BALLOON_BREAK:
+	case BALLOON:
+	case ROLL:
+		if (scoremode == 0 || scoremode == 1) {	//旧配点
 			if (isGOGO == true) {
-				TotalScore += 6000;
-				CurrentScore += 6000;
+				TotalScore += 120;
+				CurrentScore += 120;
 			}
 			else {
-				TotalScore += 5000;
-				CurrentScore += 5000;
+				TotalScore += 100;
+				CurrentScore += 100;
 			}
-			break;
-
-		case ROLL_END:
-			CurrentRollCount = 0;
-			break;
-
-		default:
-			break;
 		}
+		else if (scoremode == 2) {	//新配点
+			if (isGOGO == true) {
+				TotalScore += 360;
+				CurrentScore += 360;
+			}
+			else {
+				TotalScore += 300;
+				CurrentScore += 300;
+			}
+		}
+
+		if (knd == ROLL) {
+			CurrentRollCount++;
+			CurrentTotalRollCount++;
+			TotalRollCount++;
+		}
+		break;
+
+	case BIG_ROLL:
+		if (scoremode == 0 || scoremode == 1) {	//旧配点
+			if (isGOGO == true) {
+				TotalScore += 430;
+				CurrentScore += 430;
+			}
+			else {
+				TotalScore += 360;
+				CurrentScore += 360;
+			}
+		}
+		else if (scoremode == 2) {	//新配点
+			if (isGOGO == true) {
+				TotalScore += 240;
+				CurrentScore += 240;
+			}
+			else {
+				TotalScore += 200;
+				CurrentScore += 200;
+			}
+		}
+		CurrentTotalRollCount++;
+		TotalRollCount++;
+		CurrentRollCount++;
+		break;
+
+	case BALLOON_BREAK:
+		if (isGOGO == true) {
+			TotalScore += 6000;
+			CurrentScore += 6000;
+		}
+		else {
+			TotalScore += 5000;
+			CurrentScore += 5000;
+		}
+		break;
+
+	case ROLL_END:
+		CurrentRollCount = 0;
+		break;
+
+	default:
+		break;
+	}
 	//}
 
+	if (combo > MaxComboCount) MaxComboCount = combo;
 	if (Gauge.score < 0) Gauge.score = 0;
 
 	if (scoremode == 2) {	//100コンボ毎のボーナス(新配点のみ)
@@ -333,6 +336,36 @@ void draw_gauge(C2D_Sprite  sprites[Sprite_Number]) {
 	C2D_DrawRectSolid(123 + 250.0*Gauge.norma / Gauge.soul, 67, 0, 250 * gauge - (250.0*Gauge.norma / Gauge.soul), 17, C2D_Color32f(1, 1, 12.0/255, 1));
 
 	//魂
+	for (int i = 0; i < 2; i++) C2D_SpriteSetPos(&sprites[sOul_on + i], 385, 75);
+	C2D_SpriteSetPos(&sprites[sOul_effect], 395, 65);
+	if ((Gauge.score / 200) * 200 >= Gauge.soul) {
+		C2D_ImageTint Tint;
+		C2D_AlphaImageTint(&Tint, 0.8);
+		C2D_DrawSpriteTinted(&sprites[sOul_effect], &Tint);
+		C2D_DrawSprite(&sprites[sOul_on]);
+	}
+	else C2D_DrawSprite(&sprites[sOul_off]);
+}
+
+void draw_gauge_result(C2D_Sprite  sprites[Sprite_Number]) {
+
+	int diff = 50;
+	double x_start = 123-diff, x_end = 250-diff;
+	double gauge = 1.0 * (Gauge.score / 200) * 200 / Gauge.soul;
+	if (gauge > 1.0) gauge = 1.0;
+
+	//赤
+	C2D_DrawRectSolid(x_start, 76, 0, x_end*Gauge.norma / Gauge.soul, 8, C2D_Color32f(102.0 / 255, 0, 0, 1));
+	C2D_DrawRectSolid(x_start, 76, 0, x_end*gauge, 8, C2D_Color32f(1, 0, 0, 1));
+
+	//黄
+	C2D_DrawRectSolid(x_start + x_end*Gauge.norma / Gauge.soul, 67, 0, x_end - x_end*Gauge.norma / Gauge.soul, 17, C2D_Color32f(102.0 / 255, 68.0 / 255, 0, 1));
+	if (x_end * gauge - (x_end*Gauge.norma / Gauge.soul) >= 0)
+		C2D_DrawRectSolid(x_start + x_end*Gauge.norma / Gauge.soul, 67, 0, x_end * gauge - (x_end*Gauge.norma / Gauge.soul), 17, C2D_Color32f(1, 1, 12.0 / 255, 1));
+
+	//魂
+	for (int i = 0; i < 2; i++) C2D_SpriteSetPos(&sprites[sOul_on + i], 385-diff*2, 75);
+	C2D_SpriteSetPos(&sprites[sOul_effect], 395-diff*2, 65);
 	if ((Gauge.score / 200) * 200 >= Gauge.soul) {
 		C2D_ImageTint Tint;
 		C2D_AlphaImageTint(&Tint, 0.8);
@@ -714,4 +747,14 @@ void draw_emblem(C2D_Sprite  sprites[Sprite_Number]) {
 		C2D_DrawSprite(&sprites[eMblem_edit]);
 		break;
 	}
+}
+
+void get_result(RESULT_T *Result) {
+
+	Result->perfect = TotalPerfectCount;
+	Result->nice = TotalNiceCount;
+	Result->bad = TotalBadCount;
+	Result->roll = TotalRollCount;
+	Result->combo = MaxComboCount;
+	Result->score = CurrentScore;
 }
