@@ -44,9 +44,7 @@ void notes_main(
 	MEASURE_T Measure[Measure_Max],
 	int cnt,
 	C2D_Sprite  sprites[Sprite_Number]);
-void toggle_auto();
 int ctoi(char c);
 int get_branch_course();
 void init_notes(TJA_HEADER_T TJA_Header);
-bool get_isAuto();
 bool get_notes_finish();
