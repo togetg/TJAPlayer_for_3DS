@@ -6,6 +6,7 @@
 #include "playback.h"
 #include "score.h"
 #include "select.h"
+#include "option.h"
 
 C2D_Sprite sprites[Sprite_Number];			//画像用
 static C2D_SpriteSheet spriteSheet;
