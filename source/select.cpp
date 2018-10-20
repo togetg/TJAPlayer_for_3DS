@@ -4,12 +4,13 @@
 #include "tja.h"
 #include "audio.h"
 #include "notes.h"
+#include "option.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 
 void load_file_list(const char *path);
 void draw_select(float x, float y, const char *text);
-void draw_option_text(float x, float y, const char *text, bool state);
+void draw_option_text(float x, float y, const char *text, bool state,float *width,float *height);
 
 LIST_T List[List_Max];
 char buf_select[256];
@@ -93,7 +94,7 @@ void disp_file_list() {
 				for (int j = 0; j < (10 - level); j++) {
 					draw_select(200 + (j + level) * 10, (n + cursor) * 20 + 60, "・");
 				}
-				draw_select(80, (n + cursor) * 20 + 60, "おに");
+				draw_select(80, (n + cursor) * 20 + 60, Text[get_lang()][onI]);
 				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[EDIT]);
 				draw_select(360, (n + cursor) * 20 + 60, buf_select);
 				draw_select(360, (n + cursor) * 20 + 60, buf_select);
@@ -112,7 +113,7 @@ void disp_file_list() {
 				for (int j = 0; j < (10 - level); j++) {
 					draw_select(200 + (j + level) * 10, (n + cursor) * 20 + 60, "・");
 				}
-				draw_select(80, (n + cursor) * 20 + 60, "おに");
+				draw_select(80, (n + cursor) * 20 + 60, Text[get_lang()][onI]);
 				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[ONI]);
 				draw_select(360, (n + cursor) * 20 + 60, buf_select);
 				n++;
@@ -130,7 +131,7 @@ void disp_file_list() {
 				for (int j = 0; j < (10 - level); j++) {
 					draw_select(200 + (j + level) * 10, (n + cursor) * 20 + 60, "・");
 				}
-				draw_select(80, (n + cursor) * 20 + 60, "むずかしい");
+				draw_select(80, (n + cursor) * 20 + 60, Text[get_lang()][harD]);
 				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[HARD]);
 				draw_select(360, (n + cursor) * 20 + 60, buf_select);
 				n++;
@@ -148,7 +149,7 @@ void disp_file_list() {
 				for (int j = 0; j < (10 - level); j++) {
 					draw_select(200 + (j + level) * 10, (n + cursor) * 20 + 60, "・");
 				}
-				draw_select(80, (n + cursor) * 20 + 60, "ふつう");
+				draw_select(80, (n + cursor) * 20 + 60, Text[get_lang()][normaL]);
 				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[NORMAL]);
 				draw_select(360, (n + cursor) * 20 + 60, buf_select);
 				n++;
@@ -166,7 +167,7 @@ void disp_file_list() {
 				for (int j = 0; j < (10 - level); j++) {
 					draw_select(200 + (j + level) * 10, (n + cursor) * 20 + 60, "・");
 				}
-				draw_select(80, (n + cursor) * 20 + 60, "かんたん");
+				draw_select(80, (n + cursor) * 20 + 60, Text[get_lang()][easY]);
 				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[EASY]);
 				draw_select(360, (n + cursor) * 20 + 60, buf_select);
 				n++;
@@ -276,25 +277,19 @@ void draw_select(float x, float y, const char *text) {
 	C2D_DrawText(&SelectText, C2D_WithColor, x, y, 0.5f, 0.5f, 0.5f, C2D_Color32f(1.0f, 1.0f, 1.0f, 1.0f));
 }
 
-void draw_option_text(float x, float y, const char *text,bool state) {
+void draw_option_text(float x, float y, const char *text,bool state, float *width, float *height) {
 
 	C2D_TextBufClear(g_SelectText);
 	C2D_TextParse(&SelectText, g_SelectText, text);
 	C2D_TextOptimize(&SelectText);
-	float size = 1.3;
+	float size = 0.7;
 	if (state == false) {
 		C2D_DrawText(&SelectText, C2D_WithColor, x, y, 1.0f, size, size, C2D_Color32f(100.0 / 255.0, 100.0 / 255.0, 100.0 / 255.0, 1.0f));
 	}
 	else if (state == true) {
 		C2D_DrawText(&SelectText, C2D_WithColor, x, y, 1.0f, size, size, C2D_Color32f(1.0f, 1.0f, 1.0f, 1.0f));
 	}
-}
-
-void draw_option(u16 px, u16 py, unsigned int key) {
-
-	if ((102 < py && 132 > py && 125 < px && 205 > px) && key & KEY_TOUCH) toggle_auto();
-	//C2D_DrawRectSolid(125, 102, 0, 80, 30, C2D_Color32f(1, 34.0 / 255.0, 204.0 / 255.0, 1));
-	draw_option_text(130, 100, "Auto", get_isAuto());
+	C2D_TextGetDimensions(&SelectText, size, size, width, height);
 }
 
 void get_SelectedId(LIST_T *TMP,int *arg) {
