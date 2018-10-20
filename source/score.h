@@ -33,3 +33,4 @@ void draw_gauge(C2D_Sprite  sprites[Sprite_Number]);
 void draw_score(C2D_Sprite  sprites[Sprite_Number]);
 void balloon_count_update(int arg);
 void draw_emblem(C2D_Sprite  sprites[Sprite_Number]);
+void draw_gauge_result(C2D_Sprite  sprites[Sprite_Number]);
