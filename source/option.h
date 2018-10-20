@@ -86,3 +86,4 @@ int get_lang();
 void draw_option(u16 px, u16 py, unsigned int key);
 void toggle_auto();
 void get_option(OPTION_T *TMP);
+void init_option();
