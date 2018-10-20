@@ -108,7 +108,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 			int BarLineId = find_line_id();
 			if (BarLineId != -1 && Measure[MeasureCount].branch == Branch.course) {
 				BarLine[BarLineId].flag = true;
-				BarLine[BarLineId].scroll = Measure[MeasureCount].scroll;
+				BarLine[BarLineId].scroll = Measure[MeasureCount].scroll * Option.speed;
 				BarLine[BarLineId].x = BarLine[BarLineId].x_ini;
 				BarLine[BarLineId].measure = MeasureCount;
 				BarLine[BarLineId].x_ini = Notes_Judge_Range * BarLine[BarLineId].scroll + Notes_Judge;
@@ -133,14 +133,35 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 				if (id != -1 && ctoi(tja_notes[Measure[MeasureCount].notes][i]) != 0 && Measure[MeasureCount].branch == Branch.course) {
 
+					int knd = ctoi(tja_notes[Measure[MeasureCount].notes][i]);
+
+					if (Option.random > 0) {		//ランダム(きまぐれ,でたらめ)
+						if (rand() % 100 < Option.random * 100) {
+							switch (knd) {
+							case Don: knd = Katsu; break;
+							case Katsu: knd = Don; break;
+							case BigDon: knd = BigKatsu; break;
+							case BigKatsu: knd = BigDon; break;
+							}
+						}
+					}
+					if (Option.isSwap == true) {	//あべこべ
+						switch (knd) {
+						case Don: knd = Katsu; break;
+						case Katsu: knd = Don; break;
+						case BigDon: knd = BigKatsu; break;
+						case BigKatsu: knd = BigDon; break;
+						}
+					}
+
 					Notes[id].flag = true;
 					Notes[id].notes_max = NotesCount;
 					Notes[id].num = NotesNumber;
-					Notes[id].scroll = Measure[MeasureCount].scroll;
+					Notes[id].scroll = Measure[MeasureCount].scroll * Option.speed;
 					Notes[id].x_ini = ((Notes_Area*Measure[MeasureCount].measure / NotesCountMax)*i + Notes_Judge_Range)*Notes[id].scroll + Notes_Judge;
 					Notes[id].x = Notes[id].x_ini;
 					Notes[id].bpm = Measure[MeasureCount].bpm;
-					Notes[id].knd = ctoi(tja_notes[Measure[MeasureCount].notes][i]);
+					Notes[id].knd = knd;
 					//Notes[id].create_time = NowTime;
 					Notes[id].pop_time = Measure[MeasureCount].pop_time;
 					Notes[id].judge_time = Measure[MeasureCount].judge_time + 60.0 / Measure[MeasureCount].bpm * 4 * Measure[MeasureCount].measure * i / NotesCountMax;
@@ -305,7 +326,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 		}
 	}
 	
-	notes_draw(sprites);
+	if (Option.isStelth == false) notes_draw(sprites);
 	draw_emblem(sprites);
 	draw_judge(NowTime, sprites);
 
