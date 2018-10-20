@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "header.h"
 
 typedef struct {
 	bool isAuto, isStelth,isSwap;
@@ -33,6 +32,13 @@ enum Text_knd {
 	lanG,
 	jP,
 	eN,
+	scorE,
+	maxcombO,
+	perfecT,
+	nicE,
+	baD,
+	rollcounT,
+	pressstarT,
 };
 
 const char Text[2][64][64] = {
@@ -56,7 +62,14 @@ const char Text[2][64][64] = {
 		"50%",
 		"language",
 		"日本語",
-		"English"
+		"English",
+		"スコア",
+		"最大ｺﾝﾎﾞ数",
+		"良",
+		"可",
+		"不可",
+		"連打数",
+		"STARTボタンを押して戻る",
 	},
 	{
 		"ON",
@@ -78,7 +91,14 @@ const char Text[2][64][64] = {
 		"50%",
 		"language",
 		"日本語",
-		"English"
+		"English",
+		"Scoere",
+		"MaxCombo",
+		"Perfect",
+		"Nice",
+		"Bad",
+		"RollCount",
+		"Press START",
 	}
 };
 
