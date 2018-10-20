@@ -88,6 +88,7 @@ int main() {
 			scene_state = SelectSong;
 			cnt = -1;
 			load_file_main();
+			init_option();
 			break;
 
 		case SelectSong:	//選曲
@@ -222,9 +223,6 @@ int main() {
 			if (isKatsu == true) {		//カツ
 				music_play(1);
 			}
-
-			snprintf(buf_main, sizeof(buf_main), "%d:%d", get_notes_finish(),ndspChnIsPlaying(CHANNEL));
-			draw_debug(0, 0, buf_main);
 
 			if (get_notes_finish() == true && ndspChnIsPlaying(CHANNEL) == false) {
 				scene_state = SelectSong;
