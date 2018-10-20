@@ -286,7 +286,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 	send_gogotime(isGOGOTime);
 
-	notes_calc(isDon, isKatsu, bpm, NowTime, cnt, sprites);
+	if (get_isPause() == false) notes_calc(isDon, isKatsu, bpm, NowTime, cnt, sprites);
 	
 	for (int i = 0; i < Measure_Max - 1; i++) {	//判定時に発動する命令
 
