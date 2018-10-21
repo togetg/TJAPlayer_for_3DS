@@ -20,3 +20,4 @@ void draw_option_text(float x, float y, const char *text, bool state, float *wid
 void draw_result_text(float x, float y, float size, const char *text);
 void get_result(RESULT_T *Result);
 void calc_result_text(const char *text, float *width, float *height);
+int pause_window(u16 px, u16 py, unsigned int key);
