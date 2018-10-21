@@ -37,8 +37,8 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 	//最初の小節のcreate_timeがマイナスだった時用に調整
 	double NowTime = time_now(0) + Measure[0].create_time;
 
-	snprintf(buf_notes, sizeof(buf_notes), "time:%.2f", NowTime);
-	draw_debug(0, 0, buf_notes);
+	//snprintf(buf_notes, sizeof(buf_notes), "time:%.2f", NowTime);
+	//draw_debug(0, 0, buf_notes);
 
 	if (cnt >= 0 && isNotesLoad == true) {
 
@@ -344,12 +344,10 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 	int n = 273;
 	snprintf(buf_notes, sizeof(buf_notes), "%d:%s:%f:%d:%d", n, tja_notes[Measure[n].notes],Measure[n].create_time,Measure[n].branch,Branch.course);
 	draw_debug(0, 30, buf_notes);
-	*/
 
 	if (Option.isAuto == true) draw_debug(0, 200, "Auto");
 	else draw_debug(0, 200, "Manual");
 
-	/*
 	snprintf(buf_notes, sizeof(buf_notes), "%s", tja_notes[4]);
 	draw_debug(0, 210, buf_notes);
 	*/
@@ -1108,6 +1106,34 @@ bool get_notes_finish() {
 		if (Notes[i].flag == true) return false;
 	}
 	return true;
+}
+
+C2D_TextBuf g_NotesText = C2D_TextBufNew(4096);
+C2D_Text NotesText;
+
+void draw_notes_text(float x, float y, const char *text, float *width, float *height) {
+
+	C2D_TextBufClear(g_NotesText);
+	C2D_TextParse(&NotesText, g_NotesText, text);
+	C2D_TextOptimize(&NotesText);
+	float size = 0.7;
+
+	C2D_TextGetDimensions(&NotesText, size, size, width, height);
+
+	C2D_DrawText(&NotesText, C2D_WithColor, x-*width, y, 1.0f, size, size, C2D_Color32f(1.0f, 1.0f, 1.0f, 1.0f));
+}
+
+void draw_title() {
+
+	TJA_HEADER_T Header;
+	get_tja_header(&Header);
+	float width = 0, height = 0;
+
+	if (Header.subtitle_state != -1 && Header.subtitle_state != 1) {
+
+		draw_notes_text(TOP_WIDTH, 20, Header.subtitle, &width, &height);
+	}
+	draw_notes_text(TOP_WIDTH-width, 20, Header.title, &width, &height);
 }
 void init_notes_structure() {
 
