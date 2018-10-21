@@ -39,6 +39,9 @@ enum Text_knd {
 	baD,
 	rollcounT,
 	pressstarT,
+	continuE,
+	startoveR,
+	returnselecT,
 };
 
 const char Text[2][64][64] = {
@@ -70,6 +73,9 @@ const char Text[2][64][64] = {
 		"不可",
 		"連打数",
 		"STARTボタンを押して戻る",
+		"演奏を続ける",
+		"はじめからやり直す",
+		"曲選択に戻る"
 	},
 	{
 		"ON",
@@ -99,6 +105,9 @@ const char Text[2][64][64] = {
 		"Bad",
 		"RollCount",
 		"Press START",
+		"Continue",
+		"Start over",
+		"Return to select song"
 	}
 };
 
