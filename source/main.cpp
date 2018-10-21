@@ -150,7 +150,7 @@ int main() {
 		case MainGame:		//メイン
 
 			C2D_DrawSprite(&sprites[tOp]);
-			//C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(1, 0, 0, 1));
+			draw_title();
 			draw_emblem(sprites);
 
 			if (cnt >= 0) NowTime = time_now(1);
@@ -220,7 +220,6 @@ int main() {
 			}
 			//draw_fps();
 			draw_lane(sprites);
-			draw_title();
 			draw_gauge(sprites);
 
 			if (isNotesStart == true) {
