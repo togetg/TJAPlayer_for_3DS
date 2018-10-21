@@ -31,7 +31,7 @@ void load_music() {
 	ndspSetOutputCount(1);
 	char sound_address[MUSIC_NUMBER][30] = {
 		"romfs:/don.ogg",
-		"romfs:/ka.ogg",
+		"romfs:/katsu.ogg",
 		"romfs:/balloonbreak.ogg",
 	};
 
