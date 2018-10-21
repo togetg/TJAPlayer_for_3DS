@@ -1131,9 +1131,9 @@ void draw_title() {
 
 	if (Header.subtitle_state != -1 && Header.subtitle_state != 1) {
 
-		draw_notes_text(TOP_WIDTH, 20, Header.subtitle, &width, &height);
+		draw_notes_text(TOP_WIDTH, 160, Header.subtitle, &width, &height);
 	}
-	draw_notes_text(TOP_WIDTH-width, 20, Header.title, &width, &height);
+	draw_notes_text(TOP_WIDTH-width, 160, Header.title, &width, &height);
 }
 void init_notes_structure() {
 
