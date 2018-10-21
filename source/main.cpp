@@ -62,7 +62,7 @@ int main() {
 	load_sprites();
 	load_music();
 
-	int cnt = 0, notes_cnt = 0, scene_state = SelectLoad, course = ONI;
+	int cnt = 0, notes_cnt = 0, scene_state = SelectLoad, course = ONI, tmp;
 	bool isNotesStart = false, isMusicStart = false, isPlayMain = false,isExit = false;
 	double FirstMeasureTime = INT_MAX,
 		offset = 0,
@@ -149,8 +149,6 @@ int main() {
 
 		case MainGame:		//メイン
 
-			if (key & KEY_START) isExit = true;
-
 			C2D_DrawSprite(&sprites[tOp]);
 			//C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(1, 0, 0, 1));
 			draw_emblem(sprites);
@@ -185,40 +183,44 @@ int main() {
 				}
 			}
 
-			if ((((tp.px - 160)*(tp.px - 160) + (tp.py - 135)*(tp.py - 135)) <= 105 * 105 && key & KEY_TOUCH) ||
-				key & KEY_B ||
-				key & KEY_Y ||
-				key & KEY_RIGHT ||
-				key & KEY_DOWN ||
-				key & KEY_CSTICK_LEFT ||
-				key & KEY_CSTICK_DOWN) {	//ドン
-				isDon = true;
-			}
-			else if (key & KEY_TOUCH ||
-				key & KEY_A ||
-				key & KEY_X ||
-				key & KEY_LEFT ||
-				key & KEY_UP ||
-				key & KEY_CSTICK_RIGHT ||
-				key & KEY_CSTICK_UP ||
-				key & KEY_R ||
-				key & KEY_L ||
-				key & KEY_ZR ||
-				key & KEY_ZL) {				//カツ
-				isKatsu = true;
+			if (isPause == false) {
+
+				if ((((tp.px - 160)*(tp.px - 160) + (tp.py - 135)*(tp.py - 135)) <= 105 * 105 && key & KEY_TOUCH) ||
+					key & KEY_B ||
+					key & KEY_Y ||
+					key & KEY_RIGHT ||
+					key & KEY_DOWN ||
+					key & KEY_CSTICK_LEFT ||
+					key & KEY_CSTICK_DOWN) {	//ドン
+					isDon = true;
+				}
+				else if (key & KEY_TOUCH ||
+					key & KEY_A ||
+					key & KEY_X ||
+					key & KEY_LEFT ||
+					key & KEY_UP ||
+					key & KEY_CSTICK_RIGHT ||
+					key & KEY_CSTICK_UP ||
+					key & KEY_R ||
+					key & KEY_L ||
+					key & KEY_ZR ||
+					key & KEY_ZL) {				//カツ
+					isKatsu = true;
+				}
 			}
 			if (isDon == true) music_play(0);		//ドン
 			if (isKatsu == true) music_play(1);		//カツ
 
 			//if (key & KEY_SELECT) toggle_auto();
-			if (key & KEY_SELECT) {
+			if (key & KEY_SELECT || key & KEY_START) {
 				togglePlayback();
 				toggle_time(0);
 				toggle_time(1);
 				isPause = !isPause;
 			}
-			draw_fps();
+			//draw_fps();
 			draw_lane(sprites);
+			draw_title();
 			draw_gauge(sprites);
 
 			if (isNotesStart == true) {
@@ -232,6 +234,34 @@ int main() {
 			C2D_SceneBegin(bottom);
 			C2D_DrawSprite(&sprites[bOttom]);
 
+			if (isPause == true) {
+				
+				tmp = pause_window(tp.px, tp.py, key);
+
+				switch (tmp) {
+				case 0:
+					break;
+
+				case 1:
+					stopPlayback();
+					scene_state = MainLoad;
+					break;
+
+				case 2:
+					stopPlayback();
+					cnt = -1;
+					scene_state = SelectSong;
+					break;
+				}
+
+				if (tmp > -1) {
+					togglePlayback();
+					toggle_time(0);
+					toggle_time(1);
+					isPause = !isPause;
+					music_play(0);
+				}
+			}
 			if (get_notes_finish() == true && ndspChnIsPlaying(CHANNEL) == false) {
 				scene_state = ResultGame;
 				cnt = -1;
