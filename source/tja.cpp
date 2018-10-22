@@ -73,12 +73,14 @@ void load_tja_head(int course,LIST_T Song) {
 	Current_Header.scoremode = 1;
 
 	chdir(Song.path);
+	int cnt = -1;
 
 	if ((fp = fopen(Song.tja, "r")) != NULL) {
 
 		char* temp = NULL;
 		while (fgets(buf, 128, fp) != NULL) {
 
+			cnt++;
 			temp = (char *)malloc((strlen(buf) + 1));
 
 
@@ -92,6 +94,15 @@ void load_tja_head(int course,LIST_T Song) {
 					Current_Header.title = temp;
 				}
 				continue;
+			}
+			if (cnt == 0) {
+				if (strstr(buf, "TITLE:") == buf + 3 && strstr(buf, "SUBTITLE:") == 0) {
+					if (buf[9] != '\n' && buf[9] != '\r') {
+						strlcpy(temp, buf + 9, strlen(buf) - 10);
+						Current_Header.title = temp;
+					}
+					continue;
+				}
 			}
 
 			if (strstr(buf, "SUBTITLE:") == buf) {
@@ -272,7 +283,7 @@ void load_tja_head_simple(LIST_T *List) {		//選曲用のヘッダ取得
 
 	FILE *fp;
 	char buf[128],*temp = NULL;;
-	int course = ONI;
+	int course = ONI,cnt = 0;
 
 	chdir(List->path);
 
@@ -287,6 +298,14 @@ void load_tja_head_simple(LIST_T *List) {		//選曲用のヘッダ取得
 					strlcpy(List->title, buf + 6, strlen(buf) - 7);
 				}
 				continue;
+			}
+			if (cnt == 0) {
+				if (strstr(buf, "TITLE:") == buf+3 && strstr(buf, "SUBTITLE:") == 0) {
+					if (buf[9] != '\n' && buf[9] != '\r') {
+						strlcpy(List->title, buf + 9, strlen(buf) - 10);
+					}
+					continue;
+				}
 			}
 
 			if (strstr(buf, "WAVE:") == buf) {
@@ -323,6 +342,7 @@ void load_tja_head_simple(LIST_T *List) {		//選曲用のヘッダ取得
 				}
 				continue;
 			}
+			cnt++;
 		}
 	}
 
