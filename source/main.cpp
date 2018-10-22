@@ -8,6 +8,7 @@
 #include "select.h"
 #include "option.h"
 #include "result.h"
+#include "main.h"
 
 C2D_Sprite sprites[Sprite_Number];			//画像用
 static C2D_SpriteSheet spriteSheet;
@@ -46,6 +47,8 @@ void main_exit() {
 	romfsExit();
 	music_exit();
 }
+
+int touch_x, touch_y, touch_cnt,PreTouch_x,PreTouch_y;	//タッチ用
 
 int main() {
 
@@ -186,7 +189,35 @@ int main() {
 
 			if (isPause == false) {
 
-				if ((((tp.px - 160)*(tp.px - 160) + (tp.py - 135)*(tp.py - 135)) <= 105 * 105 && key & KEY_TOUCH) ||
+				if (tp.px != 0 && tp.py != 0) {
+
+					PreTouch_x = touch_x, PreTouch_y = touch_y;
+					touch_x = tp.px, touch_y = tp.py;
+
+					if (
+						(key & KEY_TOUCH || 
+							pow((touch_x - PreTouch_x)*(touch_x - PreTouch_x) + (touch_y - PreTouch_y)*(touch_y - PreTouch_y), 0.5) > 20.0
+						) &&
+						(tp.px - 160)*(tp.px - 160) + (tp.py - 135)*(tp.py - 135) <= 105 * 105 &&
+						touch_cnt < 2) {
+						isDon = true;
+						touch_cnt++;
+					}
+					else if (
+						(
+						key & KEY_TOUCH ||
+						pow((touch_x - PreTouch_x)*(touch_x - PreTouch_x) + (touch_y - PreTouch_y)*(touch_y - PreTouch_y), 0.5) > 20.0 
+							)&&
+						touch_cnt < 2) {
+						isKatsu = true;
+						touch_cnt++;
+					}
+				}
+				else {
+					touch_x = 0, touch_y = 0, touch_cnt = 0, PreTouch_x = 0, PreTouch_y = 0;
+				}
+
+				if (
 					key & KEY_B ||
 					key & KEY_Y ||
 					key & KEY_RIGHT ||
@@ -195,7 +226,7 @@ int main() {
 					key & KEY_CSTICK_DOWN) {	//ドン
 					isDon = true;
 				}
-				else if (key & KEY_TOUCH ||
+				else if (
 					key & KEY_A ||
 					key & KEY_X ||
 					key & KEY_LEFT ||
@@ -209,6 +240,7 @@ int main() {
 					isKatsu = true;
 				}
 			}
+
 			if (isDon == true) music_play(0);		//ドン
 			if (isKatsu == true) music_play(1);		//カツ
 
@@ -233,6 +265,8 @@ int main() {
 			C2D_TargetClear(bottom, C2D_Color32(0x42, 0x42, 0x42, 0xFF));	//下画面
 			C2D_SceneBegin(bottom);
 			C2D_DrawSprite(&sprites[bOttom]);
+
+			//debug_touch(tp.px,tp.py);
 
 			if (isPause == true) {
 				
@@ -314,4 +348,14 @@ void load_sprites() {
 
 bool get_isPause() {
 	return isPause;
+}
+
+void debug_touch(int x,int y) {
+
+	snprintf(buf_main, sizeof(buf_main), "%d:%d:%.1f\n%d:%d:%d", 
+		PreTouch_x-touch_x,
+		PreTouch_y-touch_y,
+		pow((touch_x - PreTouch_x)*(touch_x - PreTouch_x) + (touch_y - PreTouch_y)*(touch_y - PreTouch_y), 0.5), 
+		touch_x,touch_y,touch_cnt);
+	draw_debug(0, 0, buf_main);
 }
