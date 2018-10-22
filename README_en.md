@@ -1,4 +1,4 @@
-[日本語版はこちら](説明.md)
+[日本語版はこちら](README.md)
 
 # TJAPlayer on 3DS
 

@@ -1,4 +1,4 @@
-[English here](Description.md)
+[English here](README_en.md)
 
 # TJAPlayer on 3DS
 
@@ -30,7 +30,7 @@
   - BMSCROLL
   - HBSCROLL
 - その他
-  - tjcフォーマット
-  - tjfフォーマット
+  - TJCフォーマット
+  - TJFフォーマット
   - ジャンル分け
   - スコアの保存
