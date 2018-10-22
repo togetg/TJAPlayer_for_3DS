@@ -65,7 +65,7 @@ void load_tja_head(int course,LIST_T Song) {
 	Current_Header.sevol = 100;
 	Current_Header.scoreinit = -1;
 	Current_Header.scorediff = -1;
-	Current_Header.course = 3;
+	Current_Header.course = course;
 	Current_Header.style = 1;
 	Current_Header.life = -1;
 	Current_Header.demostart = 0;
@@ -73,6 +73,7 @@ void load_tja_head(int course,LIST_T Song) {
 	Current_Header.scoremode = 1;
 
 	chdir(Song.path);
+
 	if ((fp = fopen(Song.tja, "r")) != NULL) {
 
 		char* temp = NULL;
@@ -199,7 +200,9 @@ void load_tja_head(int course,LIST_T Song) {
 					else if (strcmp(temp, "Oni") == 0 || strcmp(temp, "oni") == 0)    course = ONI;
 					else if (strcmp(temp, "Edit") == 0 || strcmp(temp, "edit") == 0)   course = EDIT;
 
-					if (Current_Header.course == course) isCourseMatch = true;
+					if (Current_Header.course == course) {
+						isCourseMatch = true;
+					}
 					else isCourseMatch = false;
 				}
 				continue;
@@ -305,6 +308,7 @@ void load_tja_head_simple(LIST_T *List) {		//選曲用のヘッダ取得
 
 
 					List->course[course] = true;
+					List->course_exist[course] = true;
 				}
 
 				continue;
@@ -314,6 +318,8 @@ void load_tja_head_simple(LIST_T *List) {		//選曲用のヘッダ取得
 				if (buf[6] != '\n' && buf[6] != '\r') {
 					strlcpy(temp, buf + 6, strlen(buf) - 7);
 					List->level[course] = atoi(temp);
+
+					List->course[course] = true;
 				}
 				continue;
 			}
@@ -363,6 +369,8 @@ void load_tja_notes(int course, LIST_T Song) {
 		BeforeBranchDelay = 0,
 		BeforeBranchMeasure = 0,
 		BeforeBranchScroll = 1;
+
+	if (course == -1) isCourseMatch = true;		//コース表記なし
 
 	chdir(Song.path);
 	if ((fp = fopen(Song.tja, "r")) != NULL) {
