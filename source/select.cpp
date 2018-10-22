@@ -346,6 +346,7 @@ void get_SelectedId(LIST_T *TMP,int *arg) {
 
 	for (int i = 0; i < 5; i++) {
 		TMP->course[i] = List[SelectedId].course[i];
+		TMP->course_exist[i] = List[SelectedId].course_exist[i];
 		TMP->level[i] = List[SelectedId].level[i];
 	}
 	strlcpy(TMP->tja, List[SelectedId].tja, strlen(List[SelectedId].tja) + 1);
