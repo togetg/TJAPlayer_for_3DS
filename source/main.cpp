@@ -135,7 +135,8 @@ int main() {
 			get_tja_header(&TJA_Header);
 			init_score();
 			init_notes(TJA_Header);
-			load_tja_notes(course, SelectedSong);
+			if (SelectedSong.course_exist[course] == false) load_tja_notes(-1, SelectedSong);
+			else load_tja_notes(course, SelectedSong);
 			time_ini();
 			offset = TJA_Header.offset;
 			notes_cnt = 0;
