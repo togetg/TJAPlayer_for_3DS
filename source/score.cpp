@@ -26,6 +26,7 @@ void init_guage_structure() {
 
 void init_score() {
 
+	isGOGO = false;
 	combo = 0;
 	get_tja_header(&TJA_Header);
 	init = TJA_Header.scoreinit;
@@ -235,8 +236,10 @@ void score_debug() {
 
 	snprintf(buf_score, sizeof(buf_score), "Scoremode:%d   Init:%d   Diff:%d", TJA_Header.scoremode, init, diff);
 	draw_debug(0, 10, buf_score);
-	snprintf(buf_score, sizeof(buf_score), "%s %s    Course:%d    Level:%d    %s" ,TJA_Header.title, TJA_Header.subtitle,TJA_Header.course, TJA_Header.level,TJA_Header.wave);
+	snprintf(buf_score, sizeof(buf_score), "%s %s" ,TJA_Header.title, TJA_Header.subtitle);
 	draw_debug(0, 30, buf_score);
+	snprintf(buf_score, sizeof(buf_score), "Course:%d    Level:%d    %s" ,TJA_Header.course, TJA_Header.level,TJA_Header.wave);
+	draw_debug(0, 40, buf_score);
 	snprintf(buf_score, sizeof(buf_score), "Score:%d    %dCombo    diff:%d",TotalScore, combo, ScoreDiff);
 	draw_debug(0, 150, buf_score);
 	snprintf(buf_score, sizeof(buf_score), "Current   Score:%d    Roll:%d    Precision:%.1f", CurrentScore, CurrentTotalRollCount, CurrentPrecision);
