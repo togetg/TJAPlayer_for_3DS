@@ -1,12 +1,12 @@
-[English here](README_en.md)
+[English](README_en.md)
 
-# TJAPlayer on 3DS
+# TJAPlayer for 3DS
 
 太鼓さん次郎等で使われている[TJAファイル](https://wikiwiki.jp/jiro/%E5%A4%AA%E9%BC%93%E3%81%95%E3%82%93%E6%AC%A1%E9%83%8E#h2_content_1_8)を3DSでプレイします。
 
 # 使い方
 
-1. **TJAファイルの文字コードをUFT-8に変換します。**<br>この作業はフリーソフト等を使って一括で行うことをオススメします。<br>TITLEやWAVEに日本語などのマルチバイト文字が含まれていない場合、この作業は必要ありません。
+1. **TJAファイルの文字コードをUFT-8に変換します。**<br>この作業はフリーソフト等を使って一括で行うことをオススメします。<br>TITLEやWAVEに日本語などのマルチバイト文字が含まれていない場合はこの作業は必要ありません。
 2. 3DSのSDカードのルートに「tjafiles」というフォルダを作り、その中にTJAファイルと音源ファイルを入れてください。
 
 # 注意

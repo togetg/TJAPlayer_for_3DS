@@ -1,6 +1,6 @@
-[日本語版はこちら](README.md)
+[日本語](README.md)
 
-# TJAPlayer on 3DS
+# TJAPlayer for 3DS
 
 It's a music game of the [TJA file](https://wikiwiki.jp/jiro/%E5%A4%AA%E9%BC%93%E3%81%95%E3%82%93%E6%AC%A1%E9%83%8E#h2_content_1_8) used by Taiko Jiro on 3DS.
 
