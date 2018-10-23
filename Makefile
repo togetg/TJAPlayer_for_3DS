@@ -43,13 +43,9 @@ GFXBUILD	:= $(ROMFS)/gfx
 RESOURCES   := resources
 OUT         := 
 
-APP_TITLE = TJAPlayer_on_3DS
-APP_DESCRIPTION = Music games like Taiko no Tatsujin
+APP_TITLE = TJAPlayer for 3DS
+APP_DESCRIPTION = Music game of the TJA file.
 APP_AUTHOR = Togetoge
-
-VERSION_MAJOR := 1
-VERSION_MINOR := 0
-VERSION_MICRO := 0
 
 #---------------------------------------------------------------------------------
 # options for code generation
