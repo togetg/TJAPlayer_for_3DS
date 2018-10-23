@@ -13,7 +13,7 @@ It's a music game of the [TJA file](https://wikiwiki.jp/jiro/%E5%A4%AA%E9%BC%93%
 
 - **When music is delayed, lower the bit rate of the sound file.**
 - Only the Ogg file is supported for the sound file.
-- If you don't hearh the notes sound and music at all, start up [DSP1](https://github.com/zoogie/DSP1/releases).
+- If you don't hear the notes sound and music at all, start up [DSP1](https://github.com/zoogie/DSP1/releases).
 
 # Not supported
 
