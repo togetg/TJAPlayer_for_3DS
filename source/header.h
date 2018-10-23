@@ -11,14 +11,13 @@
 #include <unistd.h>
 #include <ctype.h>
 
-#define File_Name "シャルル"
 #define DEFAULT_DIR	"sdmc:/tjafiles/"
 
 #define Max_Notes_Measure 130	//一小節の最大ノーツ数+1
 #define Measure_Max 4096
-#define Notes_Area 500.0
+#define Notes_Area 420.0
 #define Notes_Judge 93
-#define Notes_Judge_Range 407
+#define Notes_Judge_Range 327
 
 #define TOP_WIDTH  400
 #define TOP_HEIGHT 240
@@ -31,8 +30,6 @@
 #define BarLine_Max 64
 #define Roll_Max 64
 #define Balloon_Max 64
-
-#define Score_Course 3		//難易度
 
 #define List_Max 1024		//選曲リストの最大数
 
