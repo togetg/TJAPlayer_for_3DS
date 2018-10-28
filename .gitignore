@@ -3,3 +3,5 @@ build
 *.elf
 *.o
 *.smdh
+*.cia
+*.cxi
