@@ -23,7 +23,7 @@ ROLL_T RollNotes[Roll_Max];
 BALLOON_T BalloonNotes[Balloon_Max];
 BRANCH_T Branch;
 
-int MeasureCount, RollState, NotesCount, JudgeDispknd, JudgeRollState, BalloonBreakCount,
+int MeasureCount, RollState, NotesCount, JudgeDispknd, JudgeRollState, BalloonBreakCount, PreNotesKnd,
 NotesNumber;	//何番目のノーツか
 bool  isNotesLoad = true, isJudgeDisp = false, isBalloonBreakDisp = false, isGOGOTime = false, isLevelHold = false;	//要初期化
 double JudgeMakeTime, JudgeY,JudgeEffectCnt;
@@ -135,6 +135,11 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 					int knd = ctoi(tja_notes[Measure[MeasureCount].notes][i]);
 
+					if ((knd == Roll || knd == BigRoll) && (PreNotesKnd == Roll || PreNotesKnd == BigRoll )) {	//55558のような表記に対応
+						
+						continue;
+					}
+
 					if (knd == Potato) knd = Don;	//イモ連打はドンに置換
 
 					if (Option.random > 0) {		//ランダム(きまぐれ,でたらめ)
@@ -169,6 +174,8 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 					Notes[id].judge_time = Measure[MeasureCount].judge_time + 60.0 / Measure[MeasureCount].bpm * 4 * Measure[MeasureCount].measure * i / NotesCountMax;
 					Notes[id].roll_id = -1;
 					Notes[id].isThrough = false;
+
+					PreNotesKnd = knd;
 
 					int roll_id = -1;
 
@@ -256,6 +263,9 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 					}
 
 					NotesNumber++;
+				}
+				else if (ctoi(tja_notes[Measure[MeasureCount].notes][i]) == 0){
+				PreNotesKnd = 0;
 				}
 			}
 
@@ -1179,4 +1189,5 @@ void init_notes(TJA_HEADER_T TJA_Header) {
 	Branch.next = false;
 	Branch.wait = false;
 	isLevelHold = false;
+	PreNotesKnd = 0;
 }
