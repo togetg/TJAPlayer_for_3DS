@@ -134,7 +134,7 @@ int main() {
 
 			init_tja();
 			load_tja_head(course, SelectedSong);
-			init_main_music();
+			//init_main_music();
 			get_tja_header(&TJA_Header);
 			init_score();
 			init_notes(TJA_Header);
@@ -277,11 +277,13 @@ int main() {
 					break;
 
 				case 1:
+					isPlayMain = true;
 					stopPlayback();
 					scene_state = MainLoad;
 					break;
 
 				case 2:
+					isPlayMain = true;
 					stopPlayback();
 					cnt = -1;
 					scene_state = SelectSong;
