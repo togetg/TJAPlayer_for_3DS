@@ -9,6 +9,7 @@
 	free((void*) ptr); ptr = NULL
 
 static volatile bool stop = true;
+char buf_playback[160];
 
 bool togglePlayback(void){
 	bool paused = ndspChnIsPaused(CHANNEL);
@@ -84,6 +85,8 @@ err:
 	return file_type;
 }
 
+int testtest = 0;
+
 void playFile(void* infoIn){
 	struct decoder_fn decoder;
 	struct playbackInfo_t* info = (playbackInfo_t*)infoIn;
@@ -124,7 +127,7 @@ void playFile(void* infoIn){
 	{
 		goto err;
 	}
-	 
+	testtest = 99;
 	buffer1 = (int16_t*)linearAlloc(decoder.buffSize * sizeof(int16_t));
 	buffer2 = (int16_t*)linearAlloc(decoder.buffSize * sizeof(int16_t));
 
@@ -190,6 +193,7 @@ void playFile(void* infoIn){
 
 			ndspChnWaveBufAdd(CHANNEL, &waveBuf[1]);
 		}
+
 
 		//DSP_FlushDataCache(buffer1, decoder.buffSize * sizeof(int16_t));
 		//DSP_FlushDataCache(buffer2, decoder.buffSize * sizeof(int16_t));
@@ -261,4 +265,9 @@ void stop_main_music() {
 
 void init_main_music() {
 	playbackInfo.file = NULL;
+}
+
+void playback_debug() {
+	snprintf(buf_playback, sizeof(buf_playback), "test:%d",testtest);
+	draw_debug(100, 0, buf_playback);
 }
