@@ -2,14 +2,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 
-
+#include "main.h"
 #include "vorbis.h"
 
 static OggVorbis_File	vorbisFile;
 static vorbis_info		*vi;
 static FILE				*f;
 static const size_t		buffSize = 7000;// 8 * 4096;
+char buf_vorbis[160];
 
 void setVorbis(struct decoder_fn* decoder){
 	decoder->init = &initVorbis;
@@ -59,6 +61,7 @@ void exitVorbis(void)
 	fclose(f);
 }
 
+double vorbis_time = 0;
 
 uint64_t fillVorbisBuffer(char* bufferOut)
 {
@@ -83,7 +86,7 @@ uint64_t fillVorbisBuffer(char* bufferOut)
 		samplesToRead -= samplesJustRead;
 		bufferOut += samplesJustRead;
 	}
-
+	//vorbis_time = (double)ov_time_tell(&vorbisFile)/1000.0;
 	return samplesRead / sizeof(int16_t);
 }
 
@@ -100,4 +103,16 @@ int isVorbis(const char *in){
 	ov_clear(&testvf);
 	fclose(ft);
 	return err;
+}
+
+double getVorbisTime() {
+	// double(ov_time_tell(&vorbisFile))
+	
+	return vorbis_time = (double)ov_time_tell(&vorbisFile) /1000.0;
+}
+
+void vorbis_debug() {
+
+	snprintf(buf_vorbis, sizeof(buf_vorbis), "vorbis_time:%.3f", vorbis_time);
+	draw_debug(100, 0, buf_vorbis);
 }
