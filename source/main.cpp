@@ -9,6 +9,7 @@
 #include "option.h"
 #include "result.h"
 #include "main.h"
+#include "vorbis.h"
 
 C2D_Sprite sprites[Sprite_Number];			//画像用
 static C2D_SpriteSheet spriteSheet;
@@ -69,7 +70,7 @@ int main() {
 	bool isNotesStart = false, isMusicStart = false, isPlayMain = false,isExit = false;
 	double FirstMeasureTime = INT_MAX,
 		offset = 0,
-		NowTime = -1000;
+		CompTime = -1000,CurrentTime = -1000,VorbisTime=-1000;
 
 	while (aptMainLoop()) {
 
@@ -145,7 +146,7 @@ int main() {
 			notes_cnt = 0;
 			isNotesStart = false, isMusicStart = false, isPlayMain = false;
 			FirstMeasureTime = INT_MAX;
-			NowTime = -1000;
+			CurrentTime = -1000,VorbisTime=-1000,CompTime = -1000;
 
 			scene_state = MainGame;
 			cnt = -120;
@@ -157,19 +158,25 @@ int main() {
 			draw_title();
 			draw_emblem(sprites);
 
-			if (cnt >= 0) NowTime = time_now(1);
-
 			if (cnt == 0) {
 
 				FirstMeasureTime = get_FirstMeasureTime();
 				play_main_music(&isPlayMain, SelectedSong);
 			}
 
+			if (cnt >= 0) CompTime = get_current_time(1);
+			if (isMusicStart == true) VorbisTime = getVorbisTime() + FirstMeasureTime;
+			if (CompTime != -1000 && VorbisTime != -1000 && (CompTime > VorbisTime)) {
+				CurrentTime = VorbisTime;
+			}
+			else CurrentTime = CompTime;
+
+
 			//譜面が先
 			if (offset > 0 && (isNotesStart == false || isMusicStart == false)) {
 
-				if (NowTime >= 0 && isNotesStart == false) isNotesStart = true;
-				if (NowTime >= offset + FirstMeasureTime && isMusicStart == false) {
+				if (CurrentTime >= 0 && isNotesStart == false) isNotesStart = true;
+				if (CurrentTime >= offset + FirstMeasureTime && isMusicStart == false) {
 					isPlayMain = true;
 					isMusicStart = true;
 				}
@@ -178,11 +185,11 @@ int main() {
 			//音楽が先
 			else if (offset <= 0 && (isNotesStart == false || isMusicStart == false)) {
 
-				if (NowTime >= FirstMeasureTime && isPlayMain == false) {
+				if (CurrentTime >= FirstMeasureTime && isPlayMain == false) {
 					isPlayMain = true;
 					isMusicStart = true;
 				}
-				if (NowTime >= (-1.0) * offset && isNotesStart == false) {
+				if (CurrentTime >= (-1.0) * offset && isNotesStart == false) {
 					isNotesStart = true;
 				}
 			}
@@ -261,6 +268,12 @@ int main() {
 			}
 			draw_score(sprites);
 			//score_debug();
+			//vorbis_debug();
+			//playback_debug();
+			/*if (isMusicStart == true) {
+				snprintf(buf_main, sizeof(buf_main), "t:%.3f ct:%.3f vt:%.3f", CurrentTime,CompTime, getVorbisTime() + FirstMeasureTime);
+				draw_debug(0, 0, buf_main);
+			}*/
 
 			C2D_TargetClear(bottom, C2D_Color32(0x42, 0x42, 0x42, 0xFF));	//下画面
 			C2D_SceneBegin(bottom);
