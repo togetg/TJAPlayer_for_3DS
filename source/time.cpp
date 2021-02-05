@@ -9,13 +9,14 @@ enum msec_status {
 	DiFF,
 	LaST_DiFF,
 };
+#define TIME_NUM 5
 
 struct timeval myTime;
-int cnt[5], msec[5][4], sec[5];
-int isStop[5];
-double PreTime[5],Time[5];
+int cnt[TIME_NUM], msec[TIME_NUM][4], sec[TIME_NUM];
+int isStop[TIME_NUM];
+double PreTime[TIME_NUM],Time[TIME_NUM];
 
-double time_now(int id) {
+double get_current_time(int id) {
 
 	if (isStop[id] != 1) {
 		gettimeofday(&myTime, NULL);
@@ -70,7 +71,7 @@ double fps_time[2],fps_cnt,fps_sum,fps;	//要初期化
 void draw_fps() {
 	
 	fps_time[0] = fps_time[1];
-	fps_time[1] = time_now(2);
+	fps_time[1] = get_current_time(2);
 
 	fps_sum += (fps_time[1] - fps_time[0]);
 	fps_cnt++;
@@ -86,7 +87,7 @@ void draw_fps() {
 
 void time_ini() {
 
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < TIME_NUM; i++) {
 
 		for (int n = 0; n < 4; n++) {
 			msec[i][n] = 0;
