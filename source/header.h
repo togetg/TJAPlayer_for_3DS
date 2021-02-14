@@ -14,7 +14,7 @@
 #define DEFAULT_DIR	"sdmc:/tjafiles/"
 
 #define Max_Notes_Measure 130	//一小節の最大ノーツ数+1
-#define Measure_Max 4096
+#define Measure_Max 8192
 #define Notes_Area 420.0
 #define Notes_Judge 93
 #define Notes_Judge_Range 327
@@ -27,11 +27,11 @@
 #define Sprite_Number 83
 
 #define Notes_Max 512
-#define BarLine_Max 64
-#define Roll_Max 64
-#define Balloon_Max 64
+#define BarLine_Max 512
+#define Roll_Max 512
+#define Balloon_Max 512
 
-#define List_Max 1024		//選曲リストの最大数
+#define List_Max 16384		//選曲リストの最大数
 
 enum Notes_knd {
 
