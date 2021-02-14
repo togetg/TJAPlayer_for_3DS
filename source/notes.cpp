@@ -11,7 +11,6 @@
 
 int balloon[256], BalloonCount;
 double bpm, offset;
-char buf_notes[160];
 
 int find_notes_id(), find_line_id(), make_roll_start(int NotesId), make_roll_end(int NotesId), make_balloon_start(int NotesId), make_balloon_end(int NotesId);
 void notes_calc(bool isDon, bool isKatsu, double bpm, double CurrentTime, int cnt, C2D_Sprite sprites[Sprite_Number]);
