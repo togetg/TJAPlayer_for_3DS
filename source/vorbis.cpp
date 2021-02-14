@@ -11,7 +11,6 @@ static OggVorbis_File	vorbisFile;
 static vorbis_info		*vi;
 static FILE				*f;
 static const size_t		buffSize = 7000;// 8 * 4096;
-char buf_vorbis[160];
 
 void setVorbis(struct decoder_fn* decoder){
 	decoder->init = &initVorbis;
@@ -106,13 +105,7 @@ int isVorbis(const char *in){
 }
 
 double getVorbisTime() {
-	// double(ov_time_tell(&vorbisFile))
-	
-	return vorbis_time = (double)ov_time_tell(&vorbisFile) /1000.0;
-}
 
-void vorbis_debug() {
-
-	snprintf(buf_vorbis, sizeof(buf_vorbis), "vorbis_time:%.3f", vorbis_time);
-	draw_debug(100, 0, buf_vorbis);
+	//曲開始前に呼ぶとクラッシュする(要修正)
+	return vorbis_time = (double)ov_time_tell(&vorbisFile) / 1000.0;
 }
