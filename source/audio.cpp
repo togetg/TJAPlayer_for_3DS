@@ -4,7 +4,7 @@
 #include "header.h"
 
 #define MUSIC_CHANNEL 1
-#define BUFFER_SIZE 4096
+#define AUDIO_BUFFER_SIZE 4096
 #define STACKSIZE (4 * 1024)
 #define MUSIC_NUMBER 3
 
@@ -79,7 +79,7 @@ void load_music() {
 		int eof = 0;
 		int currentSection;
 		while (!eof) {
-			long ret = ov_read(&music[i].ovf, &music[i].data[offset], BUFFER_SIZE, &currentSection);
+			long ret = ov_read(&music[i].ovf, &music[i].data[offset], AUDIO_BUFFER_SIZE, &currentSection);
 			if (ret == 0) {
 				eof = 1;
 			}
