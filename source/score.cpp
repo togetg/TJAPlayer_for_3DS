@@ -6,10 +6,10 @@
 #include "result.h"
 
 bool isGOGO;
-int combo,init,diff,DiffMul,scoremode,HitScore,ScoreDiff,BaseCeilingPoint,
-CurrentScore,TotalScore,CurrentTotalRollCount, CurrentRollCount, TotalRollCount,TotalPerfectCount,TotalNiceCount,TotalBadCount, 
-CurrentPerfectCount, CurrentNiceCount, CurrentBadCount, CurrentBalloonCount,MaxComboCount;
-double tmp,Precision,CurrentPrecision;
+int combo, init, diff, DiffMul, scoremode, HitScore, ScoreDiff, BaseCeilingPoint,
+CurrentScore, TotalScore, CurrentTotalRollCount, CurrentRollCount, TotalRollCount, TotalPerfectCount, TotalNiceCount, TotalBadCount,
+CurrentPerfectCount, CurrentNiceCount, CurrentBadCount, CurrentBalloonCount, MaxComboCount;
+double tmp, Precision, CurrentPrecision;
 TJA_HEADER_T TJA_Header;
 char buf_score[160];
 GAUGE_T Gauge;
@@ -87,8 +87,8 @@ void score_update(int knd) {
 	switch (knd) {
 
 	case PERFECT:
-		TotalScore += round_down(HitScore*GOGOMul);
-		CurrentScore += round_down(HitScore*GOGOMul);
+		TotalScore += round_down(HitScore * GOGOMul);
+		CurrentScore += round_down(HitScore * GOGOMul);
 		combo++;
 		isCombo = true;
 		TotalPerfectCount++;
@@ -226,9 +226,9 @@ void score_update(int knd) {
 		}
 	}
 	ScoreDiff = TotalScore - PreScore;
-	if ((TotalPerfectCount + TotalNiceCount + TotalBadCount) != 0) Precision = (double)TotalPerfectCount / (TotalPerfectCount + TotalNiceCount + TotalBadCount)*100.0;
+	if ((TotalPerfectCount + TotalNiceCount + TotalBadCount) != 0) Precision = (double)TotalPerfectCount / (TotalPerfectCount + TotalNiceCount + TotalBadCount) * 100.0;
 	else Precision = 0;
-	if ((CurrentPerfectCount + CurrentNiceCount + CurrentBadCount) != 0) CurrentPrecision = (double)CurrentPerfectCount / (CurrentPerfectCount + CurrentNiceCount + CurrentBadCount)*100.0;
+	if ((CurrentPerfectCount + CurrentNiceCount + CurrentBadCount) != 0) CurrentPrecision = (double)CurrentPerfectCount / (CurrentPerfectCount + CurrentNiceCount + CurrentBadCount) * 100.0;
 	else CurrentPrecision = 0;
 }
 
@@ -236,15 +236,15 @@ void score_debug() {
 
 	snprintf(buf_score, sizeof(buf_score), "Scoremode:%d   Init:%d   Diff:%d", TJA_Header.scoremode, init, diff);
 	draw_debug(0, 10, buf_score);
-	snprintf(buf_score, sizeof(buf_score), "%s %s" ,TJA_Header.title, TJA_Header.subtitle);
+	snprintf(buf_score, sizeof(buf_score), "%s %s", TJA_Header.title, TJA_Header.subtitle);
 	draw_debug(0, 30, buf_score);
-	snprintf(buf_score, sizeof(buf_score), "Course:%d    Level:%d    %s" ,TJA_Header.course, TJA_Header.level,TJA_Header.wave);
+	snprintf(buf_score, sizeof(buf_score), "Course:%d    Level:%d    %s", TJA_Header.course, TJA_Header.level, TJA_Header.wave);
 	draw_debug(0, 40, buf_score);
-	snprintf(buf_score, sizeof(buf_score), "Score:%d    %dCombo    diff:%d",TotalScore, combo, ScoreDiff);
+	snprintf(buf_score, sizeof(buf_score), "Score:%d    %dCombo    diff:%d", TotalScore, combo, ScoreDiff);
 	draw_debug(0, 150, buf_score);
 	snprintf(buf_score, sizeof(buf_score), "Current   Score:%d    Roll:%d    Precision:%.1f", CurrentScore, CurrentTotalRollCount, CurrentPrecision);
 	draw_debug(0, 160, buf_score);
-	snprintf(buf_score, sizeof(buf_score), "良:%d 可:%d 不可:%d ゲージ%d",Gauge.perfect,Gauge.nice,Gauge.bad,Gauge.score);
+	snprintf(buf_score, sizeof(buf_score), "良:%d 可:%d 不可:%d ゲージ%d", Gauge.perfect, Gauge.nice, Gauge.bad, Gauge.score);
 	draw_debug(0, 170, buf_score);
 	if (isGOGO == true) {
 		snprintf(buf_score, sizeof(buf_score), "GOGOTIME");
@@ -257,8 +257,8 @@ void draw_score(C2D_Sprite  sprites[Sprite_Number]) {
 	//スコア
 	for (int i = 0; i < 7; i++) {
 
-		if (TotalScore / (int)pow(10, i) > 0) {
-			int n = TotalScore / (int)pow(10, i) % 10;
+		if (TotalScore / powi(10, i) > 0) {
+			int n = TotalScore / powi(10, i) % 10;
 			C2D_SpriteSetPos(&sprites[sCore_0 + n], 80 - i * 12, 70);
 			C2D_DrawSprite(&sprites[sCore_0 + n]);
 		}
@@ -268,13 +268,13 @@ void draw_score(C2D_Sprite  sprites[Sprite_Number]) {
 
 	//コンボ
 	for (j = 0; j < 5; j++) {
-		if (combo / (int)pow(10, j) == 0) break;
+		if (combo / powi(10, j) == 0) break;
 	}
 	for (int i = 0; i < 4; i++) {
 
-		if (combo >= 10 && combo / (int)pow(10, i) > 0) {
+		if (combo >= 10 && combo / powi(10, i) > 0) {
 
-			int n = combo / (int)pow(10, i) % 10;
+			int n = combo / powi(10, i) % 10;
 
 			if (combo < 100) {
 				C2D_SpriteSetPos(&sprites[cOmbo_0 + n], 22 + j * 8 - i * 16, 110);
@@ -289,7 +289,7 @@ void draw_score(C2D_Sprite  sprites[Sprite_Number]) {
 
 	//連打
 	for (j = 0; j < 4; j++) {
-		if (CurrentRollCount / (int)pow(10, j) == 0) break;
+		if (CurrentRollCount / powi(10, j) == 0) break;
 	}
 	if (CurrentRollCount > 0) {
 		C2D_SpriteSetPos(&sprites[rOll_count], 110, 35);
@@ -297,17 +297,17 @@ void draw_score(C2D_Sprite  sprites[Sprite_Number]) {
 	}
 	for (int i = 0; i < 4; i++) {
 
-		if (CurrentRollCount / (int)pow(10, i) > 0) {
+		if (CurrentRollCount / powi(10, i) > 0) {
 
-			int n = CurrentRollCount / (int)pow(10, i) % 10;
-			C2D_SpriteSetPos(&sprites[rOll_0 + n], 95 + j * 10 - i * 20,30);
+			int n = CurrentRollCount / powi(10, i) % 10;
+			C2D_SpriteSetPos(&sprites[rOll_0 + n], 95 + j * 10 - i * 20, 30);
 			C2D_DrawSprite(&sprites[rOll_0 + n]);
 		}
 	}
 
 	//風船
 	for (j = 0; j < 4; j++) {
-		if (CurrentBalloonCount / (int)pow(10, j) == 0) break;
+		if (CurrentBalloonCount / powi(10, j) == 0) break;
 	}
 	if (CurrentBalloonCount > 0) {
 		C2D_SpriteSetPos(&sprites[bAlloon_count], 110, 35);
@@ -315,9 +315,9 @@ void draw_score(C2D_Sprite  sprites[Sprite_Number]) {
 	}
 	for (int i = 0; i < 4; i++) {
 
-		if (CurrentBalloonCount / (int)pow(10, i) > 0) {
+		if (CurrentBalloonCount / powi(10, i) > 0) {
 
-			int n = CurrentBalloonCount / (int)pow(10, i) % 10;
+			int n = CurrentBalloonCount / powi(10, i) % 10;
 			C2D_SpriteSetPos(&sprites[rOll_0 + n], 97 + j * 10 - i * 20, 30);
 			C2D_DrawSprite(&sprites[rOll_0 + n]);
 		}
@@ -325,18 +325,18 @@ void draw_score(C2D_Sprite  sprites[Sprite_Number]) {
 }
 
 void draw_gauge(C2D_Sprite  sprites[Sprite_Number]) {
-	
-	double gauge = 1.0 * (Gauge.score/200)*200 / Gauge.soul;
+
+	double gauge = 1.0 * (Gauge.score / 200) * 200 / Gauge.soul;
 	if (gauge > 1.0) gauge = 1.0;
 
 	//赤
-	C2D_DrawRectSolid(123, 76, 0, 250.0*Gauge.norma/Gauge.soul, 8, C2D_Color32f(102.0/255, 0, 0, 1) );
-	C2D_DrawRectSolid(123, 76, 0, 250.0*gauge, 8, C2D_Color32f(1, 0, 0, 1));
+	C2D_DrawRectSolid(123, 76, 0, 250.0 * Gauge.norma / Gauge.soul, 8, C2D_Color32f(102.0 / 255, 0, 0, 1));
+	C2D_DrawRectSolid(123, 76, 0, 250.0 * gauge, 8, C2D_Color32f(1, 0, 0, 1));
 
 	//黄
-	C2D_DrawRectSolid(123 + 250.0*Gauge.norma / Gauge.soul, 67, 0, 250 - 250.0*Gauge.norma / Gauge.soul, 17, C2D_Color32f(102.0 / 255, 68.0 / 255, 0, 1));
-	if (250 * gauge - (250.0*Gauge.norma / Gauge.soul) >= 0)
-	C2D_DrawRectSolid(123 + 250.0*Gauge.norma / Gauge.soul, 67, 0, 250 * gauge - (250.0*Gauge.norma / Gauge.soul), 17, C2D_Color32f(1, 1, 12.0/255, 1));
+	C2D_DrawRectSolid(123 + 250.0 * Gauge.norma / Gauge.soul, 67, 0, 250 - 250.0 * Gauge.norma / Gauge.soul, 17, C2D_Color32f(102.0 / 255, 68.0 / 255, 0, 1));
+	if (250 * gauge - (250.0 * Gauge.norma / Gauge.soul) >= 0)
+		C2D_DrawRectSolid(123 + 250.0 * Gauge.norma / Gauge.soul, 67, 0, 250 * gauge - (250.0 * Gauge.norma / Gauge.soul), 17, C2D_Color32f(1, 1, 12.0 / 255, 1));
 
 	//魂
 	for (int i = 0; i < 2; i++) C2D_SpriteSetPos(&sprites[sOul_on + i], 385, 75);
@@ -353,22 +353,22 @@ void draw_gauge(C2D_Sprite  sprites[Sprite_Number]) {
 void draw_gauge_result(C2D_Sprite  sprites[Sprite_Number]) {
 
 	int diff = 50;
-	double x_start = 123-diff, x_end = 250-diff;
+	double x_start = 123 - diff, x_end = 250 - diff;
 	double gauge = 1.0 * (Gauge.score / 200) * 200 / Gauge.soul;
 	if (gauge > 1.0) gauge = 1.0;
 
 	//赤
-	C2D_DrawRectSolid(x_start, 76, 0, x_end*Gauge.norma / Gauge.soul, 8, C2D_Color32f(102.0 / 255, 0, 0, 1));
-	C2D_DrawRectSolid(x_start, 76, 0, x_end*gauge, 8, C2D_Color32f(1, 0, 0, 1));
+	C2D_DrawRectSolid(x_start, 76, 0, x_end * Gauge.norma / Gauge.soul, 8, C2D_Color32f(102.0 / 255, 0, 0, 1));
+	C2D_DrawRectSolid(x_start, 76, 0, x_end * gauge, 8, C2D_Color32f(1, 0, 0, 1));
 
 	//黄
-	C2D_DrawRectSolid(x_start + x_end*Gauge.norma / Gauge.soul, 67, 0, x_end - x_end*Gauge.norma / Gauge.soul, 17, C2D_Color32f(102.0 / 255, 68.0 / 255, 0, 1));
-	if (x_end * gauge - (x_end*Gauge.norma / Gauge.soul) >= 0)
-		C2D_DrawRectSolid(x_start + x_end*Gauge.norma / Gauge.soul, 67, 0, x_end * gauge - (x_end*Gauge.norma / Gauge.soul), 17, C2D_Color32f(1, 1, 12.0 / 255, 1));
+	C2D_DrawRectSolid(x_start + x_end * Gauge.norma / Gauge.soul, 67, 0, x_end - x_end * Gauge.norma / Gauge.soul, 17, C2D_Color32f(102.0 / 255, 68.0 / 255, 0, 1));
+	if (x_end * gauge - (x_end * Gauge.norma / Gauge.soul) >= 0)
+		C2D_DrawRectSolid(x_start + x_end * Gauge.norma / Gauge.soul, 67, 0, x_end * gauge - (x_end * Gauge.norma / Gauge.soul), 17, C2D_Color32f(1, 1, 12.0 / 255, 1));
 
 	//魂
-	for (int i = 0; i < 2; i++) C2D_SpriteSetPos(&sprites[sOul_on + i], 385-diff*2, 75);
-	C2D_SpriteSetPos(&sprites[sOul_effect], 395-diff*2, 65);
+	for (int i = 0; i < 2; i++) C2D_SpriteSetPos(&sprites[sOul_on + i], 385 - diff * 2, 75);
+	C2D_SpriteSetPos(&sprites[sOul_effect], 395 - diff * 2, 65);
 	if ((Gauge.score / 200) * 200 >= Gauge.soul) {
 		C2D_ImageTint Tint;
 		C2D_AlphaImageTint(&Tint, 0.8);
@@ -418,7 +418,7 @@ void draw_lane(C2D_Sprite  sprites[Sprite_Number]) {
 	}
 }
 
-int branch_start(int knd,double x,double y) {	//分岐
+int branch_start(int knd, double x, double y) {	//分岐
 
 	int branch;
 	switch (knd) {
@@ -464,10 +464,10 @@ int round_down(int arg) {
 }
 
 void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max_Notes_Measure]) {	//初項と公差を計算　魂ゲージの伸びも
-	
-	int NotesCount = 0, i = 0, combo = 0, DiffTmp = 0, BalloonCnt = 0, TmpBaseCeilingPoint = 0,NotesCountMax = 0,RollCnt=0,RollKnd=0;
+
+	int NotesCount = 0, i = 0, combo = 0, DiffTmp = 0, BalloonCnt = 0, TmpBaseCeilingPoint = 0, NotesCountMax = 0, RollCnt = 0, RollKnd = 0;
 	bool isEND = false;
-	double init_cnt=0,diff_cnt=0,gogo = 1,special = 1,roll_start_time=0, roll_end_time = 0;
+	double init_cnt = 0, diff_cnt = 0, gogo = 1, special = 1, roll_start_time = 0, roll_end_time = 0;
 	COMMAND_T Command;
 
 	int PerfectNotesCount = 0;	//魂ゲージの伸び計算用
@@ -703,7 +703,7 @@ void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max
 	default:
 		Gauge.nice = Gauge.perfect / 2;
 		if (level <= 7) {
-			Gauge.bad = Gauge.perfect  * 8/ 5;
+			Gauge.bad = Gauge.perfect * 8 / 5;
 			Gauge.norma = 5660;
 			Gauge.soul = 7075;
 		}
@@ -730,11 +730,11 @@ void draw_emblem(C2D_Sprite  sprites[Sprite_Number]) {
 
 	switch (TJA_Header.course) {
 	case EASY:
-		C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(1, 51.0/255.0, 0, 1));
+		C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(1, 51.0 / 255.0, 0, 1));
 		C2D_DrawSprite(&sprites[eMblem_easy]);
 		break;
 	case NORMAL:
-		C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(136.0/255.0, 204.0/255.0, 34.0/255.0, 1));
+		C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(136.0 / 255.0, 204.0 / 255.0, 34.0 / 255.0, 1));
 		C2D_DrawSprite(&sprites[eMblem_normal]);
 		break;
 	case HARD:
@@ -742,17 +742,17 @@ void draw_emblem(C2D_Sprite  sprites[Sprite_Number]) {
 		C2D_DrawSprite(&sprites[eMblem_hard]);
 		break;
 	case ONI:
-		C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(1, 34.0 / 255.0, 204.0/255.0, 1));
+		C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(1, 34.0 / 255.0, 204.0 / 255.0, 1));
 		C2D_DrawSprite(&sprites[eMblem_oni]);
 		break;
 	case EDIT:
-		C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(136.0/255.0, 34.0/255.0, 1, 1));
+		C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(136.0 / 255.0, 34.0 / 255.0, 1, 1));
 		C2D_DrawSprite(&sprites[eMblem_edit]);
 		break;
 	}
 }
 
-void get_result(RESULT_T *Result) {
+void get_result(RESULT_T* Result) {
 
 	Result->perfect = TotalPerfectCount;
 	Result->nice = TotalNiceCount;
