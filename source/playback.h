@@ -38,4 +38,3 @@ void play_main_music(bool *p_isPlayMain, LIST_T Song);
 void pasue_main_music();
 void stop_main_music();
 void init_main_music();
-void playback_debug();

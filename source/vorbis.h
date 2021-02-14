@@ -13,5 +13,4 @@ void exitVorbis(void);
 //int playVorbis(const char* in, bool *p_isPlayMain);
 uint64_t fillVorbisBuffer(char* bufferOut);
 int isVorbis(const char* in);
-void vorbis_debug();
 double getVorbisTime();
