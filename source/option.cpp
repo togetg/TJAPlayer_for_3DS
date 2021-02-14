@@ -6,7 +6,6 @@
 int lang = jp;
 
 OPTION_T Option;
-char buf_option[160];
 
 void draw_option(u16 px, u16 py, unsigned int key) {
 	

@@ -9,7 +9,6 @@
 	free((void*) ptr); ptr = NULL
 
 static volatile bool stop = true;
-char buf_playback[160];
 
 bool togglePlayback(void){
 	bool paused = ndspChnIsPaused(CHANNEL);
@@ -265,9 +264,4 @@ void stop_main_music() {
 
 void init_main_music() {
 	playbackInfo.file = NULL;
-}
-
-void playback_debug() {
-	snprintf(buf_playback, sizeof(buf_playback), "test:%d",testtest);
-	draw_debug(100, 0, buf_playback);
 }
