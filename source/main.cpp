@@ -14,9 +14,9 @@
 C2D_Sprite sprites[Sprite_Number];			//画像用
 static C2D_SpriteSheet spriteSheet;
 C2D_TextBuf g_dynamicBuf;
-char buf_main[160];
 C2D_Text dynText;
-bool isPause = false;
+bool isPause = false, isNotesStart = false, isMusicStart = false, isPlayMain = false, isExit = false;
+char buffer[BUFFER_SIZE];
 
 void load_sprites();
 
@@ -67,7 +67,7 @@ int main() {
 	load_music();
 
 	int cnt = 0, notes_cnt = 0, scene_state = SelectLoad, course = ONI, tmp;
-	bool isNotesStart = false, isMusicStart = false, isPlayMain = false,isExit = false;
+
 	double FirstMeasureTime = INT_MAX,
 		offset = 0,
 		CompTime = -1000,CurrentTime = -1000,VorbisTime=-1000;
@@ -92,7 +92,7 @@ int main() {
 		case SelectLoad:
 
 			draw_select_text(30, 0, "Now Loading...");
-
+			C3D_FrameEnd(0);
 			scene_state = SelectSong;
 			cnt = -1;
 			load_file_main();
@@ -126,7 +126,6 @@ int main() {
 			C2D_SceneBegin(bottom);
 			//C2D_DrawSprite(&sprites[bOttom]);
 			draw_option(tp.px, tp.py, key);
-			draw_debug(0, 40, buf_main);
 			isPause = false;
 
 			break;
@@ -271,8 +270,8 @@ int main() {
 			//vorbis_debug();
 			//playback_debug();
 			/*if (isMusicStart == true) {
-				snprintf(buf_main, sizeof(buf_main), "t:%.3f ct:%.3f vt:%.3f", CurrentTime,CompTime, getVorbisTime() + FirstMeasureTime);
-				draw_debug(0, 0, buf_main);
+				snprintf(buffer, sizeof(buffer), "0:%.3f 1:%.3f vt:%.3f", get_current_time(0),get_current_time(1), getVorbisTime());
+				draw_debug(0, 0, buffer);
 			}*/
 
 			C2D_TargetClear(bottom, C2D_Color32(0x42, 0x42, 0x42, 0xFF));	//下画面
@@ -367,10 +366,28 @@ bool get_isPause() {
 
 void debug_touch(int x,int y) {
 
-	snprintf(buf_main, sizeof(buf_main), "%d:%d:%.1f\n%d:%d:%d", 
+	snprintf(buffer, sizeof(buffer), "%d:%d:%.1f\n%d:%d:%d", 
 		PreTouch_x-touch_x,
 		PreTouch_y-touch_y,
 		pow((touch_x - PreTouch_x)*(touch_x - PreTouch_x) + (touch_y - PreTouch_y)*(touch_y - PreTouch_y), 0.5), 
 		touch_x,touch_y,touch_cnt);
-	draw_debug(0, 0, buf_main);
+	draw_debug(0, 0, buffer);
+}
+
+bool get_isMusicStart() {
+	return isMusicStart;
+}
+
+char *get_buffer() {
+	return buffer;
+}
+
+int powi(int x, int y) {	//なぜかpowのキャストが上手くいかないので整数用powを自作
+
+	int ans = 1;
+
+	for (int i = 0; i < y; i++) {
+		ans = ans * x;
+	}
+	return ans;
 }
