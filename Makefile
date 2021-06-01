@@ -31,22 +31,28 @@ include $(DEVKITARM)/3ds_rules
 #     - icon.png
 #     - <libctru folder>/default_icon.png
 #---------------------------------------------------------------------------------
-TARGET		:= $(notdir $(CURDIR))
-BUILD		:= build
-SOURCES		:= source
-DATA		:= data
-INCLUDES	:= include
-GRAPHICS	:= gfx
-#GFXBUILD	:= $(BUILD)
-ROMFS		:= romfs
-GFXBUILD	:= $(ROMFS)/gfx
-RESOURCES   := resources
-OUT         := 
+TARGET		:=	$(notdir $(CURDIR))
+BUILD		:=	build
+SOURCES		:=	source
+DATA		:=	data
+INCLUDES	:=	include
+GRAPHICS	:=	gfx
+ROMFS		:=	romfs
+GFXBUILD	:=	$(ROMFS)/gfx
+#---------------------------------------------------------------------------------
+APP_VER					:= 1026
+APP_TITLE				:= TJAPlayer for 3DS
+APP_DESCRIPTION				:= Music game of the TJA file.
+APP_AUTHOR				:= Togetoge
+PRODUCT_CODE				:= CTR-HB-TJAP
+UNIQUE_ID				:= 0xB7655
 
-APP_TITLE = TJAPlayer for 3DS
-APP_DESCRIPTION = Music game of the TJA file.
-APP_AUTHOR = Togetoge
+BANNER_AUDIO				:= resource/banner.wav
+BANNER_IMAGE				:= resource/banner.png
+ICON        				:= resource/icon.png
+RSF_PATH				:= resource/app.rsf
 
+#---------------------------------------------------------------------------------
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
@@ -69,8 +75,7 @@ LIBS	:= -lcitro2d -lcitro3d -lctru -lm -lvorbisidec -logg
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= $(CTRULIB) $(PORTLIBS)
-
+LIBDIRS := $(CTRULIB) $(PORTLIBS)
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
@@ -79,7 +84,7 @@ LIBDIRS	:= $(CTRULIB) $(PORTLIBS)
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
 
-export OUTPUT	:=	$(CURDIR)/$(OUT)/$(TARGET)
+export OUTPUT	:=	$(CURDIR)/$(TARGET)
 export TOPDIR	:=	$(CURDIR)
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
@@ -148,9 +153,8 @@ ifeq ($(strip $(ICON)),)
 	ifneq (,$(findstring $(TARGET).png,$(icons)))
 		export APP_ICON := $(TOPDIR)/$(TARGET).png
 	else
-		icons := $(wildcard $(RESOURCES)/*.png)
 		ifneq (,$(findstring icon.png,$(icons)))
-			export APP_ICON := $(TOPDIR)/$(RESOURCES)/icon.png
+			export APP_ICON := $(TOPDIR)/icon.png
 		endif
 	endif
 else
@@ -168,8 +172,41 @@ endif
 .PHONY: all clean
 
 #---------------------------------------------------------------------------------
+MAKEROM      ?= makerom
+MAKEROM_ARGS := -elf "$(OUTPUT).elf" -rsf "$(RSF_PATH)" -banner "$(BUILD)/banner.bnr" -icon "$(BUILD)/icon.icn" -DAPP_TITLE="$(APP_TITLE)" -DAPP_PRODUCT_CODE="$(PRODUCT_CODE)" -DAPP_UNIQUE_ID="$(UNIQUE_ID)"
+
+ifneq ($(strip $(LOGO)),)
+	MAKEROM_ARGS	+=	 -logo "$(LOGO)"
+endif
+ifneq ($(strip $(ROMFS)),)
+	MAKEROM_ARGS	+=	 -DAPP_ROMFS="$(ROMFS)"
+endif
+
+BANNERTOOL   ?= bannertool
+
+ifeq ($(suffix $(BANNER_IMAGE)),.cgfx)
+	BANNER_IMAGE_ARG := -ci
+else
+	BANNER_IMAGE_ARG := -i
+endif
+
+ifeq ($(suffix $(BANNER_AUDIO)),.cwav)
+	BANNER_AUDIO_ARG := -ca
+else
+	BANNER_AUDIO_ARG := -a
+endif
+#
+
+#---------------------------------------------------------------------------------
+
 all: $(BUILD) $(GFXBUILD) $(DEPSDIR) $(ROMFS_T3XFILES) $(T3XHFILES)
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+	@echo Building 3dsx...
+	@$(MAKE) -j -s --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+	@echo
+	@echo Building cia...
+	@$(BANNERTOOL) makebanner $(BANNER_IMAGE_ARG) $(BANNER_IMAGE) $(BANNER_AUDIO_ARG) $(BANNER_AUDIO) -o $(BUILD)/banner.bnr
+	@$(BANNERTOOL) makesmdh -s "$(APP_TITLE)" -l "$(APP_DESCRIPTION)" -p $(APP_AUTHOR) -i $(APP_ICON) -o $(BUILD)/icon.icn
+	@$(MAKEROM) -f cia -o $(OUTPUT).cia -target t -exefslogo $(MAKEROM_ARGS) -ver $(APP_VER)
 
 $(BUILD):
 	@mkdir -p $@
@@ -186,8 +223,8 @@ endif
 
 #---------------------------------------------------------------------------------
 clean:
-	@echo clean...
-	@rm -fr $(BUILD) $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf $(GFXBUILD)
+	@echo clean ...
+	@rm -fr $(BUILD) $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf $(TARGET).cia $(GFXBUILD)
 
 #---------------------------------------------------------------------------------
 $(GFXBUILD)/%.t3x	$(BUILD)/%.h	:	%.t3s
@@ -219,18 +256,6 @@ $(OUTPUT).elf	:	$(OFILES)
 .PRECIOUS	:	%.t3x
 #---------------------------------------------------------------------------------
 %.t3x.o	%_t3x.h :	%.t3x
-#---------------------------------------------------------------------------------
-	@echo $(notdir $<)
-	@$(bin2o)
-
-#---------------------------------------------------------------------------------
-%.ogg.o	%_ogg.h :	%.ogg
-#---------------------------------------------------------------------------------
-	@echo $(notdir $<)
-	@$(bin2o)
-
-#---------------------------------------------------------------------------------
-%.title.o	%_title.h :	%.title
 #---------------------------------------------------------------------------------
 	@echo $(notdir $<)
 	@$(bin2o)
