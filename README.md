@@ -34,3 +34,14 @@
   - TJFフォーマット
   - ジャンル分け
   - スコアの保存
+
+# ビルド
+1. [devkitPro](https://github.com/devkitPro/installer/releases/tag/v3.0.3)をインストール
+
+2. 以下のコマンドでパッケージをインストーする
+
+   `pacman -S 3ds-libogg 3ds-dev 3ds-libvorbisidec --noconfirm`
+
+3. [MakeROM](https://github.com/3DSGuy/Project_CTR/releases)と[bannertool](https://github.com/Steveice10/bannertool/releases)をダウンロードしPATHを通す
+
+4. Build.batを起動
