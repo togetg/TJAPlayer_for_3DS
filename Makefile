@@ -40,7 +40,7 @@ GRAPHICS	:=	gfx
 ROMFS		:=	romfs
 GFXBUILD	:=	$(ROMFS)/gfx
 #---------------------------------------------------------------------------------
-APP_VER					:= 1026
+APP_VER					:= 1026 #1024.16.1?
 APP_TITLE				:= TJAPlayer for 3DS
 APP_DESCRIPTION				:= Music game of the TJA file.
 APP_AUTHOR				:= Togetoge
