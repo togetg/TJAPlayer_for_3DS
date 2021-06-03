@@ -32,14 +32,14 @@ double JudgeMakeTime, JudgeY,JudgeEffectCnt;
 
 void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_Measure], MEASURE_T Measure[Measure_Max], int cnt, C2D_Sprite  sprites[Sprite_Number]) {
 
+	//snprintf(get_buffer(), BUFFER_SIZE, "400");
+	//draw_debug(400-20, 0, get_buffer());
+
 	OPTION_T Option;
 	get_option(&Option);
 
 	//最初の小節のcreate_timeがマイナスだった時用に調整
-	double CurrentTime = get_current_time(0) + Measure[0].create_time;
-
-	//snprintf(buf_notes, sizeof(buf_notes), "time:%.2f", CurrentTime);
-	//draw_debug(0, 0, buf_notes);
+	double CurrentTime = get_current_time(0) + Measure[0].create_time;	
 
 	if (cnt >= 0 && isNotesLoad == true) {
 

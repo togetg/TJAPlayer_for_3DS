@@ -25,7 +25,7 @@ double get_current_time(int id) {
 		if (CurrentTime[id] == 0 && Time[id] == 0 && IniVorbisTime[id]==0) IniVorbisTime[id] = getVorbisTime();
 		CurrentTime[id] = Time[id] + getVorbisTime() - IniVorbisTime[id];
 		//return CurrentTime[id]; 
-		snprintf(get_buffer(), BUFFER_SIZE, "vbt:%.1f", CurrentTime[id]);
+		//snprintf(get_buffer(), BUFFER_SIZE, "vbt:%.1f", CurrentTime[id]);
 		//draw_debug(100, id*10, get_buffer()); 
 	}
 
@@ -46,7 +46,7 @@ double get_current_time(int id) {
 		//printf("%04d:%06d\n", sec, msec[id][DiFF]);
 		Time[id] = sec[id] + msec[id][DiFF] / 1000000.0 + PreTime[id];
 	}
-	snprintf(get_buffer(), BUFFER_SIZE, "t:%.1f", Time[id]);
+	//snprintf(get_buffer(), BUFFER_SIZE, "t:%.1f", Time[id]);
 	//draw_debug(0, id*10, get_buffer());
 	return Time[id];
 }
