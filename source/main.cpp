@@ -89,9 +89,11 @@ int main() {
 
 		switch (scene_state) {
 
-		case SelectLoad:
+		case SelectLoad:	//ロード画面
 
-			draw_select_text(30, 0, "Now Loading...");
+			snprintf(get_buffer(), BUFFER_SIZE, "TJAPlayer for 3DS %.2f", VERSION);
+			draw_select_text(120, 70, get_buffer());
+			draw_select_text(120, 100, "Now Loading...");
 			C3D_FrameEnd(0);
 			scene_state = SelectSong;
 			cnt = -1;
