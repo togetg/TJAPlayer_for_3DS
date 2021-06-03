@@ -11,13 +11,14 @@
 #include <unistd.h>
 #include <ctype.h>
 
+#define VERSION 1.02
 #define DEFAULT_DIR	"sdmc:/tjafiles/"
 
 #define Max_Notes_Measure 130	//一小節の最大ノーツ数+1
 #define Measure_Max 8192
-#define Notes_Area 420.0
-#define Notes_Judge 93
-#define Notes_Judge_Range 327
+#define Notes_Area 338.0		//ノーツ表示エリアの長さ
+#define Notes_Judge 93			//判定枠の中心のX座標
+#define Notes_Judge_Range 307	//判定枠の中心から小節生成位置(右端)の距離
 
 #define TOP_WIDTH  400
 #define TOP_HEIGHT 240
