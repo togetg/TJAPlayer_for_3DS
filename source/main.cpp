@@ -98,7 +98,7 @@ int main() {
 			scene_state = SCENE_SELECTSONG;
 			cnt = -1;
 			load_file_main();
-			init_option();
+			load_option();
 			break;
 
 		case SCENE_SELECTSONG:	//選曲
@@ -333,6 +333,7 @@ int main() {
 		if (isPause == false) cnt++;
 	}
 
+	exit_option();
 	main_exit();
 	return 0;
 }

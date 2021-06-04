@@ -1,14 +1,14 @@
 ﻿#pragma once
 
 typedef struct {
+	int lang;
 	bool isAuto, isStelth,isSwap;
 	double speed, random;
-
 } OPTION_T;
 
 enum Lang_knd {
-	jp = 0,
-	en,
+	LANG_JP = 0,
+	LANG_EN,
 };
 
 enum Text_knd {
@@ -116,3 +116,4 @@ void draw_option(u16 px, u16 py, unsigned int key);
 void toggle_auto();
 void get_option(OPTION_T *TMP);
 void init_option();
+void load_option(),exit_option(),save_option();
