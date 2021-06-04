@@ -19,7 +19,7 @@
 #define Measure_Max 8192
 #define Notes_Area 338.0		//ノーツ表示エリアの長さ
 #define Notes_Judge 93			//判定枠の中心のX座標
-#define Notes_Judge_Range 307	//判定枠の中心から小節生成位置(右端)の距離
+#define Notes_Judge_Range 327	//判定枠の中心から小節生成位置の距離(右端+20)
 
 #define TOP_WIDTH  400
 #define TOP_HEIGHT 240
