@@ -66,7 +66,7 @@ int main() {
 	load_sprites();
 	load_music();
 
-	int cnt = 0, notes_cnt = 0, scene_state = SelectLoad, course = ONI, tmp;
+	int cnt = 0, notes_cnt = 0, scene_state = SCENE_SELECTLOAD, course = COURSE_ONI, tmp;
 
 	double FirstMeasureTime = INT_MAX,
 		offset = 0,
@@ -89,19 +89,19 @@ int main() {
 
 		switch (scene_state) {
 
-		case SelectLoad:	//ロード画面
+		case SCENE_SELECTLOAD:	//ロード画面
 
 			snprintf(get_buffer(), BUFFER_SIZE, "TJAPlayer for 3DS %.2f", VERSION);
 			draw_select_text(120, 70, get_buffer());
 			draw_select_text(120, 100, "Now Loading...");
 			C3D_FrameEnd(0);
-			scene_state = SelectSong;
+			scene_state = SCENE_SELECTSONG;
 			cnt = -1;
 			load_file_main();
 			init_option();
 			break;
 
-		case SelectSong:	//選曲
+		case SCENE_SELECTSONG:	//選曲
 
 			if (key & KEY_START) isExit = true;
 
@@ -119,20 +119,20 @@ int main() {
 			disp_file_list();
 
 			if (get_isGameStart() == true) {
-				scene_state = MainLoad;
+				scene_state = SCENE_MAINLOAD;
 				cnt = -1;
 			}
 			get_SelectedId(&SelectedSong, &course);
 
 			C2D_TargetClear(bottom, C2D_Color32(0x42, 0x42, 0x42, 0xFF));	//下画面
 			C2D_SceneBegin(bottom);
-			//C2D_DrawSprite(&sprites[bOttom]);
+			//C2D_DrawSprite(&sprites[SPRITE_BOTTOM]);
 			draw_option(tp.px, tp.py, key);
 			isPause = false;
 
 			break;
 
-		case MainLoad:
+		case SCENE_MAINLOAD:
 
 			init_tja();
 			load_tja_head(course, SelectedSong);
@@ -149,13 +149,13 @@ int main() {
 			FirstMeasureTime = INT_MAX;
 			CurrentTime = -1000,VorbisTime=-1000,CompTime = -1000;
 
-			scene_state = MainGame;
+			scene_state = SCENE_MAINGAME;
 			cnt = -120;
 			break;
 
-		case MainGame:		//メイン
+		case SCENE_MAINGAME:		//メイン
 
-			C2D_DrawSprite(&sprites[tOp]);
+			C2D_DrawSprite(&sprites[SPRITE_TOP]);
 			draw_title();
 			draw_emblem(sprites);
 
@@ -278,7 +278,7 @@ int main() {
 
 			C2D_TargetClear(bottom, C2D_Color32(0x42, 0x42, 0x42, 0xFF));	//下画面
 			C2D_SceneBegin(bottom);
-			C2D_DrawSprite(&sprites[bOttom]);
+			C2D_DrawSprite(&sprites[SPRITE_BOTTOM]);
 
 			//debug_touch(tp.px,tp.py);
 
@@ -293,14 +293,14 @@ int main() {
 				case 1:
 					isPlayMain = true;
 					stopPlayback();
-					scene_state = MainLoad;
+					scene_state = SCENE_MAINLOAD;
 					break;
 
 				case 2:
 					isPlayMain = true;
 					stopPlayback();
 					cnt = -1;
-					scene_state = SelectSong;
+					scene_state = SCENE_SELECTSONG;
 					break;
 				}
 
@@ -313,16 +313,16 @@ int main() {
 				}
 			}
 			if (get_notes_finish() == true && ndspChnIsPlaying(CHANNEL) == false) {
-				scene_state = ResultGame;
+				scene_state = SCENE_RESULT;
 				cnt = -1;
 			}
 			break;
 
-		case ResultGame:
+		case SCENE_RESULT:
 
 			if (key & KEY_START) {
 				cnt = -1;
-				scene_state = SelectSong;
+				scene_state = SCENE_SELECTSONG;
 			}
 			draw_gauge_result(sprites);
 			draw_result();
@@ -346,20 +346,20 @@ void load_sprites() {
 		C2D_SpriteFromSheet(&sprites[i], spriteSheet, i);
 		C2D_SpriteSetCenter(&sprites[i], 0.5f, 0.5f);
 	}
-	C2D_SpriteSetCenterRaw(&sprites[bAlloon], 13, 13);
-	C2D_SpriteSetCenterRaw(&sprites[bAlloon_1], 9, 12);
-	C2D_SpriteSetCenterRaw(&sprites[bAlloon_2], 9, 26);
-	C2D_SpriteSetCenterRaw(&sprites[bAlloon_3], 9, 31);
-	C2D_SpriteSetCenterRaw(&sprites[bAlloon_4], 9, 45);
-	C2D_SpriteSetCenterRaw(&sprites[bAlloon_5], 9, 51);
-	C2D_SpriteSetCenterRaw(&sprites[bAlloon_6], 9, 59);
-	for (int i = 0; i < 4; i++) C2D_SpriteSetPos(&sprites[eFfect_perfect + i], 93, 109);
+	C2D_SpriteSetCenterRaw(&sprites[SPRITE_BALLOON], 13, 13);
+	C2D_SpriteSetCenterRaw(&sprites[SPRITE_BALLOON_1], 9, 12);
+	C2D_SpriteSetCenterRaw(&sprites[SPRITE_BALLOON_2], 9, 26);
+	C2D_SpriteSetCenterRaw(&sprites[SPRITE_BALLOON_3], 9, 31);
+	C2D_SpriteSetCenterRaw(&sprites[SPRITE_BALLOON_4], 9, 45);
+	C2D_SpriteSetCenterRaw(&sprites[SPRITE_BALLOON_5], 9, 51);
+	C2D_SpriteSetCenterRaw(&sprites[SPRITE_BALLOON_6], 9, 59);
+	for (int i = 0; i < 4; i++) C2D_SpriteSetPos(&sprites[SPRITE_EFFECT_PERFECT + i], 93, 109);
 
-	C2D_SpriteSetPos(&sprites[eFfect_gogo], 110, 92);
+	C2D_SpriteSetPos(&sprites[SPRITE_EFFECT_GOGO], 110, 92);
 
-	C2D_SpriteSetPos(&sprites[tOp], TOP_WIDTH / 2, TOP_HEIGHT / 2);
-	C2D_SpriteSetPos(&sprites[bOttom], BOTTOM_WIDTH / 2, BOTTOM_HEIGHT / 2);
-	for (int i = 0; i < 5; i++)C2D_SpriteSetPos(&sprites[eMblem_easy + i], 31, 113);
+	C2D_SpriteSetPos(&sprites[SPRITE_TOP], TOP_WIDTH / 2, TOP_HEIGHT / 2);
+	C2D_SpriteSetPos(&sprites[SPRITE_BOTTOM], BOTTOM_WIDTH / 2, BOTTOM_HEIGHT / 2);
+	for (int i = 0; i < 5; i++)C2D_SpriteSetPos(&sprites[SPRITE_EMBLEM_EASY + i], 31, 113);
 }
 
 bool get_isPause() {

@@ -205,11 +205,11 @@ void load_tja_head(int course,LIST_T Song) {
 				if (buf[7] != '\n' && buf[7] != '\r') {
 					strlcpy(temp, buf + 7, strlen(buf) - 8);
 					if (strlen(temp) == 1) Current_Header.course = atoi(temp);		//数字表記
-					else if (strcmp(temp, "Easy") == 0 || strcmp(temp, "easy") == 0)   course = EASY;	//文字表記
-					else if (strcmp(temp, "Normal") == 0 || strcmp(temp, "normal") == 0) course = NORMAL;
-					else if (strcmp(temp, "Hard") == 0 || strcmp(temp, "hard") == 0)   course = HARD;
-					else if (strcmp(temp, "Oni") == 0 || strcmp(temp, "oni") == 0)    course = ONI;
-					else if (strcmp(temp, "Edit") == 0 || strcmp(temp, "edit") == 0)   course = EDIT;
+					else if (strcmp(temp, "Easy") == 0 || strcmp(temp, "easy") == 0)   course = COURSE_EASY;	//文字表記
+					else if (strcmp(temp, "Normal") == 0 || strcmp(temp, "normal") == 0) course = COURSE_NORMAL;
+					else if (strcmp(temp, "Hard") == 0 || strcmp(temp, "hard") == 0)   course = COURSE_HARD;
+					else if (strcmp(temp, "Oni") == 0 || strcmp(temp, "oni") == 0)    course = COURSE_ONI;
+					else if (strcmp(temp, "Edit") == 0 || strcmp(temp, "edit") == 0)   course = COURSE_EDIT;
 
 					if (Current_Header.course == course) {
 						isCourseMatch = true;
@@ -283,7 +283,7 @@ void load_tja_head_simple(LIST_T *List) {		//選曲用のヘッダ取得
 
 	FILE *fp;
 	char buf[128],*temp = NULL;;
-	int course = ONI,cnt = 0;
+	int course = COURSE_ONI,cnt = 0;
 
 	chdir(List->path);
 
@@ -319,11 +319,11 @@ void load_tja_head_simple(LIST_T *List) {		//選曲用のヘッダ取得
 				if (buf[7] != '\n' && buf[7] != '\r') {
 					strlcpy(temp, buf + 7, strlen(buf) - 8);
 					if (strlen(temp) == 1) course = atoi(temp);			//数字表記
-					else if (strcmp(temp, "Easy") == 0 || strcmp(temp, "easy") == 0)   course = EASY;	//文字表記
-					else if (strcmp(temp, "Normal") == 0 || strcmp(temp, "normal") == 0) course = NORMAL;
-					else if (strcmp(temp, "Hard") == 0 || strcmp(temp, "hard") == 0)   course = HARD;
-					else if (strcmp(temp, "Oni") == 0 || strcmp(temp, "oni") == 0)    course = ONI;
-					else if (strcmp(temp, "Edit") == 0 || strcmp(temp, "edit") == 0)   course = EDIT;
+					else if (strcmp(temp, "Easy") == 0 || strcmp(temp, "easy") == 0)   course = COURSE_EASY;	//文字表記
+					else if (strcmp(temp, "Normal") == 0 || strcmp(temp, "normal") == 0) course = COURSE_NORMAL;
+					else if (strcmp(temp, "Hard") == 0 || strcmp(temp, "hard") == 0)   course = COURSE_HARD;
+					else if (strcmp(temp, "Oni") == 0 || strcmp(temp, "oni") == 0)    course = COURSE_ONI;
+					else if (strcmp(temp, "Edit") == 0 || strcmp(temp, "edit") == 0)   course = COURSE_EDIT;
 
 
 					List->course[course] = true;
@@ -415,11 +415,11 @@ void load_tja_notes(int course, LIST_T Song) {
 
 				strlcpy(temp, tja_notes[tja_cnt] + 7, strlen(tja_notes[tja_cnt]) - 8);
 				if (strlen(temp) == 1) CurrentCourse = atoi(temp);		//数字表記
-				else if (strcmp(temp, "Easy") ==   0 || strcmp(temp, "easy") == 0)   CurrentCourse = EASY;	//文字表記
-				else if (strcmp(temp, "Normal") == 0 || strcmp(temp, "normal") == 0) CurrentCourse = NORMAL;
-				else if (strcmp(temp, "Hard") ==   0 || strcmp(temp, "hard") == 0)   CurrentCourse = HARD;
-				else if (strcmp(temp, "Oni") ==    0 || strcmp(temp, "oni") == 0)    CurrentCourse = ONI;
-				else if (strcmp(temp, "Edit") ==   0 || strcmp(temp, "edit") == 0)   CurrentCourse = EDIT;
+				else if (strcmp(temp, "Easy") ==   0 || strcmp(temp, "easy") == 0)   CurrentCourse = COURSE_EASY;	//文字表記
+				else if (strcmp(temp, "Normal") == 0 || strcmp(temp, "normal") == 0) CurrentCourse = COURSE_NORMAL;
+				else if (strcmp(temp, "Hard") ==   0 || strcmp(temp, "hard") == 0)   CurrentCourse = COURSE_HARD;
+				else if (strcmp(temp, "Oni") ==    0 || strcmp(temp, "oni") == 0)    CurrentCourse = COURSE_ONI;
+				else if (strcmp(temp, "Edit") ==   0 || strcmp(temp, "edit") == 0)   CurrentCourse = COURSE_EDIT;
 
 				free(temp);
 
@@ -461,43 +461,43 @@ void load_tja_notes(int course, LIST_T Song) {
 					get_command_value(tja_notes[tja_cnt], &Command);
 					Measure[MeasureCount].command = Command.knd;
 					switch (Command.knd) {
-					case BPmchange:
+					case COMMAND_BPMCHANGE:
 						NextBpm = Command.val[0];
 						break;
-					case MEasure:
+					case COMMAND_MEASURE:
 						NextMeasure = Command.val[0];
 						break;
-					case SCroll:
+					case COMMAND_SCROLL:
 						scroll = Command.val[0];
 						break;
-					case DElay:
+					case COMMAND_DELAY:
 						delay = Command.val[0];
 						break;
-					case BArlineon:
+					case COMMAND_BARLINEON:
 						isDispBarLine = true;
 						break;
-					case BArlineoff:
+					case COMMAND_BARLINEOFF:
 						isDispBarLine = false;
 						break;
-					case N:
-						BranchCourse = N;
+					case COMMAND_N:
+						BranchCourse = COMMAND_N;
 						break;
-					case E:
-						BranchCourse = E;
+					case COMMAND_E:
+						BranchCourse = COMMAND_E;
 						break;
-					case M:
-						BranchCourse = M;
+					case COMMAND_M:
+						BranchCourse = COMMAND_M;
 						break;
-					case BRanchstart:
+					case COMMAND_BRANCHSTART:
 						isBranch = true;
 						break;
-					case BRanchend:
+					case COMMAND_BRANCHEND:
 						BranchCourse = -1;
 						break;
-					case SEction:
-						Measure[MeasureCount].command = SEction;
+					case COMMAND_SECTION:
+						Measure[MeasureCount].command = COMMAND_SECTION;
 						break;
-					case ENd:
+					case COMMAND_END:
 						isEnd = true;
 						break;
 					default:
@@ -539,7 +539,7 @@ void load_tja_notes(int course, LIST_T Song) {
 						//Measure[MeasureCount].isDispBarLine = false;
 					}
 					switch (Command.knd) {
-					case BRanchstart:
+					case COMMAND_BRANCHSTART:
 						BeforeBranchJudgeTime = Measure[MeasureCount].judge_time;
 						BeforeBranchCreateTime = Measure[MeasureCount].create_time;
 						BeforeBranchBpm = bpm;
@@ -548,9 +548,9 @@ void load_tja_notes(int course, LIST_T Song) {
 						BeforeBranchPreJudge = PreJudge;
 						BeforeBranchScroll = scroll;
 						break;
-					case N:
-					case E:
-					case M:
+					case COMMAND_N:
+					case COMMAND_E:
+					case COMMAND_M:
 						bpm = BeforeBranchBpm;
 						measure = BeforeBranchMeasure;
 						delay = BeforeBranchDelay;
@@ -613,7 +613,7 @@ void load_tja_notes(int course, LIST_T Song) {
 
 		for (int i = 0; i < MeasureMaxNumber; i++) {	//次の小節の判定時に発動する命令の調整
 
-			if (Measure[i].command == SEction) {
+			if (Measure[i].command == COMMAND_SECTION) {
 				int n = i + 1;
 				while (n <= MeasureMaxNumber && tja_notes[n][0] == '#') n++;
 				Measure[i].judge_time = Measure[n].judge_time;
@@ -698,17 +698,17 @@ void get_command_value(char* buf, COMMAND_T *Command) {
 		Command->val[1] = 0;
 		Command->val[2] = 0;
 
-		if (strcmp(command, "START") == 0) Command->knd = STart;
-		else if (strcmp(command, "END") == 0) Command->knd = ENd;
+		if (strcmp(command, "START") == 0) Command->knd = COMMAND_START;
+		else if (strcmp(command, "END") == 0) Command->knd = COMMAND_END;
 		else if (strcmp(command, "BPMCHANGE") == 0) {
-			Command->knd = BPmchange;
+			Command->knd = COMMAND_BPMCHANGE;
 			Command->val[0] = strtod(value, NULL);
 		}
-		else if (strcmp(command, "GOGOSTART") == 0) Command->knd = GOgostart;
-		else if (strcmp(command, "GOGOEND") == 0) Command->knd = GOgoend;
+		else if (strcmp(command, "GOGOSTART") == 0) Command->knd = COMMAND_GOGOSTART;
+		else if (strcmp(command, "GOGOEND") == 0) Command->knd = COMMAND_GOGOEND;
 
 		else if (strcmp(command, "MEASURE") == 0) {
-			Command->knd = MEasure;
+			Command->knd = COMMAND_MEASURE;
 			if (strstr(value, "/") != NULL) {
 
 				int srash = strstr(value, "/") - value;
@@ -726,16 +726,16 @@ void get_command_value(char* buf, COMMAND_T *Command) {
 			}
 		}
 		else if (strcmp(command, "SCROLL") == 0) {
-			Command->knd = SCroll;
+			Command->knd = COMMAND_SCROLL;
 			Command->val[0] = strtod(value, NULL);
 		}
 		else if (strcmp(command, "DELAY") == 0) {
-			Command->knd = DElay;
+			Command->knd = COMMAND_DELAY;
 			Command->val[0] = strtod(value, NULL);
 		}
-		else if (strcmp(command, "SECTION") == 0) Command->knd = SEction;
+		else if (strcmp(command, "SECTION") == 0) Command->knd = COMMAND_SECTION;
 		else if (strcmp(command, "BRANCHSTART") == 0) {
-			Command->knd = BRanchstart;
+			Command->knd = COMMAND_BRANCHSTART;
 			char* tp;
 			tp = strtok(value, ",");
 			switch (value[1]) {
@@ -750,15 +750,15 @@ void get_command_value(char* buf, COMMAND_T *Command) {
 				i++;
 			}
 		}
-		else if (strcmp(command, "BRANCHEND") == 0) Command->knd = BRanchend;
-		else if (strcmp(command, "N") == 0) Command->knd = N;
-		else if (strcmp(command, "E") == 0) Command->knd = E;
-		else if (strcmp(command, "M") == 0) Command->knd = M;
-		else if (strcmp(command, "LEVELHOLD") == 0) Command->knd = LEvelhold;
-		else if (strcmp(command, "BMSCROLl") == 0) Command->knd = BMscroll;
-		else if (strcmp(command, "HBSCROLL") == 0) Command->knd = HBscroll;
-		else if (strcmp(command, "BARLINEOFF") == 0) Command->knd = BArlineoff;
-		else if (strcmp(command, "BARLINEON") == 0) Command->knd = BArlineon;
+		else if (strcmp(command, "BRANCHEND") == 0) Command->knd = COMMAND_BRANCHEND;
+		else if (strcmp(command, "N") == 0) Command->knd = COMMAND_N;
+		else if (strcmp(command, "E") == 0) Command->knd = COMMAND_E;
+		else if (strcmp(command, "M") == 0) Command->knd = COMMAND_M;
+		else if (strcmp(command, "LEVELHOLD") == 0) Command->knd = COMMAND_LEVELHOLD;
+		else if (strcmp(command, "BMSCROLl") == 0) Command->knd = COMMAND_BMSCROLL;
+		else if (strcmp(command, "HBSCROLL") == 0) Command->knd = COMMAND_HBSCROLL;
+		else if (strcmp(command, "BARLINEOFF") == 0) Command->knd = COMMAND_BARLINEOFF;
+		else if (strcmp(command, "BARLINEON") == 0) Command->knd = COMMAND_BARLINEON;
 		else Command->knd = -1;
 
 		free(command);

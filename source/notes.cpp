@@ -74,10 +74,10 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 					Command.notes = tja_notes[Measure[MeasureCount].notes];
 
 					switch (Command.knd) {
-					case ENd:
+					case COMMAND_END:
 						isNotesLoad = false;
 						break;
-					case BRanchstart:
+					case COMMAND_BRANCHSTART:
 
 						if (isLevelHold == false) {
 
@@ -87,7 +87,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 							Branch.wait = true;
 						}
 						break;
-					case BRanchend:
+					case COMMAND_BRANCHEND:
 						Branch.course = -1;
 						break;
 					default:
@@ -136,29 +136,29 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 					int knd = ctoi(tja_notes[Measure[MeasureCount].notes][i]);
 
-					if ((knd == Roll || knd == BigRoll) && (PreNotesKnd == Roll || PreNotesKnd == BigRoll )) {	//55558のような表記に対応
+					if ((knd == NOTES_ROLL || knd == NOTES_BIGROLL) && (PreNotesKnd == NOTES_ROLL || PreNotesKnd == NOTES_BIGROLL )) {	//55558のような表記に対応
 						
 						continue;
 					}
 
-					if (knd == Potato) knd = Don;	//イモ連打はドンに置換
+					if (knd == NOTES_POTATO) knd = NOTES_DON;	//イモ連打はドンに置換
 
 					if (Option.random > 0) {		//ランダム(きまぐれ,でたらめ)
 						if (rand() % 100 < Option.random * 100) {
 							switch (knd) {
-							case Don: knd = Katsu; break;
-							case Katsu: knd = Don; break;
-							case BigDon: knd = BigKatsu; break;
-							case BigKatsu: knd = BigDon; break;
+							case NOTES_DON: knd = NOTES_KATSU; break;
+							case NOTES_KATSU: knd = NOTES_DON; break;
+							case NOTES_BIGDON: knd = NOTES_BIGKATSU; break;
+							case NOTES_BIGKATSU: knd = NOTES_BIGDON; break;
 							}
 						}
 					}
 					if (Option.isSwap == true) {	//あべこべ
 						switch (knd) {
-						case Don: knd = Katsu; break;
-						case Katsu: knd = Don; break;
-						case BigDon: knd = BigKatsu; break;
-						case BigKatsu: knd = BigDon; break;
+						case NOTES_DON: knd = NOTES_KATSU; break;
+						case NOTES_KATSU: knd = NOTES_DON; break;
+						case NOTES_BIGDON: knd = NOTES_BIGKATSU; break;
+						case NOTES_BIGKATSU: knd = NOTES_BIGDON; break;
 						}
 					}
 
@@ -182,8 +182,8 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 					switch (Notes[id].knd) {
 
-					case Roll:
-						RollState = Roll;
+					case NOTES_ROLL:
+						RollState = NOTES_ROLL;
 						roll_id = make_roll_start(id);
 						if (roll_id != -1) {
 							Notes[id].roll_id = roll_id;
@@ -193,8 +193,8 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 						}
 						break;
 
-					case BigRoll:
-						RollState = BigRoll;
+					case NOTES_BIGROLL:
+						RollState = NOTES_BIGROLL;
 						roll_id = make_roll_start(id);
 						if (roll_id != -1) {
 							Notes[id].roll_id = roll_id;
@@ -204,8 +204,8 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 						}
 						break;
 
-					case Balloon:
-						RollState = Balloon;
+					case NOTES_BALLOON:
+						RollState = NOTES_BALLOON;
 						roll_id = make_balloon_start(id);
 						if (roll_id != -1) {
 							Notes[id].roll_id = roll_id;
@@ -215,14 +215,14 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 						}
 						break;
 
-					case RollEnd:
+					case NOTES_ROLLEND:
 
 						switch (RollState) {
-						case Roll:
+						case NOTES_ROLL:
 							roll_id = make_roll_end(id);
 							if (roll_id != -1) {
 								Notes[id].roll_id = roll_id;
-								Notes[id].knd = RollEnd;
+								Notes[id].knd = NOTES_ROLLEND;
 								RollState = 0;
 							}
 							else {
@@ -230,11 +230,11 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 							}
 							break;
 
-						case BigRoll:
+						case NOTES_BIGROLL:
 							roll_id = make_roll_end(id);
 							if (roll_id != -1) {
 								Notes[id].roll_id = roll_id;
-								Notes[id].knd = BigRollEnd;
+								Notes[id].knd = NOTES_BIGROLLEND;
 								RollState = 0;
 							}
 							else {
@@ -242,11 +242,11 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 							}
 							break;
 
-						case Balloon:
+						case NOTES_BALLOON:
 							roll_id = make_balloon_end(id);
 							if (roll_id != -1) {
 								Notes[id].roll_id = roll_id;
-								Notes[id].knd = BalloonEnd;
+								Notes[id].knd = NOTES_BALLOONEND;
 							}
 							else {
 								delete_notes(id);
@@ -308,16 +308,16 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 			if (Measure[i].command != -1 && Measure[i].judge_time <= CurrentTime) {
 
 				switch (Measure[i].command) {
-				case GOgostart:
+				case COMMAND_GOGOSTART:
 					isGOGOTime = true;
 					break;
-				case GOgoend:
+				case COMMAND_GOGOEND:
 					isGOGOTime = false;
 					break;
-				case SEction:
+				case COMMAND_SECTION:
 					init_branch_section();
 					break;
-				case BRanchstart:
+				case COMMAND_BRANCHSTART:
 
 					if (isLevelHold == false && (Branch.knd != 0 || JudgeRollState == -1) ) {	//連打分岐の時は連打が無くなってから分岐
 
@@ -327,7 +327,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 					}
 					else NotFalse = true;
 					break;
-				case LEvelhold:
+				case COMMAND_LEVELHOLD:
 					isLevelHold = true;
 					break;
 				default:
@@ -406,32 +406,32 @@ void draw_judge(double CurrentTime, C2D_Sprite sprites[Sprite_Number]) {
 		switch (JudgeDispknd) {
 
 		case PERFECT:			//良
-			C2D_DrawSpriteTinted(&sprites[eFfect_perfect], &Tint);
-			C2D_SpriteSetPos(&sprites[jUdge_perfect], 93, JudgeY);
-			C2D_DrawSprite(&sprites[jUdge_perfect]);
+			C2D_DrawSpriteTinted(&sprites[SPRITE_EFFECT_PERFECT], &Tint);
+			C2D_SpriteSetPos(&sprites[SPRITE_JUDGE_PERFECT], 93, JudgeY);
+			C2D_DrawSprite(&sprites[SPRITE_JUDGE_PERFECT]);
 			break;
 
 		case SPECIAL_PERFECT:	//特良
-			C2D_DrawSpriteTinted(&sprites[eFfect_special_perfect], &Tint);
-			C2D_SpriteSetPos(&sprites[jUdge_perfect], 93, JudgeY);
-			C2D_DrawSprite(&sprites[jUdge_perfect]);
+			C2D_DrawSpriteTinted(&sprites[SPRITE_EFFECT_SPECIAL_PERFECT], &Tint);
+			C2D_SpriteSetPos(&sprites[SPRITE_JUDGE_PERFECT], 93, JudgeY);
+			C2D_DrawSprite(&sprites[SPRITE_JUDGE_PERFECT]);
 			break;
 
 		case NICE:				//可
-			C2D_DrawSpriteTinted(&sprites[eFfect_nice], &Tint);
-			C2D_SpriteSetPos(&sprites[jUdge_nice], 93, JudgeY);
-			C2D_DrawSprite(&sprites[jUdge_nice]);
+			C2D_DrawSpriteTinted(&sprites[SPRITE_EFFECT_NICE], &Tint);
+			C2D_SpriteSetPos(&sprites[SPRITE_JUDGE_NICE], 93, JudgeY);
+			C2D_DrawSprite(&sprites[SPRITE_JUDGE_NICE]);
 			break;
 
 		case SPECIAL_NICE:		//特可
-			C2D_DrawSpriteTinted(&sprites[eFfect_special_nice], &Tint);
-			C2D_SpriteSetPos(&sprites[jUdge_nice], 93, JudgeY);
-			C2D_DrawSprite(&sprites[jUdge_nice]);
+			C2D_DrawSpriteTinted(&sprites[SPRITE_EFFECT_SPECIAL_NICE], &Tint);
+			C2D_SpriteSetPos(&sprites[SPRITE_JUDGE_NICE], 93, JudgeY);
+			C2D_DrawSprite(&sprites[SPRITE_JUDGE_NICE]);
 			break;
 
 		case BAD:				//不可
-			C2D_SpriteSetPos(&sprites[jUdge_bad], 92, JudgeY);
-			C2D_DrawSprite(&sprites[jUdge_bad]);
+			C2D_SpriteSetPos(&sprites[SPRITE_JUDGE_BAD], 92, JudgeY);
+			C2D_DrawSprite(&sprites[SPRITE_JUDGE_BAD]);
 			break;
 
 		}
@@ -475,9 +475,9 @@ void notes_judge(double CurrentTime, bool isDon, bool isKatsu, int cnt) {
 
 		if (Notes[i].flag == true) {
 
-			if (Notes[i].knd == Don ||
-				Notes[i].knd == BigDon ||
-				Notes[i].knd == Potato) {	//ドン
+			if (Notes[i].knd == NOTES_DON ||
+				Notes[i].knd == NOTES_BIGDON ||
+				Notes[i].knd == NOTES_POTATO) {	//ドン
 
 				if (CurrentJudgeNotesLag[0] > fabs(Notes[i].judge_time - CurrentTime) ||
 					CurrentJudgeNotesLag[0] == -1) {
@@ -487,8 +487,8 @@ void notes_judge(double CurrentTime, bool isDon, bool isKatsu, int cnt) {
 				}
 			}
 			else if (
-				Notes[i].knd == Katsu ||
-				Notes[i].knd == BigKatsu) {	//カツ
+				Notes[i].knd == NOTES_KATSU ||
+				Notes[i].knd == NOTES_BIGKATSU) {	//カツ
 
 				if (CurrentJudgeNotesLag[1] > fabs(Notes[i].judge_time - CurrentTime) ||
 					CurrentJudgeNotesLag[1] == -1) {
@@ -505,30 +505,30 @@ void notes_judge(double CurrentTime, bool isDon, bool isKatsu, int cnt) {
 		for (int i = 0; i < Notes_Max - 1; i++) {
 
 			if (Notes[i].flag == true && Notes[i].judge_time <= CurrentTime &&
-				(Notes[i].knd != Roll && Notes[i].knd != BigRoll && Notes[i].knd != BigRollEnd &&
-					Notes[i].knd != RollEnd && Notes[i].knd != Balloon && Notes[i].knd != BalloonEnd)) {
+				(Notes[i].knd != NOTES_ROLL && Notes[i].knd != NOTES_BIGROLL && Notes[i].knd != NOTES_BIGROLLEND &&
+					Notes[i].knd != NOTES_ROLLEND && Notes[i].knd != NOTES_BALLOON && Notes[i].knd != NOTES_BALLOONEND)) {
 
-				if (Notes[i].knd == Don ||
-					Notes[i].knd == Potato) {
+				if (Notes[i].knd == NOTES_DON ||
+					Notes[i].knd == NOTES_POTATO) {
 
 					music_play(0);
 					make_judge(PERFECT, CurrentTime);
 				}
-				else if (Notes[i].knd == BigDon) {
+				else if (Notes[i].knd == NOTES_BIGDON) {
 					music_play(0);
 					make_judge(SPECIAL_PERFECT, CurrentTime);
 				}
-				else if (Notes[i].knd == Katsu) {
+				else if (Notes[i].knd == NOTES_KATSU) {
 					music_play(1);
 					make_judge(PERFECT, CurrentTime);
 				}
-				else if (Notes[i].knd == BigKatsu) {
+				else if (Notes[i].knd == NOTES_BIGKATSU) {
 					music_play(1);
 					make_judge(SPECIAL_PERFECT, CurrentTime);
 				}
 
-				if (Notes[i].knd == BigDon || Notes[i].knd == BigKatsu) score_update(SPECIAL_PERFECT);
-				else if (Notes[i].knd == Don || Notes[i].knd == Katsu) score_update(PERFECT);
+				if (Notes[i].knd == NOTES_BIGDON || Notes[i].knd == NOTES_BIGKATSU) score_update(SPECIAL_PERFECT);
+				else if (Notes[i].knd == NOTES_DON || Notes[i].knd == NOTES_KATSU) score_update(PERFECT);
 
 				delete_notes(i);
 			}
@@ -538,8 +538,8 @@ void notes_judge(double CurrentTime, bool isDon, bool isKatsu, int cnt) {
 
 			if (cnt % AUTO_ROLL_FRAME == 0) {
 
-				if (JudgeRollState == Roll) score_update(ROLL);
-				else if (JudgeRollState == BigRoll) score_update(BIG_ROLL);
+				if (JudgeRollState == NOTES_ROLL) score_update(ROLL);
+				else if (JudgeRollState == NOTES_BIGROLL) score_update(BIG_ROLL);
 
 				music_play(0);
 			}
@@ -565,7 +565,7 @@ void notes_judge(double CurrentTime, bool isDon, bool isKatsu, int cnt) {
 	else if (Option.isAuto == false) {			//手動
 
 		bool isBig;
-		if (Notes[CurrentJudgeNotes[0]].knd == BigDon || Notes[CurrentJudgeNotes[0]].knd == BigKatsu) isBig = true;
+		if (Notes[CurrentJudgeNotes[0]].knd == NOTES_BIGDON || Notes[CurrentJudgeNotes[0]].knd == NOTES_BIGKATSU) isBig = true;
 		else isBig = false;
 
 		if (isDon == true && CurrentJudgeNotes[0] != -1) {	//ドン
@@ -635,12 +635,12 @@ void notes_judge(double CurrentTime, bool isDon, bool isKatsu, int cnt) {
 		if (JudgeRollState != -1) {	//連打
 
 			if (isDon == true) {
-				if (JudgeRollState == Roll) score_update(ROLL);
-				else if (JudgeRollState == BigRoll) score_update(BIG_ROLL);
+				if (JudgeRollState == NOTES_ROLL) score_update(ROLL);
+				else if (JudgeRollState == NOTES_BIGROLL) score_update(BIG_ROLL);
 			}
 			if (isKatsu == true) {
-				if (JudgeRollState == Roll) score_update(ROLL);
-				else if (JudgeRollState == BigRoll) score_update(BIG_ROLL);
+				if (JudgeRollState == NOTES_ROLL) score_update(ROLL);
+				else if (JudgeRollState == NOTES_BIGROLL) score_update(BIG_ROLL);
 			}
 		}
 
@@ -679,42 +679,42 @@ void notes_calc(bool isDon, bool isKatsu, double bpm, double CurrentTime, int cn
 
 			switch (Notes[i].knd) {
 
-			case Roll:
+			case NOTES_ROLL:
 				if (Notes[i].roll_id != -1 && RollNotes[Notes[i].roll_id].flag == true) {
 					RollNotes[Notes[i].roll_id].start_x = Notes[i].x;
 					RollNotes[Notes[i].roll_id].start_id = i;
 				}
 				break;
 
-			case RollEnd:
+			case NOTES_ROLLEND:
 				if (Notes[i].roll_id != -1 && RollNotes[Notes[i].roll_id].flag == true) {
 					RollNotes[Notes[i].roll_id].end_x = Notes[i].x;
 					RollNotes[Notes[i].roll_id].end_id = i;
 				}
 				break;
 
-			case BigRoll:
+			case NOTES_BIGROLL:
 				if (Notes[i].roll_id != -1 && RollNotes[Notes[i].roll_id].flag == true) {
 					RollNotes[Notes[i].roll_id].start_x = Notes[i].x;
 					RollNotes[Notes[i].roll_id].start_id = i;
 				}
 				break;
 
-			case BigRollEnd:
+			case NOTES_BIGROLLEND:
 				if (Notes[i].roll_id != -1 && RollNotes[Notes[i].roll_id].flag == true) {
 					RollNotes[Notes[i].roll_id].end_x = Notes[i].x;
 					RollNotes[Notes[i].roll_id].end_id = i;
 				}
 				break;
 
-			case Balloon:
+			case NOTES_BALLOON:
 				if (Notes[i].x <= Notes_Judge) Notes[i].x = Notes_Judge;
 				if (Notes[i].roll_id != -1) {
 					BalloonNotes[Notes[i].roll_id].start_id = i;
 				}
 				break;
 
-			case BalloonEnd:
+			case NOTES_BALLOONEND:
 				if (Notes[i].roll_id != -1) {
 					BalloonNotes[Notes[i].roll_id].end_id = i;
 				}
@@ -723,10 +723,10 @@ void notes_calc(bool isDon, bool isKatsu, double bpm, double CurrentTime, int cn
 				}
 				break;
 
-			case Don:
-			case Katsu:
-			case BigDon:
-			case BigKatsu:
+			case NOTES_DON:
+			case NOTES_KATSU:
+			case NOTES_BIGDON:
+			case NOTES_BIGKATSU:
 				if (CurrentTime - Notes[i].judge_time > 0.150 && Notes[i].isThrough == false) {
 					score_update(THROUGH);
 					Notes[i].isThrough = true;
@@ -743,10 +743,10 @@ void notes_calc(bool isDon, bool isKatsu, double bpm, double CurrentTime, int cn
 
 		if (Notes[i].flag == true &&
 			Notes[i].x <= 20 &&
-			Notes[i].knd != Roll && Notes[i].knd != BigRoll) {
+			Notes[i].knd != NOTES_ROLL && Notes[i].knd != NOTES_BIGROLL) {
 
 			if (Notes[i].isThrough == false && 
-				(Notes[i].knd == Don || Notes[i].knd == Katsu || Notes[i].knd == BigDon || Notes[i].knd == BigKatsu)) {
+				(Notes[i].knd == NOTES_DON || Notes[i].knd == NOTES_KATSU || Notes[i].knd == NOTES_BIGDON || Notes[i].knd == NOTES_BIGKATSU)) {
 				score_update(THROUGH);
 				Notes[i].isThrough = true;
 			}
@@ -766,23 +766,23 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 		if (Notes[i].flag == true) {
 
 			switch (Notes[i].knd) {
-			case Don:
-				C2D_SpriteSetPos(&sprites[dOn], Notes[i].x, notes_y);
-				C2D_DrawSprite(&sprites[dOn]);
+			case NOTES_DON:
+				C2D_SpriteSetPos(&sprites[SPRITE_DON], Notes[i].x, notes_y);
+				C2D_DrawSprite(&sprites[SPRITE_DON]);
 				break;
-			case Katsu:
-				C2D_SpriteSetPos(&sprites[kAtsu], Notes[i].x, notes_y);
-				C2D_DrawSprite(&sprites[kAtsu]);
+			case NOTES_KATSU:
+				C2D_SpriteSetPos(&sprites[SPRITE_KATSU], Notes[i].x, notes_y);
+				C2D_DrawSprite(&sprites[SPRITE_KATSU]);
 				break;
-			case BigDon:
-				C2D_SpriteSetPos(&sprites[bIg_don], Notes[i].x, notes_y);
-				C2D_DrawSprite(&sprites[bIg_don]);
+			case NOTES_BIGDON:
+				C2D_SpriteSetPos(&sprites[SPRITE_BIG_DON], Notes[i].x, notes_y);
+				C2D_DrawSprite(&sprites[SPRITE_BIG_DON]);
 				break;
-			case BigKatsu:
-				C2D_SpriteSetPos(&sprites[bIg_katsu], Notes[i].x, notes_y);
-				C2D_DrawSprite(&sprites[bIg_katsu]);
+			case NOTES_BIGKATSU:
+				C2D_SpriteSetPos(&sprites[SPRITE_BIG_KATSU], Notes[i].x, notes_y);
+				C2D_DrawSprite(&sprites[SPRITE_BIG_KATSU]);
 				break;
-			case Roll: {
+			case NOTES_ROLL: {
 
 				if (RollNotes[Notes[i].roll_id].flag == true) {
 
@@ -791,15 +791,15 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 					else end_x = RollNotes[Notes[i].roll_id].end_x;
 
 					for (int n = 0; n < (end_x - RollNotes[Notes[i].roll_id].start_x) / 9.0; n++) {
-						C2D_SpriteSetPos(&sprites[rOll_int], Notes[i].x + 9 * n, notes_y);
-						C2D_DrawSprite(&sprites[rOll_int]);
+						C2D_SpriteSetPos(&sprites[SPRITE_ROLL_INT], Notes[i].x + 9 * n, notes_y);
+						C2D_DrawSprite(&sprites[SPRITE_ROLL_INT]);
 					}
-					C2D_SpriteSetPos(&sprites[rOll_start], Notes[i].x, notes_y);
-					C2D_DrawSprite(&sprites[rOll_start]);
+					C2D_SpriteSetPos(&sprites[SPRITE_ROLL_START], Notes[i].x, notes_y);
+					C2D_DrawSprite(&sprites[SPRITE_ROLL_START]);
 				}
 				break;
 			}
-			case BigRoll: {
+			case NOTES_BIGROLL: {
 
 				if (RollNotes[Notes[i].roll_id].flag == true) {
 
@@ -808,46 +808,46 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 					else end_x = RollNotes[Notes[i].roll_id].end_x;
 
 					for (int n = 0; n < (end_x - RollNotes[Notes[i].roll_id].start_x) / 9.0; n++) {
-						C2D_SpriteSetPos(&sprites[bIg_roll_int], Notes[i].x + 9 * n, notes_y);
-						C2D_DrawSprite(&sprites[bIg_roll_int]);
+						C2D_SpriteSetPos(&sprites[SPRITE_BIG_ROLL_INT], Notes[i].x + 9 * n, notes_y);
+						C2D_DrawSprite(&sprites[SPRITE_BIG_ROLL_INT]);
 					}
 
-					C2D_SpriteSetPos(&sprites[bIg_roll_start], Notes[i].x, notes_y);
-					C2D_DrawSprite(&sprites[bIg_roll_start]);
+					C2D_SpriteSetPos(&sprites[SPRITE_BIG_ROLL_START], Notes[i].x, notes_y);
+					C2D_DrawSprite(&sprites[SPRITE_BIG_ROLL_START]);
 					break;
 				}
 			}
-			case Balloon:
+			case NOTES_BALLOON:
 
 				if (BalloonNotes[Notes[i].roll_id].current_hit == 0) {
 
-					C2D_SpriteSetPos(&sprites[bAlloon], Notes[i].x, notes_y);
-					C2D_DrawSprite(&sprites[bAlloon]);
+					C2D_SpriteSetPos(&sprites[SPRITE_BALLOON], Notes[i].x, notes_y);
+					C2D_DrawSprite(&sprites[SPRITE_BALLOON]);
 				}
 				else if (BalloonNotes[Notes[i].roll_id].current_hit <= BalloonNotes[Notes[i].roll_id].need_hit * 1 / 5) {
 
-					C2D_SpriteSetPos(&sprites[bAlloon_1], Notes[i].x, notes_y);
-					C2D_DrawSprite(&sprites[bAlloon_1]);
+					C2D_SpriteSetPos(&sprites[SPRITE_BALLOON_1], Notes[i].x, notes_y);
+					C2D_DrawSprite(&sprites[SPRITE_BALLOON_1]);
 				}
 				else if (BalloonNotes[Notes[i].roll_id].current_hit <= BalloonNotes[Notes[i].roll_id].need_hit * 2 / 5) {
 
-					C2D_SpriteSetPos(&sprites[bAlloon_2], Notes[i].x, notes_y);
-					C2D_DrawSprite(&sprites[bAlloon_2]);
+					C2D_SpriteSetPos(&sprites[SPRITE_BALLOON_2], Notes[i].x, notes_y);
+					C2D_DrawSprite(&sprites[SPRITE_BALLOON_2]);
 				}
 				else if (BalloonNotes[Notes[i].roll_id].current_hit <= BalloonNotes[Notes[i].roll_id].need_hit * 3 / 5) {
 
-					C2D_SpriteSetPos(&sprites[bAlloon_3], Notes[i].x, notes_y);
-					C2D_DrawSprite(&sprites[bAlloon_3]);
+					C2D_SpriteSetPos(&sprites[SPRITE_BALLOON_3], Notes[i].x, notes_y);
+					C2D_DrawSprite(&sprites[SPRITE_BALLOON_3]);
 				}
 				else if (BalloonNotes[Notes[i].roll_id].current_hit <= BalloonNotes[Notes[i].roll_id].need_hit * 4 / 5) {
 
-					C2D_SpriteSetPos(&sprites[bAlloon_4], Notes[i].x, notes_y);
-					C2D_DrawSprite(&sprites[bAlloon_4]);
+					C2D_SpriteSetPos(&sprites[SPRITE_BALLOON_4], Notes[i].x, notes_y);
+					C2D_DrawSprite(&sprites[SPRITE_BALLOON_4]);
 				}
 				else if (BalloonNotes[Notes[i].roll_id].current_hit <= BalloonNotes[Notes[i].roll_id].need_hit) {
 
-					C2D_SpriteSetPos(&sprites[bAlloon_5], Notes[i].x, notes_y);
-					C2D_DrawSprite(&sprites[bAlloon_5]);
+					C2D_SpriteSetPos(&sprites[SPRITE_BALLOON_5], Notes[i].x, notes_y);
+					C2D_DrawSprite(&sprites[SPRITE_BALLOON_5]);
 				}
 
 				if (BalloonNotes[Notes[i].roll_id].current_hit >= 1) balloon_count_update(BalloonNotes[Notes[i].roll_id].need_hit - BalloonNotes[Notes[i].roll_id].current_hit);
@@ -855,13 +855,13 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 				//snprintf(buf_notes, sizeof(buf_notes), "%d", BalloonNotes[Notes[i].roll_id].need_hit - BalloonNotes[Notes[i].roll_id].current_hit);
 				//draw_debug(Notes[i].x, 132, buf_notes);
 				break;
-			case RollEnd:
-				C2D_SpriteSetPos(&sprites[rOll_end], Notes[i].x, notes_y);
-				C2D_DrawSprite(&sprites[rOll_end]);
+			case NOTES_ROLLEND:
+				C2D_SpriteSetPos(&sprites[SPRITE_ROLL_END], Notes[i].x, notes_y);
+				C2D_DrawSprite(&sprites[SPRITE_ROLL_END]);
 				break;
-			case BigRollEnd:
-				C2D_SpriteSetPos(&sprites[bIg_roll_end], Notes[i].x, notes_y);
-				C2D_DrawSprite(&sprites[bIg_roll_end]);
+			case NOTES_BIGROLLEND:
+				C2D_SpriteSetPos(&sprites[SPRITE_BIG_ROLL_END], Notes[i].x, notes_y);
+				C2D_DrawSprite(&sprites[SPRITE_BIG_ROLL_END]);
 				break;
 			default:
 				break;
@@ -876,8 +876,8 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 		BalloonBreakCount--;
 		C2D_ImageTint Tint;
 		C2D_AlphaImageTint(&Tint, BalloonBreakCount / 40.0);
-		C2D_SpriteSetPos(&sprites[bAlloon_6], Notes_Judge, notes_y);
-		C2D_DrawSpriteTinted(&sprites[bAlloon_6], &Tint);
+		C2D_SpriteSetPos(&sprites[SPRITE_BALLOON_6], Notes_Judge, notes_y);
+		C2D_DrawSpriteTinted(&sprites[SPRITE_BALLOON_6], &Tint);
 	}
 	if (BalloonBreakCount <= 0) isBalloonBreakDisp = false;
 
@@ -1062,7 +1062,7 @@ void delete_notes(int i) {
 
 	if (i >= 0 &&
 		Notes[i].roll_id != -1 &&
-		(Notes[i].knd == RollEnd || Notes[i].knd == BigRollEnd) &&
+		(Notes[i].knd == NOTES_ROLLEND || Notes[i].knd == NOTES_BIGROLLEND) &&
 		RollNotes[Notes[i].roll_id].flag == true
 		) {	//連打削除
 
@@ -1076,13 +1076,13 @@ void delete_notes(int i) {
 		Notes[i].roll_id != -1 &&
 		BalloonNotes[Notes[i].roll_id].flag == true) {					//風船削除
 
-		if (Notes[i].knd == BalloonEnd) {
+		if (Notes[i].knd == NOTES_BALLOONEND) {
 
 			if (BalloonNotes[Notes[i].roll_id].start_id != -1) delete_notes(BalloonNotes[Notes[i].roll_id].start_id);
 			delete_balloon(Notes[i].roll_id);
 			balloon_count_update(0);
 		}
-		else if (Notes[i].knd == Balloon) {
+		else if (Notes[i].knd == NOTES_BALLOON) {
 
 			BalloonNotes[Notes[i].roll_id].start_id = -1;
 

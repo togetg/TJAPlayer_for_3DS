@@ -259,8 +259,8 @@ void draw_score(C2D_Sprite  sprites[Sprite_Number]) {
 
 		if (TotalScore / powi(10, i) > 0) {
 			int n = TotalScore / powi(10, i) % 10;
-			C2D_SpriteSetPos(&sprites[sCore_0 + n], 80 - i * 12, 70);
-			C2D_DrawSprite(&sprites[sCore_0 + n]);
+			C2D_SpriteSetPos(&sprites[SPRITE_SCORE_0 + n], 80 - i * 12, 70);
+			C2D_DrawSprite(&sprites[SPRITE_SCORE_0 + n]);
 		}
 	}
 
@@ -277,12 +277,12 @@ void draw_score(C2D_Sprite  sprites[Sprite_Number]) {
 			int n = combo / powi(10, i) % 10;
 
 			if (combo < 100) {
-				C2D_SpriteSetPos(&sprites[cOmbo_0 + n], 22 + j * 8 - i * 16, 110);
-				C2D_DrawSprite(&sprites[cOmbo_0 + n]);
+				C2D_SpriteSetPos(&sprites[SPRITE_COMBO_0 + n], 22 + j * 8 - i * 16, 110);
+				C2D_DrawSprite(&sprites[SPRITE_COMBO_0 + n]);
 			}
 			else {
-				C2D_SpriteSetPos(&sprites[cOmbo_0_red + n], 22 + j * 8 - i * 16, 110);
-				C2D_DrawSprite(&sprites[cOmbo_0_red + n]);
+				C2D_SpriteSetPos(&sprites[SPRITE_COMBO_0_RED + n], 22 + j * 8 - i * 16, 110);
+				C2D_DrawSprite(&sprites[SPRITE_COMBO_0_RED + n]);
 			}
 		}
 	}
@@ -292,16 +292,16 @@ void draw_score(C2D_Sprite  sprites[Sprite_Number]) {
 		if (CurrentRollCount / powi(10, j) == 0) break;
 	}
 	if (CurrentRollCount > 0) {
-		C2D_SpriteSetPos(&sprites[rOll_count], 110, 35);
-		C2D_DrawSprite(&sprites[rOll_count]);
+		C2D_SpriteSetPos(&sprites[SPRITE_ROLL_COUNT], 110, 35);
+		C2D_DrawSprite(&sprites[SPRITE_ROLL_COUNT]);
 	}
 	for (int i = 0; i < 4; i++) {
 
 		if (CurrentRollCount / powi(10, i) > 0) {
 
 			int n = CurrentRollCount / powi(10, i) % 10;
-			C2D_SpriteSetPos(&sprites[rOll_0 + n], 95 + j * 10 - i * 20, 30);
-			C2D_DrawSprite(&sprites[rOll_0 + n]);
+			C2D_SpriteSetPos(&sprites[SPRITE_ROLL_0 + n], 95 + j * 10 - i * 20, 30);
+			C2D_DrawSprite(&sprites[SPRITE_ROLL_0 + n]);
 		}
 	}
 
@@ -310,16 +310,16 @@ void draw_score(C2D_Sprite  sprites[Sprite_Number]) {
 		if (CurrentBalloonCount / powi(10, j) == 0) break;
 	}
 	if (CurrentBalloonCount > 0) {
-		C2D_SpriteSetPos(&sprites[bAlloon_count], 110, 35);
-		C2D_DrawSprite(&sprites[bAlloon_count]);
+		C2D_SpriteSetPos(&sprites[SPRITE_BALLOON_COUNT], 110, 35);
+		C2D_DrawSprite(&sprites[SPRITE_BALLOON_COUNT]);
 	}
 	for (int i = 0; i < 4; i++) {
 
 		if (CurrentBalloonCount / powi(10, i) > 0) {
 
 			int n = CurrentBalloonCount / powi(10, i) % 10;
-			C2D_SpriteSetPos(&sprites[rOll_0 + n], 97 + j * 10 - i * 20, 30);
-			C2D_DrawSprite(&sprites[rOll_0 + n]);
+			C2D_SpriteSetPos(&sprites[SPRITE_ROLL_0 + n], 97 + j * 10 - i * 20, 30);
+			C2D_DrawSprite(&sprites[SPRITE_ROLL_0 + n]);
 		}
 	}
 }
@@ -339,15 +339,15 @@ void draw_gauge(C2D_Sprite  sprites[Sprite_Number]) {
 		C2D_DrawRectSolid(123 + 250.0 * Gauge.norma / Gauge.soul, 67, 0, 250 * gauge - (250.0 * Gauge.norma / Gauge.soul), 17, C2D_Color32f(1, 1, 12.0 / 255, 1));
 
 	//魂
-	for (int i = 0; i < 2; i++) C2D_SpriteSetPos(&sprites[sOul_on + i], 385, 75);
-	C2D_SpriteSetPos(&sprites[sOul_effect], 395, 65);
+	for (int i = 0; i < 2; i++) C2D_SpriteSetPos(&sprites[SPRITE_SOUL_ON + i], 385, 75);
+	C2D_SpriteSetPos(&sprites[SPRITE_SOUL_EFFECT], 395, 65);
 	if ((Gauge.score / 200) * 200 >= Gauge.soul) {
 		C2D_ImageTint Tint;
 		C2D_AlphaImageTint(&Tint, 0.8);
-		C2D_DrawSpriteTinted(&sprites[sOul_effect], &Tint);
-		C2D_DrawSprite(&sprites[sOul_on]);
+		C2D_DrawSpriteTinted(&sprites[SPRITE_SOUL_EFFECT], &Tint);
+		C2D_DrawSprite(&sprites[SPRITE_SOUL_ON]);
 	}
-	else C2D_DrawSprite(&sprites[sOul_off]);
+	else C2D_DrawSprite(&sprites[SPRITE_SOUL_OFF]);
 }
 
 void draw_gauge_result(C2D_Sprite  sprites[Sprite_Number]) {
@@ -367,15 +367,15 @@ void draw_gauge_result(C2D_Sprite  sprites[Sprite_Number]) {
 		C2D_DrawRectSolid(x_start + x_end * Gauge.norma / Gauge.soul, 67, 0, x_end * gauge - (x_end * Gauge.norma / Gauge.soul), 17, C2D_Color32f(1, 1, 12.0 / 255, 1));
 
 	//魂
-	for (int i = 0; i < 2; i++) C2D_SpriteSetPos(&sprites[sOul_on + i], 385 - diff * 2, 75);
-	C2D_SpriteSetPos(&sprites[sOul_effect], 395 - diff * 2, 65);
+	for (int i = 0; i < 2; i++) C2D_SpriteSetPos(&sprites[SPRITE_SOUL_ON + i], 385 - diff * 2, 75);
+	C2D_SpriteSetPos(&sprites[SPRITE_SOUL_EFFECT], 395 - diff * 2, 65);
 	if ((Gauge.score / 200) * 200 >= Gauge.soul) {
 		C2D_ImageTint Tint;
 		C2D_AlphaImageTint(&Tint, 0.8);
-		C2D_DrawSpriteTinted(&sprites[sOul_effect], &Tint);
-		C2D_DrawSprite(&sprites[sOul_on]);
+		C2D_DrawSpriteTinted(&sprites[SPRITE_SOUL_EFFECT], &Tint);
+		C2D_DrawSprite(&sprites[SPRITE_SOUL_ON]);
 	}
-	else C2D_DrawSprite(&sprites[sOul_off]);
+	else C2D_DrawSprite(&sprites[SPRITE_SOUL_OFF]);
 }
 
 void draw_lane(C2D_Sprite  sprites[Sprite_Number]) {
@@ -386,35 +386,35 @@ void draw_lane(C2D_Sprite  sprites[Sprite_Number]) {
 		int branch = get_branch_course();
 
 		switch (branch) {
-		case N:
+		case COMMAND_N:
 		default:
-			C2D_SpriteSetPos(&sprites[cHart_normal], 350, 110);
-			C2D_DrawSprite(&sprites[cHart_normal]);
+			C2D_SpriteSetPos(&sprites[SPRITE_CHART_NORMAL], 350, 110);
+			C2D_DrawSprite(&sprites[SPRITE_CHART_NORMAL]);
 			break;
 
-		case E:
-			C2D_SpriteSetPos(&sprites[lAne_expert], 233, 109);
-			C2D_DrawSprite(&sprites[lAne_expert]);
-			C2D_SpriteSetPos(&sprites[cHart_expert], 350, 110);
-			C2D_DrawSprite(&sprites[cHart_expert]);
+		case COMMAND_E:
+			C2D_SpriteSetPos(&sprites[SPRITE_LANE_EXPERT], 233, 109);
+			C2D_DrawSprite(&sprites[SPRITE_LANE_EXPERT]);
+			C2D_SpriteSetPos(&sprites[SPRITE_CHART_EXPERT], 350, 110);
+			C2D_DrawSprite(&sprites[SPRITE_CHART_EXPERT]);
 			break;
 
-		case M:
-			C2D_SpriteSetPos(&sprites[lAne_master], 233, 109);
-			C2D_DrawSprite(&sprites[lAne_master]);
-			C2D_SpriteSetPos(&sprites[cHart_master], 350, 110);
-			C2D_DrawSprite(&sprites[cHart_master]);
+		case COMMAND_M:
+			C2D_SpriteSetPos(&sprites[SPRITE_LANE_MASTER], 233, 109);
+			C2D_DrawSprite(&sprites[SPRITE_LANE_MASTER]);
+			C2D_SpriteSetPos(&sprites[SPRITE_CHART_MASTER], 350, 110);
+			C2D_DrawSprite(&sprites[SPRITE_CHART_MASTER]);
 			break;
 		}
 	}
 
-	C2D_SpriteSetPos(&sprites[jUdge_circle], Notes_Judge, 109);
-	C2D_DrawSprite(&sprites[jUdge_circle]);
+	C2D_SpriteSetPos(&sprites[SPRITE_JUDGE_CIRCLE], Notes_Judge, 109);
+	C2D_DrawSprite(&sprites[SPRITE_JUDGE_CIRCLE]);
 
 	if (isGOGO == true) {
 		C2D_ImageTint Tint;
 		C2D_AlphaImageTint(&Tint, 0.8);
-		C2D_DrawSpriteTinted(&sprites[eFfect_gogo], &Tint);
+		C2D_DrawSpriteTinted(&sprites[SPRITE_EFFECT_GOGO], &Tint);
 	}
 }
 
@@ -423,22 +423,22 @@ int branch_start(int knd, double x, double y) {	//分岐
 	int branch;
 	switch (knd) {
 	case 0:	//連打
-		if (y <= CurrentTotalRollCount) branch = M;
-		else if (x <= CurrentTotalRollCount) branch = E;
-		else branch = N;
+		if (y <= CurrentTotalRollCount) branch = COMMAND_M;
+		else if (x <= CurrentTotalRollCount) branch = COMMAND_E;
+		else branch = COMMAND_N;
 		break;
 	case 1:	//精度
-		if (y <= CurrentPrecision) branch = M;
-		else if (x <= CurrentPrecision) branch = E;
-		else branch = N;
+		if (y <= CurrentPrecision) branch = COMMAND_M;
+		else if (x <= CurrentPrecision) branch = COMMAND_E;
+		else branch = COMMAND_N;
 		break;
 	case 2:	//スコア
-		if (y <= CurrentScore) branch = M;
-		else if (x <= CurrentScore) branch = E;
-		else branch = N;
+		if (y <= CurrentScore) branch = COMMAND_M;
+		else if (x <= CurrentScore) branch = COMMAND_E;
+		else branch = COMMAND_N;
 		break;
 	default:
-		branch = N;
+		branch = COMMAND_N;
 		break;
 	}
 	return branch;
@@ -498,7 +498,7 @@ void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max
 
 		NotesCount = 0;
 
-		if (Measure[i].branch != -1 && Measure[i].branch != M) {
+		if (Measure[i].branch != -1 && Measure[i].branch != COMMAND_M) {
 
 			i++;
 			continue;
@@ -509,13 +509,13 @@ void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max
 			get_command_value(notes[i], &Command);
 
 			switch (Command.knd) {
-			case GOgostart:
+			case COMMAND_GOGOSTART:
 				gogo = 1.2;
 				break;
-			case GOgoend:
+			case COMMAND_GOGOEND:
 				gogo = 1.0;
 				break;
-			case ENd:
+			case COMMAND_END:
 				isEND = true;
 				break;
 			default:
@@ -540,8 +540,8 @@ void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max
 
 			if (knd != 0) {
 
-				if (knd == Don || knd == Katsu || knd == BigDon || knd == BigKatsu) {
-					if (knd == BigDon || knd == BigKatsu) special = 2.0;
+				if (knd == NOTES_DON || knd == NOTES_KATSU || knd == NOTES_BIGDON || knd == NOTES_BIGKATSU) {
+					if (knd == NOTES_BIGDON || knd == NOTES_BIGKATSU) special = 2.0;
 					else special = 1.0;
 					combo++;
 					init_cnt += 1 * gogo * special;
@@ -564,29 +564,29 @@ void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max
 
 					PerfectNotesCount++;
 				}
-				else if (knd == Balloon) {		//風船
+				else if (knd == NOTES_BALLOON) {		//風船
 
 					TmpBaseCeilingPoint -= (TJA_Header.balloon[BalloonCnt] * 300 + 5000) * gogo;
 					BalloonCnt++;
 				}
-				else if (knd == Roll) {			//連打
+				else if (knd == NOTES_ROLL) {			//連打
 
 					roll_start_time = Measure[i].judge_time + 60.0 / Measure[i].bpm * 4 * Measure[i].measure * i / NotesCountMax;
-					RollKnd = Roll;
+					RollKnd = NOTES_ROLL;
 				}
-				else if (knd == BigRoll) {		//大連打
+				else if (knd == NOTES_BIGROLL) {		//大連打
 
 					roll_start_time = Measure[i].judge_time + 60.0 / Measure[i].bpm * 4 * Measure[i].measure * i / NotesCountMax;
-					RollKnd = BigRoll;
+					RollKnd = NOTES_BIGROLL;
 				}
-				else if (knd == RollEnd) {
+				else if (knd == NOTES_ROLLEND) {
 
 					if (roll_start_time != 0) {
 
 						roll_end_time = Measure[i].judge_time + 60.0 / Measure[i].bpm * 4 * Measure[i].measure * i / NotesCountMax;
 						RollCnt = (int)((roll_end_time - roll_start_time) / (1.0 / 12.0));
 
-						if (RollKnd == Roll) {
+						if (RollKnd == NOTES_ROLL) {
 							if (scoremode == 1) {
 								if (gogo == true) TmpBaseCeilingPoint -= RollCnt * 360;
 								else TmpBaseCeilingPoint -= RollCnt * 300;
@@ -596,7 +596,7 @@ void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max
 								else TmpBaseCeilingPoint -= RollCnt * 100;
 							}
 						}
-						else if (RollKnd == BigRoll) {
+						else if (RollKnd == NOTES_BIGROLL) {
 							if (scoremode == 1) {
 								if (gogo == true) TmpBaseCeilingPoint -= RollCnt * 430 * gogo;
 								else TmpBaseCeilingPoint -= RollCnt * 360 * gogo;
@@ -729,25 +729,25 @@ void balloon_count_update(int arg) {
 void draw_emblem(C2D_Sprite  sprites[Sprite_Number]) {
 
 	switch (TJA_Header.course) {
-	case EASY:
+	case COURSE_EASY:
 		C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(1, 51.0 / 255.0, 0, 1));
-		C2D_DrawSprite(&sprites[eMblem_easy]);
+		C2D_DrawSprite(&sprites[SPRITE_EMBLEM_EASY]);
 		break;
-	case NORMAL:
+	case COURSE_NORMAL:
 		C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(136.0 / 255.0, 204.0 / 255.0, 34.0 / 255.0, 1));
-		C2D_DrawSprite(&sprites[eMblem_normal]);
+		C2D_DrawSprite(&sprites[SPRITE_EMBLEM_NORMAL]);
 		break;
-	case HARD:
+	case COURSE_HARD:
 		C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(51.0 / 255.0, 170.0 / 255.0, 187.0 / 255.0, 1));
-		C2D_DrawSprite(&sprites[eMblem_hard]);
+		C2D_DrawSprite(&sprites[SPRITE_EMBLEM_HARD]);
 		break;
-	case ONI:
+	case COURSE_ONI:
 		C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(1, 34.0 / 255.0, 204.0 / 255.0, 1));
-		C2D_DrawSprite(&sprites[eMblem_oni]);
+		C2D_DrawSprite(&sprites[SPRITE_EMBLEM_ONI]);
 		break;
-	case EDIT:
+	case COURSE_EDIT:
 		C2D_DrawRectSolid(0, 86, 0, 62, 58, C2D_Color32f(136.0 / 255.0, 34.0 / 255.0, 1, 1));
-		C2D_DrawSprite(&sprites[eMblem_edit]);
+		C2D_DrawSprite(&sprites[SPRITE_EMBLEM_EDIT]);
 		break;
 	}
 }
