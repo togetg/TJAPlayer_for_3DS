@@ -41,7 +41,7 @@ It's a music game of the [TJA file](https://wikiwiki.jp/jiro/%E5%A4%AA%E9%BC%93%
 
 2. Install the package with the following command
 
-`pacman -S 3ds-libogg 3ds-dev 3ds-libvorbisidec --noconfirm` 
+`pacman -S 3ds-libogg 3ds-dev 3ds-libvorbisidec 3ds-jansson --noconfirm` 
 
 3. Download [MakeROM](https://github.com/3DSGuy/Project_CTR/releases) and [bannertool](https://github.com/Steveice10/bannertool/releases) and set the PATH.
 

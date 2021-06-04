@@ -40,7 +40,7 @@
 
 2. 以下のコマンドでパッケージをインストールする
 
-`pacman -S 3ds-libogg 3ds-dev 3ds-libvorbisidec --noconfirm`
+`pacman -S 3ds-libogg 3ds-dev 3ds-libvorbisidec 3ds-jansson --noconfirm`
 
 3. [MakeROM](https://github.com/3DSGuy/Project_CTR/releases)と[bannertool](https://github.com/Steveice10/bannertool/releases)をダウンロードしPATHを通す
 
