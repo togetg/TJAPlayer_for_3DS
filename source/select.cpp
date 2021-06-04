@@ -207,7 +207,7 @@ void cursor_update(int knd) {
 	}
 	else if (knd == KEY_LEFT) {
 		if (isSelectCourse == false) cursor += 5;
-		music_play(1); music_play(1);
+		music_play(1);
 	}
 	else if (knd == KEY_A && course_count != 0) {
 		if (isSelectCourse == true) isGameStart = true;
@@ -219,6 +219,7 @@ void cursor_update(int knd) {
 		course_cursor = 0;
 		music_play(1);
 	}
+
 }
 
 void load_file_list(const char *path) {
