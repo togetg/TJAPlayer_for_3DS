@@ -155,7 +155,10 @@ void draw_option(u16 px, u16 py, unsigned int key) {
 		x = XSense * XCnt + gap, y = YSense * YCnt, XCnt++;
 		snprintf(get_buffer(), BUFFER_SIZE, "%.2f", Option.speed);
 		draw_option_text(x, y, get_buffer(), true, &width, &height);
-		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) Option.speed = input_number_keyboard(5, true);
+		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) {
+			Option.speed = input_number_keyboard(5, true);
+			if (Option.speed > 10.0) Option.speed = 10.0;
+		}
 		x = XSense * XCnt + gap, y = YSense * YCnt, XCnt++;
 		draw_option_text(x, y, Text[Option.lang][TEXT_RESET], true, &width, &height);
 		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) Option.speed = 1.0;
