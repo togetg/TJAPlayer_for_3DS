@@ -511,19 +511,19 @@ void notes_judge(double CurrentTime, bool isDon, bool isKatsu, int cnt) {
 				if (Notes[i].knd == NOTES_DON ||
 					Notes[i].knd == NOTES_POTATO) {
 
-					music_play(0);
+					music_play(SOUND_DON);
 					make_judge(PERFECT, CurrentTime);
 				}
 				else if (Notes[i].knd == NOTES_BIGDON) {
-					music_play(0);
+					music_play(SOUND_DON);
 					make_judge(SPECIAL_PERFECT, CurrentTime);
 				}
 				else if (Notes[i].knd == NOTES_KATSU) {
-					music_play(1);
+					music_play(SOUND_KATSU);
 					make_judge(PERFECT, CurrentTime);
 				}
 				else if (Notes[i].knd == NOTES_BIGKATSU) {
-					music_play(1);
+					music_play(SOUND_KATSU);
 					make_judge(SPECIAL_PERFECT, CurrentTime);
 				}
 
@@ -541,7 +541,7 @@ void notes_judge(double CurrentTime, bool isDon, bool isKatsu, int cnt) {
 				if (JudgeRollState == NOTES_ROLL) score_update(ROLL);
 				else if (JudgeRollState == NOTES_BIGROLL) score_update(BIG_ROLL);
 
-				music_play(0);
+				music_play(SOUND_DON);
 			}
 		}
 
@@ -549,7 +549,7 @@ void notes_judge(double CurrentTime, bool isDon, bool isKatsu, int cnt) {
 
 			if (cnt % AUTO_ROLL_FRAME == 0) {
 
-				music_play(0);
+				music_play(SOUND_DON);
 				BalloonNotes[JudgeBalloonState].current_hit++;
 
 				if (BalloonNotes[JudgeBalloonState].current_hit >= BalloonNotes[JudgeBalloonState].need_hit) {
@@ -663,12 +663,15 @@ void notes_judge(double CurrentTime, bool isDon, bool isKatsu, int cnt) {
 		if (BalloonNotes[JudgeBalloonState].end_id != -1) delete_notes(BalloonNotes[JudgeBalloonState].end_id);
 		else delete_notes(BalloonNotes[JudgeBalloonState].start_id);
 
-		music_play(2);
+		music_play(SOUND_BALLOONBREAK);
 		balloon_count_update(0);
 	}
 }
 
 void notes_calc(bool isDon, bool isKatsu, double bpm, double CurrentTime, int cnt, C2D_Sprite sprites[Sprite_Number]) {
+
+	OPTION_T Option;
+	get_option(&Option);
 
 	for (int i = 0; i < Notes_Max - 1; i++) {	//計算
 
@@ -747,8 +750,17 @@ void notes_calc(bool isDon, bool isKatsu, double bpm, double CurrentTime, int cn
 
 			if (Notes[i].isThrough == false && 
 				(Notes[i].knd == NOTES_DON || Notes[i].knd == NOTES_KATSU || Notes[i].knd == NOTES_BIGDON || Notes[i].knd == NOTES_BIGKATSU)) {
-				score_update(THROUGH);
-				Notes[i].isThrough = true;
+
+				if (Option.isAuto == false) {
+					score_update(THROUGH);
+					Notes[i].isThrough = true;
+				}
+				else {	//オート時はスルーでも良判定に
+					if (Notes[i].knd == NOTES_DON || Notes[i].knd == NOTES_KATSU) score_update(PERFECT);
+					else if (Notes[i].knd == NOTES_BIGDON || Notes[i].knd == NOTES_BIGKATSU) score_update(SPECIAL_PERFECT);
+					if (Notes[i].knd == NOTES_DON || Notes[i].knd == NOTES_BIGDON) music_play(SOUND_DON);
+					if (Notes[i].knd == NOTES_KATSU || Notes[i].knd == NOTES_BIGKATSU) music_play(SOUND_KATSU);
+				}
 			}
 			delete_notes(i);
 		}
