@@ -253,8 +253,8 @@ int main() {
 				}
 			}
 
-			if (isDon == true) music_play(0);		//ドン
-			if (isKatsu == true) music_play(1);		//カツ
+			if (isDon == true) music_play(SOUND_DON);		//ドン
+			if (isKatsu == true) music_play(SOUND_KATSU);		//カツ
 
 			//if (key & KEY_SELECT) toggle_auto();
 			if (key & KEY_SELECT || key & KEY_START) {
@@ -313,7 +313,7 @@ int main() {
 					toggle_time(0);
 					toggle_time(1);
 					isPause = !isPause;
-					music_play(0);
+					music_play(SOUND_DON);
 				}
 			}
 			if (get_notes_finish() == true && ndspChnIsPlaying(CHANNEL) == false) {

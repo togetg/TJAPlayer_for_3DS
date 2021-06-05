@@ -194,30 +194,30 @@ void cursor_update(int knd) {
 	if (knd == KEY_UP) {
 		if (isSelectCourse == false) cursor++;
 		else if (course_cursor > 0) course_cursor--;
-		music_play(1);
+		music_play(SOUND_KATSU);
 	}
 	else if (knd == (int)KEY_DOWN) {
 		if (isSelectCourse == false) cursor--;
 		else if (course_cursor < (course_count-1)) course_cursor++;
-		music_play(1);
+		music_play(SOUND_KATSU);
 	}
 	else if (knd == KEY_RIGHT) {
 		if (isSelectCourse == false) cursor -= 5;
-		music_play(1);
+		music_play(SOUND_KATSU);
 	}
 	else if (knd == KEY_LEFT) {
 		if (isSelectCourse == false) cursor += 5;
-		music_play(1);
+		music_play(SOUND_KATSU);
 	}
 	else if (knd == KEY_A && course_count != 0) {
 		if (isSelectCourse == true) isGameStart = true;
 		else isSelectCourse = true;
-		music_play(0);
+		music_play(SOUND_DON);
 	}
 	else if (knd == KEY_B) {
 		isSelectCourse = false;
 		course_cursor = 0;
-		music_play(1);
+		music_play(SOUND_KATSU);
 	}
 
 }
