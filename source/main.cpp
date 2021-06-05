@@ -73,8 +73,7 @@ int main() {
 	int cnt = 0, notes_cnt = 0, scene_state = SCENE_SELECTLOAD, course = COURSE_ONI, tmp;
 
 	double FirstMeasureTime = INT_MAX,
-		offset = 0,
-		CompTime = -1000,CurrentTime = -1000,VorbisTime=-1000;
+		offset = 0,CurrentTime = -1000;
 
 	while (aptMainLoop()) {
 
@@ -151,7 +150,7 @@ int main() {
 			notes_cnt = 0;
 			isNotesStart = false, isMusicStart = false, isPlayMain = false;
 			FirstMeasureTime = INT_MAX;
-			CurrentTime = -1000,VorbisTime=-1000,CompTime = -1000;
+			CurrentTime = -1000;// VorbisTime = -1000, CompTime = -1000;
 
 			scene_state = SCENE_MAINGAME;
 			cnt = -120;
@@ -169,12 +168,12 @@ int main() {
 				play_main_music(&isPlayMain, SelectedSong);
 			}
 			
-			if (cnt >= 0) CompTime = get_current_time(1);
-			if (isMusicStart == true) VorbisTime = getVorbisTime() + FirstMeasureTime;
+			if (cnt >= 0) CurrentTime = get_current_time(1);
+			/*if (isMusicStart == true) VorbisTime = getVorbisTime() + FirstMeasureTime;
 			if (CompTime != -1000 && VorbisTime != -1000 && (CompTime > VorbisTime)) {
 				CurrentTime = VorbisTime;
 			}
-			else CurrentTime = CompTime;
+			else CurrentTime = CompTime;*/
 			
 
 			//譜面が先
