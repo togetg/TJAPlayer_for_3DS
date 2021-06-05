@@ -94,7 +94,7 @@ void disp_file_list() {
 				for (int j = 0; j < (10 - level); j++) {
 					draw_select_text(200 + (j + level) * 10, (n + cursor) * 20 + 60, "・");
 				}
-				draw_select_text(80, (n + cursor) * 20 + 60, Text[get_lang()][onI]);
+				draw_select_text(80, (n + cursor) * 20 + 60, Text[get_lang()][TEXT_ONI]);
 				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[COURSE_EDIT]);
 				draw_select_text(360, (n + cursor) * 20 + 60, buf_select);
 				draw_select_text(360, (n + cursor) * 20 + 60, buf_select);
@@ -113,7 +113,7 @@ void disp_file_list() {
 				for (int j = 0; j < (10 - level); j++) {
 					draw_select_text(200 + (j + level) * 10, (n + cursor) * 20 + 60, "・");
 				}
-				draw_select_text(80, (n + cursor) * 20 + 60, Text[get_lang()][onI]);
+				draw_select_text(80, (n + cursor) * 20 + 60, Text[get_lang()][TEXT_ONI]);
 				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[COURSE_ONI]);
 				draw_select_text(360, (n + cursor) * 20 + 60, buf_select);
 				n++;
@@ -131,7 +131,7 @@ void disp_file_list() {
 				for (int j = 0; j < (10 - level); j++) {
 					draw_select_text(200 + (j + level) * 10, (n + cursor) * 20 + 60, "・");
 				}
-				draw_select_text(80, (n + cursor) * 20 + 60, Text[get_lang()][harD]);
+				draw_select_text(80, (n + cursor) * 20 + 60, Text[get_lang()][TEXT_HARD]);
 				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[COURSE_HARD]);
 				draw_select_text(360, (n + cursor) * 20 + 60, buf_select);
 				n++;
@@ -149,7 +149,7 @@ void disp_file_list() {
 				for (int j = 0; j < (10 - level); j++) {
 					draw_select_text(200 + (j + level) * 10, (n + cursor) * 20 + 60, "・");
 				}
-				draw_select_text(80, (n + cursor) * 20 + 60, Text[get_lang()][normaL]);
+				draw_select_text(80, (n + cursor) * 20 + 60, Text[get_lang()][TEXT_NORMAL]);
 				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[COURSE_NORMAL]);
 				draw_select_text(360, (n + cursor) * 20 + 60, buf_select);
 				n++;
@@ -167,7 +167,7 @@ void disp_file_list() {
 				for (int j = 0; j < (10 - level); j++) {
 					draw_select_text(200 + (j + level) * 10, (n + cursor) * 20 + 60, "・");
 				}
-				draw_select_text(80, (n + cursor) * 20 + 60, Text[get_lang()][easY]);
+				draw_select_text(80, (n + cursor) * 20 + 60, Text[get_lang()][TEXT_EASY]);
 				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[COURSE_EASY]);
 				draw_select_text(360, (n + cursor) * 20 + 60, buf_select);
 				n++;
@@ -295,19 +295,19 @@ void calc_result_text(const char *text, float *width, float *height) {
 	C2D_TextGetDimensions(&SelectText, size, size, width, height);
 }
 
-void draw_option_text(float x, float y, const char *text,bool state, float *width, float *height) {
+void draw_option_text(float x, float y, const char *text,bool state, float *width, float *height, float sizex, float sizey) {	//size省略可(0.7)
 
 	C2D_TextBufClear(g_SelectText);
 	C2D_TextParse(&SelectText, g_SelectText, text);
 	C2D_TextOptimize(&SelectText);
-	float size = 0.7;
+
 	if (state == false) {
-		C2D_DrawText(&SelectText, C2D_WithColor, x, y, 1.0f, size, size, C2D_Color32f(100.0 / 255.0, 100.0 / 255.0, 100.0 / 255.0, 1.0f));
+		C2D_DrawText(&SelectText, C2D_WithColor, x, y, 1.0f, sizex, sizey, C2D_Color32f(100.0 / 255.0, 100.0 / 255.0, 100.0 / 255.0, 1.0f));
 	}
 	else if (state == true) {
-		C2D_DrawText(&SelectText, C2D_WithColor, x, y, 1.0f, size, size, C2D_Color32f(1.0f, 1.0f, 1.0f, 1.0f));
+		C2D_DrawText(&SelectText, C2D_WithColor, x, y, 1.0f, sizex, sizey, C2D_Color32f(1.0f, 1.0f, 1.0f, 1.0f));
 	}
-	C2D_TextGetDimensions(&SelectText, size, size, width, height);
+	C2D_TextGetDimensions(&SelectText, sizex, sizey, width, height);
 }
 
 void draw_pause_text(float x, float y, const char *text, float *width, float *height) {
@@ -328,15 +328,15 @@ int pause_window(u16 px, u16 py, unsigned int key) {
 
 	C2D_DrawRectSolid(margin, margin, 0, BOTTOM_WIDTH-margin*2, BOTTOM_HEIGHT-margin*2, C2D_Color32f(0, 0, 0, 1));
 
-	draw_pause_text(-1, margin + 30, Text[get_lang()][continuE], &width, &height);		//続ける
+	draw_pause_text(-1, margin + 30, Text[get_lang()][TEXT_CONTINUE], &width, &height);		//続ける
 	x = BOTTOM_WIDTH / 2 - width / 2, y = margin + 30;
 	if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) ReturnVal = 0;
 
-	draw_pause_text(-1, margin + 80, Text[get_lang()][startoveR], &width, &height);		//はじめから
+	draw_pause_text(-1, margin + 80, Text[get_lang()][TEXT_STARTOVER], &width, &height);		//はじめから
 	x = BOTTOM_WIDTH / 2 - width / 2, y = margin + 80;
 	if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) ReturnVal = 1;
 
-	draw_pause_text(-1, margin + 130, Text[get_lang()][returnselecT], &width, &height);	//曲選択に戻る
+	draw_pause_text(-1, margin + 130, Text[get_lang()][TEXT_RETURNSELECT], &width, &height);	//曲選択に戻る
 	x = BOTTOM_WIDTH / 2 - width / 2, y = margin + 130;
 	if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) ReturnVal = 2;
 
