@@ -35,6 +35,8 @@
 
 #define List_Max 16384		//選曲リストの最大数
 
+#define DEFAULT_BUFFER_SIZE 8192
+
 enum NOTES_KND {
 
 	NOTES_REST = 0,		//休符

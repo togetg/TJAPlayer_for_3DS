@@ -22,6 +22,10 @@ void load_sprites();
 
 void draw_debug(float x, float y, const char *text) {
 
+	//使用例
+	//snprintf(get_buffer(), BUFFER_SIZE, "%d", 10);
+	// draw_debug(300, 0, get_buffer());
+
 	C2D_TextBufClear(g_dynamicBuf);
 	C2D_TextParse(&dynText, g_dynamicBuf, text);
 	C2D_TextOptimize(&dynText);
@@ -164,14 +168,14 @@ int main() {
 				FirstMeasureTime = get_FirstMeasureTime();
 				play_main_music(&isPlayMain, SelectedSong);
 			}
-
+			
 			if (cnt >= 0) CompTime = get_current_time(1);
 			if (isMusicStart == true) VorbisTime = getVorbisTime() + FirstMeasureTime;
 			if (CompTime != -1000 && VorbisTime != -1000 && (CompTime > VorbisTime)) {
 				CurrentTime = VorbisTime;
 			}
 			else CurrentTime = CompTime;
-
+			
 
 			//譜面が先
 			if (offset > 0 && (isNotesStart == false || isMusicStart == false)) {

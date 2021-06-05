@@ -6,17 +6,18 @@
 
 #include "main.h"
 #include "vorbis.h"
+#include "header.h"
 
 static OggVorbis_File	vorbisFile;
 static vorbis_info		*vi;
 static FILE				*f;
-static const size_t		buffSize = 7000;// 8 * 4096;
+size_t		vorbis_buffer_size = DEFAULT_BUFFER_SIZE;// 8 * 4096;
 
 void setVorbis(struct decoder_fn* decoder){
 	decoder->init = &initVorbis;
 	decoder->rate = &rateVorbis;
 	decoder->channels = &channelVorbis;
-	decoder->buffSize = buffSize;
+	decoder->vorbis_buffer_size = vorbis_buffer_size;
 	decoder->decode = &decodeVorbis;
 	decoder->exit = &exitVorbis;
 }
@@ -65,7 +66,7 @@ double vorbis_time = 0;
 uint64_t fillVorbisBuffer(char* bufferOut)
 {
 	uint64_t samplesRead = 0;
-	int samplesToRead = buffSize;
+	int samplesToRead = vorbis_buffer_size;
 
 	while(samplesToRead > 0)
 	{
@@ -108,4 +109,12 @@ double getVorbisTime() {
 
 	//曲開始前に呼ぶとクラッシュする(要修正)
 	return vorbis_time = (double)ov_time_tell(&vorbisFile) / 1000.0;
+}
+
+int get_buffer_size() {
+	return (int)vorbis_buffer_size;
+}
+
+void put_buffer_size(int tmp) {
+	vorbis_buffer_size = (size_t)tmp;
 }

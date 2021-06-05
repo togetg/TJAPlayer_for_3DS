@@ -127,8 +127,8 @@ void playFile(void* infoIn){
 		goto err;
 	}
 	testtest = 99;
-	buffer1 = (int16_t*)linearAlloc(decoder.buffSize * sizeof(int16_t));
-	buffer2 = (int16_t*)linearAlloc(decoder.buffSize * sizeof(int16_t));
+	buffer1 = (int16_t*)linearAlloc(decoder.vorbis_buffer_size * sizeof(int16_t));
+	buffer2 = (int16_t*)linearAlloc(decoder.vorbis_buffer_size * sizeof(int16_t));
 
 	ndspChnReset(CHANNEL);
 	ndspChnWaveBufClear(CHANNEL);
@@ -172,7 +172,7 @@ void playFile(void* infoIn){
 				lastbuf = true;
 				continue;
 			}
-			else if(read < decoder.buffSize)
+			else if(read < decoder.vorbis_buffer_size)
 				waveBuf[0].nsamples = read / (*decoder.channels)();
 
 			ndspChnWaveBufAdd(CHANNEL, &waveBuf[0]);
@@ -187,15 +187,15 @@ void playFile(void* infoIn){
 				lastbuf = true;
 				continue;
 			}
-			else if(read < decoder.buffSize)
+			else if(read < decoder.vorbis_buffer_size)
 				waveBuf[1].nsamples = read / (*decoder.channels)();
 
 			ndspChnWaveBufAdd(CHANNEL, &waveBuf[1]);
 		}
 
 
-		//DSP_FlushDataCache(buffer1, decoder.buffSize * sizeof(int16_t));
-		//DSP_FlushDataCache(buffer2, decoder.buffSize * sizeof(int16_t));
+		//DSP_FlushDataCache(buffer1, decoder.vorbis_buffer_size * sizeof(int16_t));
+		//DSP_FlushDataCache(buffer2, decoder.vorbis_buffer_size * sizeof(int16_t));
 	}
 
 	(*decoder.exit)();

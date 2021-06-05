@@ -17,7 +17,7 @@ struct decoder_fn{
 	int (* init)(const char* file);
 	uint32_t (* rate)(void);
 	uint8_t (* channels)(void);
-	size_t buffSize;
+	size_t vorbis_buffer_size;
 	uint64_t (* decode)(void*);
 	void (* exit)(void);
 };

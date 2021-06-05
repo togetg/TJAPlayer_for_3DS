@@ -14,3 +14,5 @@ void exitVorbis(void);
 uint64_t fillVorbisBuffer(char* bufferOut);
 int isVorbis(const char* in);
 double getVorbisTime();
+int get_buffer_size();
+void put_buffer_size(int tmp);
