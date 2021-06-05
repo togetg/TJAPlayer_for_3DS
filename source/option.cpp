@@ -139,6 +139,8 @@ void draw_option(u16 px, u16 py, unsigned int key) {
 		draw_option_text(x, y, get_buffer(), true, &width, &height);
 		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) {
 			Option.buffer_size = (int)input_number_keyboard(5, false);
+			if (Option.buffer_size < 1000) Option.buffer_size = 1000;
+			if (Option.buffer_size > 1000) Option.buffer_size = 1000;
 			put_buffer_size(Option.buffer_size);
 		}
 		x = XSense * XCnt + gap, y = YSense * YCnt, XCnt++;
@@ -158,6 +160,7 @@ void draw_option(u16 px, u16 py, unsigned int key) {
 		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) {
 			Option.speed = input_number_keyboard(5, true);
 			if (Option.speed > 10.0) Option.speed = 10.0;
+			if (Option.speed <= 0) Option.speed = 1;
 		}
 		x = XSense * XCnt + gap, y = YSense * YCnt, XCnt++;
 		draw_option_text(x, y, Text[Option.lang][TEXT_RESET], true, &width, &height);
