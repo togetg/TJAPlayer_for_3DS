@@ -15,7 +15,7 @@
 #define DEFAULT_DIR	"sdmc:/tjafiles/"
 #define SETTING_FILE	"sdmc:/TJAPlayerfor3ds_setting.json"
 
-#define Max_Notes_Measure 130	//一小節の最大ノーツ数+1
+#define Max_Notes_Measure 256	//一小節の最大ノーツ数+1
 #define Measure_Max 8192
 #define Notes_Area 338.0		//ノーツ表示エリアの長さ
 #define Notes_Judge 93			//判定枠の中心のX座標
