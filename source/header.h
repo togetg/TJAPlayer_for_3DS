@@ -208,3 +208,10 @@ enum SOUND_KND {
 	SOUND_KATSU,
 	SOUND_BALLOONBREAK,
 };
+
+enum TIME_KND {
+
+	TIME_NOTES = 0,	//ノーツが開始(最初の小節が生成)で計測開始,ctnはこれに最初にcreate_time加算(マイナス用,通常は0),
+	TIME_MAINGAME,	//メインゲーム,開始時には-1000,1秒後に計測開始,ノーツ・音楽開始にのみ使用
+	TIME_FPS,		//fps計測用
+};

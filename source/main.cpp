@@ -53,6 +53,25 @@ void main_exit() {
 	music_exit();
 }
 
+void button_game(bool *isDon,bool *isKatsu,OPTION_T Option, unsigned int key) {
+
+	int numKeys = 20;
+
+	int Optionkeys[] = {
+		Option.KEY_A,Option.KEY_B,Option.KEY_X,Option.KEY_Y,Option.KEY_R,Option.KEY_ZR,Option.KEY_L,Option.KEY_ZL,Option.KEY_DUP,Option.KEY_DDOWN,Option.KEY_DRIGHT,Option.KEY_DLEFT,
+		Option.KEY_CPAD_UP,Option.KEY_CPAD_DOWN,Option.KEY_CPAD_RIGHT,Option.KEY_CPAD_LEFT,Option.KEY_CSTICK_UP,Option.KEY_CSTICK_DOWN,Option.KEY_CSTICK_RIGHT,Option.KEY_CSTICK_LEFT };
+	unsigned int keys[] = {
+		KEY_A,KEY_B,KEY_X,KEY_Y,KEY_R,KEY_ZR,KEY_L,KEY_ZL,KEY_DUP,KEY_DDOWN,KEY_DRIGHT,KEY_DLEFT,
+		KEY_CPAD_UP,KEY_CPAD_DOWN,KEY_CPAD_RIGHT,KEY_CPAD_LEFT,KEY_CSTICK_UP,KEY_CSTICK_DOWN,KEY_CSTICK_RIGHT,KEY_CSTICK_LEFT};
+
+	for (int i = 0; i < numKeys;i++) {
+		if (key & keys[i]) {
+			if (Optionkeys[i] == KEY_DON) *isDon = true;
+			else if (Optionkeys[i] == KEY_KATSU) *isKatsu = true;
+		}
+	}
+}
+
 int touch_x, touch_y, touch_cnt,PreTouch_x,PreTouch_y;	//タッチ用
 
 int main() {
@@ -66,6 +85,7 @@ int main() {
 
 	TJA_HEADER_T TJA_Header;
 	LIST_T SelectedSong;
+	OPTION_T Option;
 
 	load_sprites();
 	load_music();
@@ -73,7 +93,7 @@ int main() {
 	int cnt = 0, notes_cnt = 0, scene_state = SCENE_SELECTLOAD, course = COURSE_ONI, tmp;
 
 	double FirstMeasureTime = INT_MAX,
-		offset = 0,CurrentTime = -1000;
+		offset = 0,CurrentTimeMain = -1000;
 
 	while (aptMainLoop()) {
 
@@ -89,6 +109,8 @@ int main() {
 
 		C2D_TargetClear(top, C2D_Color32(0x42, 0x42, 0x42, 0xFF));	//上画面
 		C2D_SceneBegin(top);
+
+		get_option(&Option);
 
 		switch (scene_state) {
 
@@ -130,7 +152,7 @@ int main() {
 			C2D_TargetClear(bottom, C2D_Color32(0x42, 0x42, 0x42, 0xFF));	//下画面
 			C2D_SceneBegin(bottom);
 			//C2D_DrawSprite(&sprites[SPRITE_BOTTOM]);
-			draw_option(tp.px, tp.py, key);
+			draw_option(tp.px, tp.py, key, sprites);
 			isPause = false;
 
 			break;
@@ -150,10 +172,10 @@ int main() {
 			notes_cnt = 0;
 			isNotesStart = false, isMusicStart = false, isPlayMain = false;
 			FirstMeasureTime = INT_MAX;
-			CurrentTime = -1000;// VorbisTime = -1000, CompTime = -1000;
+			CurrentTimeMain = -1000;
 
 			scene_state = SCENE_MAINGAME;
-			cnt = -120;
+			cnt = -60;
 			break;
 
 		case SCENE_MAINGAME:		//メイン
@@ -168,19 +190,17 @@ int main() {
 				play_main_music(&isPlayMain, SelectedSong);
 			}
 			
-			if (cnt >= 0) CurrentTime = get_current_time(1);
-			/*if (isMusicStart == true) VorbisTime = getVorbisTime() + FirstMeasureTime;
-			if (CompTime != -1000 && VorbisTime != -1000 && (CompTime > VorbisTime)) {
-				CurrentTime = VorbisTime;
-			}
-			else CurrentTime = CompTime;*/
-			
+			if (cnt >= 0) CurrentTimeMain = get_current_time(TIME_MAINGAME);
+
+			//snprintf(get_buffer(), BUFFER_SIZE, "%.1f", CurrentTimeMain);
+			//draw_debug(0, 0, get_buffer());
+			if (Option.dispFps == true) draw_fps();
 
 			//譜面が先
 			if (offset > 0 && (isNotesStart == false || isMusicStart == false)) {
 
-				if (CurrentTime >= 0 && isNotesStart == false) isNotesStart = true;
-				if (CurrentTime >= offset + FirstMeasureTime && isMusicStart == false) {
+				if (CurrentTimeMain >= 0 && isNotesStart == false) isNotesStart = true;
+				if (CurrentTimeMain >= offset + FirstMeasureTime && isMusicStart == false) {
 					isPlayMain = true;
 					isMusicStart = true;
 				}
@@ -189,11 +209,11 @@ int main() {
 			//音楽が先
 			else if (offset <= 0 && (isNotesStart == false || isMusicStart == false)) {
 
-				if (CurrentTime >= FirstMeasureTime && isPlayMain == false) {
+				if (CurrentTimeMain >= FirstMeasureTime && isPlayMain == false) {
 					isPlayMain = true;
 					isMusicStart = true;
 				}
-				if (CurrentTime >= (-1.0) * offset && isNotesStart == false) {
+				if (CurrentTimeMain >= (-1.0) * offset && isNotesStart == false) {
 					isNotesStart = true;
 				}
 			}
@@ -228,31 +248,10 @@ int main() {
 					touch_x = 0, touch_y = 0, touch_cnt = 0, PreTouch_x = 0, PreTouch_y = 0;
 				}
 
-				if (
-					key & KEY_B ||
-					key & KEY_Y ||
-					key & KEY_RIGHT ||
-					key & KEY_DOWN ||
-					key & KEY_CSTICK_LEFT ||
-					key & KEY_CSTICK_DOWN) {	//ドン
-					isDon = true;
-				}
-				else if (
-					key & KEY_A ||
-					key & KEY_X ||
-					key & KEY_LEFT ||
-					key & KEY_UP ||
-					key & KEY_CSTICK_RIGHT ||
-					key & KEY_CSTICK_UP ||
-					key & KEY_R ||
-					key & KEY_L ||
-					key & KEY_ZR ||
-					key & KEY_ZL) {				//カツ
-					isKatsu = true;
-				}
+				button_game(&isDon, &isKatsu, Option, key);
 			}
 
-			if (isDon == true) music_play(SOUND_DON);		//ドン
+			if (isDon == true)   music_play(SOUND_DON);		//ドン
 			if (isKatsu == true) music_play(SOUND_KATSU);		//カツ
 
 			//if (key & KEY_SELECT) toggle_auto();
@@ -262,7 +261,7 @@ int main() {
 				toggle_time(1);
 				isPause = !isPause;
 			}
-			//draw_fps();
+
 			draw_lane(sprites);
 			draw_gauge(sprites);
 
@@ -275,7 +274,7 @@ int main() {
 			//vorbis_debug();
 			//playback_debug();
 			/*if (isMusicStart == true) {
-				snprintf(buffer, sizeof(buffer), "0:%.3f 1:%.3f vt:%.3f", get_current_time(0),get_current_time(1), getVorbisTime());
+				snprintf(buffer, sizeof(buffer), "0:%.3f 1:%.3f vt:%.3f", get_current_time(TIME_NOTES),get_current_time(TIME_MAINGAME), getVorbisTime());
 				draw_debug(0, 0, buffer);
 			}*/
 
