@@ -107,8 +107,8 @@ int isVorbis(const char *in){
 
 double getVorbisTime() {
 
-	//曲開始前に呼ぶとクラッシュする(要修正)
-	return vorbis_time = (double)ov_time_tell(&vorbisFile) / 1000.0;
+	if (get_isMusicStart() == true) return vorbis_time = (double)ov_time_tell(&vorbisFile) / 1000.0;	//再生前に呼び出すとクラッシュ
+	else return -1000;
 }
 
 int get_buffer_size() {

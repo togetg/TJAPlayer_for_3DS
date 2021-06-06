@@ -6,10 +6,10 @@
 #include <sys/time.h>
 
 enum msec_status {
-	InIT,
-	CuRRENT,
-	DiFF,
-	LaST_DiFF,
+	MSEC_INIT,
+	MSEC_CURRENT,
+	MSEC_DIFF,
+	MSEC_LAST_DIFF,
 };
 #define TIME_NUM 5
 
@@ -32,19 +32,19 @@ double get_current_time(int id) {
 	if (isStop[id] != 1) {
 		gettimeofday(&myTime, NULL);
 
-		if (cnt[id] == 0) msec[id][InIT] = (int)myTime.tv_usec;
+		if (cnt[id] == 0) msec[id][MSEC_INIT] = (int)myTime.tv_usec;
 
-		msec[id][CuRRENT] = (int)myTime.tv_usec;
-		msec[id][LaST_DiFF] = msec[id][DiFF];
-		msec[id][DiFF] = msec[id][CuRRENT] - msec[id][InIT];
+		msec[id][MSEC_CURRENT] = (int)myTime.tv_usec;
+		msec[id][MSEC_LAST_DIFF] = msec[id][MSEC_DIFF];
+		msec[id][MSEC_DIFF] = msec[id][MSEC_CURRENT] - msec[id][MSEC_INIT];
 
-		if (msec[id][DiFF] < 0) msec[id][DiFF] = 1000000 - msec[id][DiFF] * -1;
+		if (msec[id][MSEC_DIFF] < 0) msec[id][MSEC_DIFF] = 1000000 - msec[id][MSEC_DIFF] * -1;
 
-		if (msec[id][LaST_DiFF] > msec[id][DiFF]) sec[id]++;
+		if (msec[id][MSEC_LAST_DIFF] > msec[id][MSEC_DIFF]) sec[id]++;
 
 		cnt[id]++;
-		//printf("%04d:%06d\n", sec, msec[id][DiFF]);
-		Time[id] = sec[id] + msec[id][DiFF] / 1000000.0 + PreTime[id];
+		//printf("%04d:%06d\n", sec, msec[id][MSEC_DIFF]);
+		Time[id] = sec[id] + msec[id][MSEC_DIFF] / 1000000.0 + PreTime[id];
 	}
 	//snprintf(get_buffer(), BUFFER_SIZE, "t:%.1f", Time[id]);
 	//draw_debug(0, id*10, get_buffer());
@@ -79,23 +79,35 @@ int get_time_isStop(int id) {
 	return isStop[id];
 }
 
-#define Fps_Sample 60
+#define FPS_SAMPLE 60
 double fps_time[2],fps_cnt,fps_sum,fps;	//要初期化
 void draw_fps() {
 	
 	fps_time[0] = fps_time[1];
-	fps_time[1] = get_current_time(2);
+	fps_time[1] = get_current_time(TIME_FPS);
 
 	fps_sum += (fps_time[1] - fps_time[0]);
 	fps_cnt++;
 
-	if (fps_cnt == Fps_Sample) {
+	if (fps_cnt == FPS_SAMPLE) {
 		fps_cnt = 0;
-		fps = Fps_Sample / fps_sum;
+		fps = FPS_SAMPLE / fps_sum;
 		fps_sum = 0;
 	}
 	snprintf(get_buffer(), BUFFER_SIZE, "%.1ffps", fps);
 	draw_debug(300, 0, get_buffer());
+}
+
+double preVorbisTime = -1000,startVorbisTime = -1000;
+double calc_vorbis_time(double CurrentTimeNotes) {
+
+	double result,vorbisTime = getVorbisTime();
+	if (vorbisTime == -1000) result = CurrentTimeNotes;	//曲開始前はそのまま返す
+	if (preVorbisTime == -1000 && vorbisTime != -1000)	startVorbisTime = CurrentTimeNotes;//曲開始時間を保存(timenotes換算)
+	if (vorbisTime != -1000) result = vorbisTime + startVorbisTime;
+
+	preVorbisTime = vorbisTime;
+	return result;
 }
 
 void time_ini() {
@@ -120,4 +132,6 @@ void time_ini() {
 	fps_cnt = 0;
 	fps_sum = 0;
 	fps = 0;
+	preVorbisTime = -1000;
+	startVorbisTime = -1000;
 }

@@ -6,3 +6,4 @@ void stop_time(int id);
 void restart_time(int id);
 int get_time_isStop(int id);
 void toggle_time(int id);
+double calc_vorbis_time(double CurrentTimeNotes);
