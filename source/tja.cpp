@@ -393,8 +393,10 @@ double calc_first_measure_time() {	//最初に到達する小節の所要時間�
 void load_tja_notes(int course, LIST_T Song) {
 
 	int FirstMultiMeasure = -1,	//複数行の小節の最初の小節id 複数出ない場合は-1
-		NotesCount = 0, BranchCourse = -1;
-	bool isStart = false, isEnd = false, isDispBarLine = true, isNoComma = false,isCourseMatch = false;
+		NotesCount = 0, BranchCourse = -1,
+		BeforeBranchFirstMultiMeasure = -1, BeforeBranchNotesCount = 0;
+	bool isStart = false, isEnd = false, isDispBarLine = true, isNoComma = false, isCourseMatch = false,
+		BeforeBranchIsDispBarLine = true, BeforeBranchIsNoComma = false;
 	FILE *fp;
 	COMMAND_T Command;
 	OPTION_T Option;
@@ -409,11 +411,15 @@ void load_tja_notes(int course, LIST_T Song) {
 		percent = 1,
 		BeforeBranchJudgeTime = 0,
 		BeforeBranchCreateTime = 0,
+		BeforeBranchPopTime = 0,
 		BeforeBranchPreJudge = 0,
 		BeforeBranchBpm = 0,
 		BeforeBranchDelay = 0,
 		BeforeBranchMeasure = 0,
-		BeforeBranchScroll = 1;
+		BeforeBranchScroll = 1,
+		BeforeBranchNextBpm = 0,
+		BeforeBranchNextMeasure = 0,
+		BeforeBranchPercent = 1;
 
 	if (course == -1) isCourseMatch = true;		//コース表記なし
 
@@ -567,11 +573,19 @@ void load_tja_notes(int course, LIST_T Song) {
 					case COMMAND_BRANCHSTART:
 						BeforeBranchJudgeTime = Measure[MeasureCount].judge_time;
 						BeforeBranchCreateTime = Measure[MeasureCount].create_time;
+						BeforeBranchPopTime = Measure[MeasureCount].pop_time;
 						BeforeBranchBpm = bpm;
 						BeforeBranchDelay = delay;
 						BeforeBranchMeasure = measure;
 						BeforeBranchPreJudge = PreJudge;
 						BeforeBranchScroll = scroll;
+						BeforeBranchNextBpm = NextBpm;
+						BeforeBranchNextMeasure = NextMeasure;
+						BeforeBranchIsDispBarLine = isDispBarLine;
+						BeforeBranchFirstMultiMeasure = FirstMultiMeasure;
+						BeforeBranchIsNoComma = isNoComma;
+						BeforeBranchNotesCount = NotesCount;
+						BeforeBranchPercent = percent;
 						break;
 					case COMMAND_N:
 					case COMMAND_E:
@@ -580,9 +594,17 @@ void load_tja_notes(int course, LIST_T Song) {
 						measure = BeforeBranchMeasure;
 						delay = BeforeBranchDelay;
 						scroll = BeforeBranchScroll;
+						NextBpm = BeforeBranchNextBpm;
+						NextMeasure = BeforeBranchNextMeasure;
 						Measure[MeasureCount].judge_time = BeforeBranchJudgeTime;
 						Measure[MeasureCount].create_time = BeforeBranchCreateTime;
+						Measure[MeasureCount].pop_time = BeforeBranchPopTime;
 						PreJudge = BeforeBranchPreJudge;
+						isDispBarLine = BeforeBranchIsDispBarLine;
+						FirstMultiMeasure =BeforeBranchFirstMultiMeasure;
+						isNoComma = BeforeBranchIsNoComma;
+						NotesCount = BeforeBranchNotesCount;
+						percent = BeforeBranchPercent;
 						break;
 					default:
 						break;
