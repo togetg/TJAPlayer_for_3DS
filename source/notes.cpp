@@ -38,10 +38,8 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 	//最初の小節のcreate_timeがマイナスだった時用に調整
 	double CurrentTimeNotes = get_current_time(TIME_NOTES) + Measure[0].create_time;	
-	/*snprintf(get_buffer(), BUFFER_SIZE, "ctm:%.1f ct:%.1f 0ct:%.1f", CurrentTimeNotes, CurrentTimeNotes - Measure[0].create_time, Measure[0].create_time);
-	draw_debug(0, 10, get_buffer());
-	snprintf(get_buffer(), BUFFER_SIZE, "vbt%.1f", calc_vorbis_time(CurrentTimeNotes));
-	draw_debug(0, 20, get_buffer());*/
+	//snprintf(get_buffer(), BUFFER_SIZE, "fmt:%.1f ctm:%.1f ct:%.1f 0ct:%.1f", get_FirstMeasureTime(), CurrentTimeNotes, CurrentTimeNotes - Measure[0].create_time, Measure[0].create_time);
+	//draw_debug(0, 10, get_buffer());
 
 	if (cnt >= 0 && isNotesLoad == true) {
 
@@ -247,8 +245,10 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 						case NOTES_BALLOON:
 							roll_id = make_balloon_end(id);
 							if (roll_id != -1) {
+								BalloonNotes[roll_id].end_id = id;
 								Notes[id].roll_id = roll_id;
 								Notes[id].knd = NOTES_BALLOONEND;
+								RollState = 0;
 							}
 							else {
 								delete_notes(id);
@@ -345,25 +345,22 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 	draw_emblem(sprites);
 	draw_judge(CurrentTimeNotes, sprites);
 
-	/*
-	snprintf(buf_notes, sizeof(buf_notes), "cnt :%d", cnt);
-	draw_debug(100, 0, buf_notes);
+	
+	/*snprintf(get_buffer(), BUFFER_SIZE, "cnt :%d", cnt);
+	draw_debug(100, 0, get_buffer());
 
-	snprintf(buf_notes, sizeof(buf_notes), "Bpm:%.1f     Measure:%.1f     Scroll:%.1f", Measure[MeasureCount].bpm, Measure[MeasureCount].measure, Measure[MeasureCount].scroll);
-	draw_debug(0, 20, buf_notes);
-
-	snprintf(buf_notes, sizeof(buf_notes), "%d:%.1f:%s", MeasureCount - 1,Measure[MeasureCount-1].judge_time, tja_notes[MeasureCount - 1]);
-	draw_debug(0, 50, buf_notes);
-	int n = 273;
-	snprintf(buf_notes, sizeof(buf_notes), "%d:%s:%f:%d:%d", n, tja_notes[Measure[n].notes],Measure[n].create_time,Measure[n].branch,Branch.course);
-	draw_debug(0, 30, buf_notes);
-
-	if (Option.isAuto == true) draw_debug(0, 200, "Auto");
-	else draw_debug(0, 200, "Manual");
-
-	snprintf(buf_notes, sizeof(buf_notes), "%s", tja_notes[4]);
-	draw_debug(0, 210, buf_notes);
-	*/
+	snprintf(get_buffer(), BUFFER_SIZE, "Bpm:%.1f     Measure:%.1f     Scroll:%.1f", Measure[MeasureCount].bpm, Measure[MeasureCount].measure, Measure[MeasureCount].scroll);
+	draw_debug(0, 20, get_buffer());
+	int id = MeasureCount - 1;
+	id = 0;
+	snprintf(get_buffer(), BUFFER_SIZE, "Judge:%.1f   Create:%.1f   Pop:%.1f", Measure[id].judge_time, Measure[id].create_time, Measure[id].pop_time);
+	draw_debug(0, 40, get_buffer());
+	snprintf(get_buffer(), BUFFER_SIZE, "%d: %s", id, tja_notes[id]);
+	draw_debug(0, 50, get_buffer());
+	snprintf(get_buffer(), BUFFER_SIZE, "course:%d", Branch.course);
+	draw_debug(250, 40, get_buffer());*/
+	
+	
 }
 
 int find_notes_id() {
@@ -880,8 +877,13 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 			default:
 				break;
 			}
-			//snprintf(buf_notes, sizeof(buf_notes), "%d", i);
-			//draw_debug(Notes[i].x, 132, buf_notes);
+			
+			/*if (Notes[i].roll_id != -1) {
+				snprintf(get_buffer(), BUFFER_SIZE, "%d", RollNotes[Notes[i].roll_id].id);
+				draw_debug(Notes[i].x, 132, get_buffer());
+			}*/
+			//snprintf(get_buffer(), BUFFER_SIZE, "%d", Notes[i].knd);
+			//draw_debug(Notes[i].x, 132, get_buffer());
 		}
 	}
 
@@ -1054,7 +1056,7 @@ int make_balloon_start(int NotesId) {
 	else return -1;
 }
 
-int find_balloon_end_id() {	//startの値だけ入ってる連打idを返す
+int find_balloon_end_id() {	//startの値だけ入ってる風船idを返す
 
 	for (int i = 0; i < Balloon_Max - 1; i++) {
 
