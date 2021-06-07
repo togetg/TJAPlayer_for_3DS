@@ -114,7 +114,7 @@ void calc_option_page(u16 px, u16 py, unsigned int key) {
 void draw_option(u16 px, u16 py, unsigned int key, C2D_Sprite sprites[Sprite_Number]) {
 	
 	float width,height,x,y;
-	int XSense=65, YSense=30,XCnt = 0,YCnt = 1,gap = 15;
+	int XSense=65, YSense=30,XCnt = 0,YCnt = 1,gap = 25;
 	int x2, y2, key_interval = 30;
 
 	switch (option_page) {
@@ -193,11 +193,14 @@ void draw_option(u16 px, u16 py, unsigned int key, C2D_Sprite sprites[Sprite_Num
 		x = XSense * XCnt + gap, y = YSense * YCnt, XCnt++;
 		draw_option_text(x, y, Text[Option.lang][TEXT_EN], Option.lang == LANG_EN, &width, &height);
 		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) Option.lang = LANG_EN;
+		x = XSense * XCnt + gap+10, y = YSense * YCnt, XCnt++;
+		draw_option_text(x, y, Text[Option.lang][TEXT_ES], Option.lang == LANG_ES, &width, &height);
+		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) Option.lang = LANG_ES;
 		XCnt = 0, YCnt++;
 		break;
 
 	case 2:
-		XSense = 65, YSense = 30, XCnt = 0, YCnt = 1, gap = 50;
+		XSense = 65, YSense = 30, XCnt = 0, YCnt = 1, gap = 100;
 		//バッファ
 		x = XSense * XCnt, y = YSense * YCnt, XCnt++;
 		draw_option_text(x, y, Text[Option.lang][TEXT_BUFFERSIZE], true, &width, &height);
@@ -226,7 +229,7 @@ void draw_option(u16 px, u16 py, unsigned int key, C2D_Sprite sprites[Sprite_Num
 		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) {
 			Option.speed = input_number_keyboard(5, true);
 			if (Option.speed > 10.0) Option.speed = 10.0;
-			if (Option.speed <= 0) Option.speed = 1;
+			if (Option.speed < 1.0) Option.speed = 1.0;
 		}
 		x = XSense * XCnt + gap, y = YSense * YCnt, XCnt++;
 		draw_option_text(x, y, Text[Option.lang][TEXT_RESET], true, &width, &height);
@@ -246,8 +249,8 @@ void draw_option(u16 px, u16 py, unsigned int key, C2D_Sprite sprites[Sprite_Num
 		break;
 
 	case 3:
-		//キーコンフィグ
-		draw_option_text(90, 10, Text[Option.lang][TEXT_BUTTON_MAPPING], true, &width, &height);
+		//ボタンマッピング
+		draw_option_text(80, 25, Text[Option.lang][TEXT_BUTTON_MAPPING], true, &width, &height);
 		x = 130, y = 120;
 		draw_option_text(x, y, Text[Option.lang][TEXT_RESET], true, &width, &height);
 		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) init_button_mapping();
