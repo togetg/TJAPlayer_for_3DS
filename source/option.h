@@ -13,6 +13,7 @@ typedef struct {
 enum Lang_knd {
 	LANG_JP = 0,
 	LANG_EN,
+	LANG_ES,
 };
 
 enum KEY_KND {
@@ -42,6 +43,7 @@ enum Text_knd {
 	TEXT_LANG,
 	TEXT_JP,
 	TEXT_EN,
+	TEXT_ES,
 	TEXT_BUFFERSIZE,
 	TEXT_RESET,
 	TEXT_DISP_FPS,
@@ -58,7 +60,7 @@ enum Text_knd {
 	TEXT_RETURNSELECT,
 };
 
-const char Text[2][64][64] = {
+const char Text[3][64][64] = {
 	{
 		"ON",
 		"OFF",
@@ -80,6 +82,7 @@ const char Text[2][64][64] = {
 		"Lang.",
 		"日本語",
 		"English",
+		"Español",
 		"ﾊﾞｯﾌｧｻｲｽﾞ",
 		"リセット",
 		"fps表示",
@@ -116,6 +119,7 @@ const char Text[2][64][64] = {
 		"Lang.",
 		"日本語",
 		"English",
+		"Español",
 		"BufferSize",
 		"Reset",
 		"Display fps",
@@ -130,6 +134,43 @@ const char Text[2][64][64] = {
 		"Continue",
 		"Retry",
 		"Back to Select song"
+	},
+	{
+		"Sí",
+		"No",
+		"Fácil",
+		"Normal",
+		"Difícil",
+		"Extremo",
+		"Auto",
+		"Velocidad",
+		"x1",
+		"x2",
+		"x3",
+		"x4",
+		"Invisible",
+		"Inversa",
+		"Random",
+		"25%",
+		"50%",
+		"Idioma",
+		"日本語",
+		"English",
+		"Español",
+		"Tamaño del búfer",
+		"Reiniciar",
+		"Mostrar fps",
+		"Mapeo de botones",
+		"Puntuación",
+		"Combo máximo",
+		"Bien",
+		"OK",
+		"Mal",
+		"Redoble",
+		"Presiona START",
+		"Continuar",
+		"Reintentar",
+		"Volver al menú"
 	}
 };
 
