@@ -409,17 +409,8 @@ void load_tja_notes(int course, LIST_T Song) {
 		NextMeasure = 1,
 		delay = 0,
 		percent = 1,
-		BeforeBranchJudgeTime = 0,
-		BeforeBranchCreateTime = 0,
-		BeforeBranchPopTime = 0,
-		BeforeBranchPreJudge = 0,
-		BeforeBranchBpm = 0,
-		BeforeBranchDelay = 0,
-		BeforeBranchMeasure = 0,
-		BeforeBranchScroll = 1,
-		BeforeBranchNextBpm = 0,
-		BeforeBranchNextMeasure = 0,
-		BeforeBranchPercent = 1;
+		BeforeBranchJudgeTime = 0,BeforeBranchCreateTime = 0,BeforeBranchPopTime = 0,BeforeBranchPreJudge = 0,BeforeBranchBpm = 0,
+		BeforeBranchDelay = 0,BeforeBranchMeasure = 0,BeforeBranchScroll = 1,BeforeBranchNextBpm = 0,BeforeBranchNextMeasure = 0,BeforeBranchPercent = 1;
 
 	if (course == -1) isCourseMatch = true;		//コース表記なし
 
@@ -586,6 +577,7 @@ void load_tja_notes(int course, LIST_T Song) {
 						BeforeBranchIsNoComma = isNoComma;
 						BeforeBranchNotesCount = NotesCount;
 						BeforeBranchPercent = percent;
+						if (tja_cnt == 0) Measure[MeasureCount].judge_time = 0;	//ノーツの前に分岐はすぐに判定
 						break;
 					case COMMAND_N:
 					case COMMAND_E:
