@@ -37,9 +37,11 @@
 
 # スクリーンショット
 <details><summary>スクリーンショット</summary>
-![1](https://user-images.githubusercontent.com/18244518/120986498-a3718300-c7b7-11eb-9036-8d9807a1b5c0.png)![2](https://user-images.githubusercontent.com/18244518/120986505-a66c7380-c7b7-11eb-9c61-d98f752e9f2d.png)
-![3](https://user-images.githubusercontent.com/18244518/120986516-a8363700-c7b7-11eb-83af-db1fe4a3de32.png)![4](https://user-images.githubusercontent.com/18244518/120986526-a9fffa80-c7b7-11eb-99a4-0756e8dae4db.png)
+
+![1](https://user-images.githubusercontent.com/18244518/120986498-a3718300-c7b7-11eb-9036-8d9807a1b5c0.png) ![2](https://user-images.githubusercontent.com/18244518/120986505-a66c7380-c7b7-11eb-9c61-d98f752e9f2d.png)
+![3](https://user-images.githubusercontent.com/18244518/120986516-a8363700-c7b7-11eb-83af-db1fe4a3de32.png) ![4](https://user-images.githubusercontent.com/18244518/120986526-a9fffa80-c7b7-11eb-99a4-0756e8dae4db.png)
 ![5](https://user-images.githubusercontent.com/18244518/120986545-ad938180-c7b7-11eb-89ad-bafca4c2c441.png)
+
 </details>
 
 # ビルド
