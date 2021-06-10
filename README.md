@@ -1,7 +1,7 @@
 [English](README_en.md)
-
-{: align="center"}
-![banner](https://user-images.githubusercontent.com/18244518/120987722-d49e8300-c7b8-11eb-9d13-f5c92804dae2.png)
+<div align="center">
+    <img src="https://user-images.githubusercontent.com/18244518/120987722-d49e8300-c7b8-11eb-9d13-f5c92804dae2.png" alt="banner">
+</div>
 
 太鼓さん次郎等で使われている[TJAファイル](https://wikiwiki.jp/jiro/%E5%A4%AA%E9%BC%93%E3%81%95%E3%82%93%E6%AC%A1%E9%83%8E#h2_content_1_8)を3DSでプレイします。
 
