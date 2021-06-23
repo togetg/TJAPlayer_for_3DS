@@ -40,15 +40,15 @@ GRAPHICS	:=	gfx
 ROMFS		:=	romfs
 GFXBUILD	:=	$(ROMFS)/gfx
 #---------------------------------------------------------------------------------
-APP_VER					:= 1026 #1024.16.1?
+APP_VER					:= 1040 #1024.16.1?
 APP_TITLE				:= TJAPlayer for 3DS
-APP_DESCRIPTION				:= Music game of the TJA file.
+APP_DESCRIPTION				:= TJAPlayer for 3DS - Music game of the TJA file.
 APP_AUTHOR				:= Togetoge
 PRODUCT_CODE				:= CTR-HB-TJAP
 UNIQUE_ID				:= 0xB7655
 
 BANNER_AUDIO				:= resource/banner.wav
-BANNER_IMAGE				:= resource/banner.png
+BANNER_IMAGE				:= resource/banner.cgfx
 ICON        				:= resource/icon.png
 RSF_PATH				:= resource/app.rsf
 
