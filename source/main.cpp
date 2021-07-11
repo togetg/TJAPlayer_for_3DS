@@ -72,6 +72,16 @@ void button_game(bool *isDon,bool *isKatsu,OPTION_T Option, unsigned int key) {
 	}
 }
 
+bool check_dsp1() { //DSP1を起動しているか確認
+
+	FILE* fp = fopen(PATH_DSP1, "r");
+
+	if (fp == NULL) return false;
+	fclose(fp);
+
+	return true;
+}
+
 int touch_x, touch_y, touch_cnt,PreTouch_x,PreTouch_y;	//タッチ用
 
 int main() {
@@ -90,7 +100,7 @@ int main() {
 	load_sprites();
 	load_music();
 
-	int cnt = 0, notes_cnt = 0, scene_state = SCENE_SELECTLOAD, course = COURSE_ONI, tmp;
+	int cnt = 0, notes_cnt = 0, scene_state = SCENE_SELECTLOAD,warning=-1, course = COURSE_ONI, tmp=0;
 
 	double FirstMeasureTime = INT_MAX,
 		offset = 0,CurrentTimeMain = -1000;
@@ -116,14 +126,29 @@ int main() {
 
 		case SCENE_SELECTLOAD:	//ロード画面
 
-			snprintf(get_buffer(), BUFFER_SIZE, "TJAPlayer for 3DS %.2f", VERSION);
+			snprintf(get_buffer(), BUFFER_SIZE, "TJAPlayer for 3DS %s", VERSION);
 			draw_select_text(120, 70, get_buffer());
 			draw_select_text(120, 100, "Now Loading...");
 			C3D_FrameEnd(0);
-			scene_state = SCENE_SELECTSONG;
-			cnt = -1;
 			load_file_main();
 			load_option();
+			if (check_dsp1() == true) scene_state = SCENE_SELECTSONG;
+			else { 
+				warning = WARNING_DSP1;
+				scene_state = SCENE_WARNING; 
+			}
+			break;
+
+		case SCENE_WARNING:		//警告画面
+
+			C2D_TargetClear(bottom, C2D_Color32(0x42, 0x42, 0x42, 0xFF));	//下画面
+			C2D_SceneBegin(bottom);
+
+			if (warning == WARNING_DSP1) tmp = message_window(tp, key, TEXT_DSP1);
+			if (tmp == 1) {
+				scene_state = SCENE_SELECTSONG;
+				warning = -1;
+			}
 			break;
 
 		case SCENE_SELECTSONG:	//選曲
@@ -151,7 +176,6 @@ int main() {
 
 			C2D_TargetClear(bottom, C2D_Color32(0x42, 0x42, 0x42, 0xFF));	//下画面
 			C2D_SceneBegin(bottom);
-			//C2D_DrawSprite(&sprites[SPRITE_BOTTOM]);
 			draw_option(tp.px, tp.py, key, sprites);
 			isPause = false;
 
@@ -168,7 +192,7 @@ int main() {
 			if (SelectedSong.course_exist[course] == false) load_tja_notes(-1, SelectedSong);
 			else load_tja_notes(course, SelectedSong);
 			time_ini();
-			offset = TJA_Header.offset;
+			offset = TJA_Header.offset + Option.offset;
 			notes_cnt = 0;
 			isNotesStart = false, isMusicStart = false, isPlayMain = false;
 			FirstMeasureTime = INT_MAX;
@@ -270,23 +294,15 @@ int main() {
 				if (isPause == false) notes_cnt++;
 			}
 			draw_score(sprites);
-			//score_debug();
-			//vorbis_debug();
-			//playback_debug();
-			/*if (isMusicStart == true) {
-				snprintf(buffer, sizeof(buffer), "0:%.3f 1:%.3f vt:%.3f", get_current_time(TIME_NOTES),get_current_time(TIME_MAINGAME), getVorbisTime());
-				draw_debug(0, 0, buffer);
-			}*/
 
 			C2D_TargetClear(bottom, C2D_Color32(0x42, 0x42, 0x42, 0xFF));	//下画面
 			C2D_SceneBegin(bottom);
 			C2D_DrawSprite(&sprites[SPRITE_BOTTOM]);
-
 			//debug_touch(tp.px,tp.py);
 
 			if (isPause == true) {
 				
-				tmp = pause_window(tp.px, tp.py, key);
+				tmp = pause_window(tp, key);
 
 				switch (tmp) {
 				case 0:
@@ -395,4 +411,54 @@ int powi(int x, int y) {	//なぜかpowのキャストが上手くいかない�
 		ans = ans * x;
 	}
 	return ans;
+}
+
+C2D_TextBuf g_MainText = C2D_TextBufNew(4096);
+C2D_Text MainText;
+
+void draw_window_text(float x, float y, const char* text, float* width, float* height,float size = 1.0) {
+
+	C2D_TextBufClear(g_MainText);
+	C2D_TextParse(&MainText, g_MainText, text);
+	C2D_TextOptimize(&MainText);
+
+	C2D_TextGetDimensions(&MainText, size, size, width, height);
+	C2D_DrawText(&MainText, C2D_WithColor, BOTTOM_WIDTH / 2 - *width / 2, y, 1.0f, size, size, C2D_Color32f(1.0f, 1.0f, 1.0f, 1.0f));
+}
+
+int pause_window(touchPosition tp, unsigned int key) {
+
+	int margin = 20, result = -1, x, y;
+	float width, height;
+
+	C2D_DrawRectSolid(margin, margin, 0, BOTTOM_WIDTH - margin * 2, BOTTOM_HEIGHT - margin * 2, C2D_Color32f(0, 0, 0, 1));
+
+	draw_window_text(-1, margin + 30, Text[get_lang()][TEXT_CONTINUE], &width, &height);		//続ける
+	x = BOTTOM_WIDTH / 2 - width / 2, y = margin + 30;
+	if ((y < tp.py && y + height > tp.py && x < tp.px && x + width > tp.px) && key & KEY_TOUCH) result = 0;
+
+	draw_window_text(-1, margin + 80, Text[get_lang()][TEXT_STARTOVER], &width, &height);		//はじめから
+	x = BOTTOM_WIDTH / 2 - width / 2, y = margin + 80;
+	if ((y < tp.py && y + height > tp.py && x < tp.px && x + width > tp.px) && key & KEY_TOUCH) result = 1;
+
+	draw_window_text(-1, margin + 130, Text[get_lang()][TEXT_RETURNSELECT], &width, &height);	//曲選択に戻る
+	x = BOTTOM_WIDTH / 2 - width / 2, y = margin + 130;
+	if ((y < tp.py && y + height > tp.py && x < tp.px && x + width > tp.px) && key & KEY_TOUCH) result = 2;
+
+	return result;
+}
+
+int message_window(touchPosition tp, unsigned int key,int text) {
+
+	int margin = 20,result = -1, x, y;
+	float width, height;
+
+	C2D_DrawRectSolid(margin, margin, 0, BOTTOM_WIDTH - margin * 2, BOTTOM_HEIGHT - margin * 2, C2D_Color32f(0, 0, 0, 1));
+	draw_window_text(-1, margin + 80, Text[get_lang()][text], &width, &height,0.5);
+
+	draw_window_text(-1, margin + 150, "OK", &width, &height);
+	x = BOTTOM_WIDTH / 2 - width / 2, y = margin + 150;
+	if ((y < tp.py && y + height > tp.py && x < tp.px && x + width > tp.px) && key & KEY_TOUCH) result = 1;
+
+	return result;
 }

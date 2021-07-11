@@ -11,9 +11,10 @@
 #include <unistd.h>
 #include <ctype.h>
 
-#define VERSION 1.02
+#define VERSION "1.1.0"
 #define DEFAULT_DIR	"sdmc:/tjafiles/"
-#define SETTING_FILE	"sdmc:/TJAPlayerfor3ds_setting.json"
+#define SETTING_FILE "sdmc:/TJAPlayerfor3ds_setting.json"
+#define PATH_DSP1 "sdmc:/3ds/dspfirm.cdc"
 
 #define Max_Notes_Measure 256	//一小節の最大ノーツ数+1
 #define Measure_Max 8192
@@ -196,6 +197,7 @@ enum COURSE_KND {
 enum SCENE_STATE {
 
 	SCENE_SELECTLOAD = 0,
+	SCENE_WARNING = 5,
 	SCENE_SELECTSONG = 10,
 	SCENE_MAINLOAD = 50,
 	SCENE_MAINGAME = 100,
@@ -211,7 +213,12 @@ enum SOUND_KND {
 
 enum TIME_KND {
 
-	TIME_NOTES = 0,	//ノーツが開始(最初の小節が生成)で計測開始,ctnはこれに最初にcreate_time加算(マイナス用,通常は0),
+	TIME_NOTES = 0,	//ノーツが開始(最初の小節が生成)で計測開始,cntはこれに最初にcreate_time加算(マイナス用,通常は0),
 	TIME_MAINGAME,	//メインゲーム,開始時には-1000,1秒後に計測開始,ノーツ・音楽開始にのみ使用
 	TIME_FPS,		//fps計測用
+};
+
+enum WARNING_KND {
+
+	WARNING_DSP1 = 0, //DSP1未起動
 };

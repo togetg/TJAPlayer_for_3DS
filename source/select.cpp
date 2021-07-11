@@ -10,7 +10,6 @@
 
 void load_file_list(const char *path);
 void draw_select_text(float x, float y, const char *text);
-void draw_option_text(float x, float y, const char *text, bool state,float *width,float *height);
 
 LIST_T List[List_Max];
 char buf_select[256];
@@ -308,39 +307,6 @@ void draw_option_text(float x, float y, const char *text,bool state, float *widt
 		C2D_DrawText(&SelectText, C2D_WithColor, x, y, 1.0f, sizex, sizey, C2D_Color32f(1.0f, 1.0f, 1.0f, 1.0f));
 	}
 	C2D_TextGetDimensions(&SelectText, sizex, sizey, width, height);
-}
-
-void draw_pause_text(float x, float y, const char *text, float *width, float *height) {
-
-	C2D_TextBufClear(g_SelectText);
-	C2D_TextParse(&SelectText, g_SelectText, text);
-	C2D_TextOptimize(&SelectText);
-	float size = 1.0;
-
-	C2D_TextGetDimensions(&SelectText, size, size, width, height);
-	C2D_DrawText(&SelectText, C2D_WithColor, BOTTOM_WIDTH/2-*width/2, y, 1.0f, size, size, C2D_Color32f(1.0f, 1.0f, 1.0f, 1.0f));
-}
-
-int pause_window(u16 px, u16 py, unsigned int key) {
-
-	int margin = 20,ReturnVal = -1,x,y;
-	float width, height;
-
-	C2D_DrawRectSolid(margin, margin, 0, BOTTOM_WIDTH-margin*2, BOTTOM_HEIGHT-margin*2, C2D_Color32f(0, 0, 0, 1));
-
-	draw_pause_text(-1, margin + 30, Text[get_lang()][TEXT_CONTINUE], &width, &height);		//続ける
-	x = BOTTOM_WIDTH / 2 - width / 2, y = margin + 30;
-	if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) ReturnVal = 0;
-
-	draw_pause_text(-1, margin + 80, Text[get_lang()][TEXT_STARTOVER], &width, &height);		//はじめから
-	x = BOTTOM_WIDTH / 2 - width / 2, y = margin + 80;
-	if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) ReturnVal = 1;
-
-	draw_pause_text(-1, margin + 130, Text[get_lang()][TEXT_RETURNSELECT], &width, &height);	//曲選択に戻る
-	x = BOTTOM_WIDTH / 2 - width / 2, y = margin + 130;
-	if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) ReturnVal = 2;
-
-	return ReturnVal;
 }
 
 void get_SelectedId(LIST_T *TMP,int *arg) {
