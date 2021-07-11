@@ -4,7 +4,7 @@ typedef struct {
 
 	int lang,buffer_size;
 	bool isAuto, isStelth,isSwap,dispFps;
-	double speed, random;
+	double speed, random,offset;
 	int KEY_A, KEY_B, KEY_DRIGHT, KEY_DLEFT, KEY_DUP, KEY_DDOWN, KEY_R, KEY_L, KEY_X, KEY_Y,
 		KEY_ZL, KEY_ZR, KEY_CSTICK_RIGHT, KEY_CSTICK_LEFT, KEY_CSTICK_UP, KEY_CSTICK_DOWN,
 		KEY_CPAD_RIGHT, KEY_CPAD_LEFT, KEY_CPAD_UP, KEY_CPAD_DOWN;
@@ -58,6 +58,7 @@ enum Text_knd {
 	TEXT_CONTINUE,
 	TEXT_STARTOVER,
 	TEXT_RETURNSELECT,
+	TEXT_DSP1,
 };
 
 const char Text[3][64][64] = {
@@ -96,7 +97,8 @@ const char Text[3][64][64] = {
 		"STARTボタンを押して戻る",
 		"演奏を続ける",
 		"はじめからやり直す",
-		"曲選択に戻る"
+		"曲選択に戻る",
+		"DSP1を起動していないため音は流れません",
 	},
 	{
 		"ON",
@@ -133,7 +135,8 @@ const char Text[3][64][64] = {
 		"Press START",
 		"Continue",
 		"Retry",
-		"Back to Select song"
+		"Back to Select song",
+		"No sound is played because\nDSP1 is not activated.",
 	},
 	{
 		"Sí",
@@ -170,7 +173,8 @@ const char Text[3][64][64] = {
 		"Presiona START",
 		"Continuar",
 		"Reintentar",
-		"Volver al menú"
+		"Volver al menú",
+		"No sound is played because\nDSP1 is not activated.",
 	}
 };
 
