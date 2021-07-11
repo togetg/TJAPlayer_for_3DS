@@ -11,14 +11,16 @@ json_error_t error_json;
 int option_page = 1,max_option_page = 3;
 
 //数字キーボードで入力
-double input_number_keyboard(int max_digits,bool isFloat) {	//最大桁数、少数かどうか
+double input_number_keyboard(int max_digits,bool isFloat,bool isMinus) {	//最大桁数、少数かどうか
 
 	SwkbdState swkbd;
 	swkbdInit(&swkbd, SWKBD_TYPE_NUMPAD, 1, max_digits);
 	//swkbdSetPasswordMode(&swkbd, SWKBD_PASSWORD_HIDE_DELAY);
 	swkbdSetValidation(&swkbd, SWKBD_ANYTHING, 0, 0);
 	swkbdSetFeatures(&swkbd, SWKBD_FIXED_WIDTH);
-	if (isFloat==true) swkbdSetNumpadKeys(&swkbd, L'.', 0);
+	if (isFloat == true && isMinus == false) swkbdSetNumpadKeys(&swkbd, L'.', 0);
+	if (isFloat == false && isMinus == true) swkbdSetNumpadKeys(&swkbd, L'-', 0);
+	if (isFloat == true && isMinus==true) swkbdSetNumpadKeys(&swkbd, L'.', L'-');
 	swkbdInputText(&swkbd, get_buffer(), BUFFER_SIZE);
 	return atof(get_buffer());
 }
@@ -120,6 +122,8 @@ void draw_option(u16 px, u16 py, unsigned int key, C2D_Sprite sprites[Sprite_Num
 	switch (option_page) {
 
 	case 1:
+		snprintf(get_buffer(), BUFFER_SIZE, "ver%s", VERSION);
+		draw_option_text(240, 0, get_buffer(), true, &width, &height);
 		//オート
 		x = XSense * XCnt, y = YSense * YCnt, XCnt++;
 		draw_option_text(x, y, Text[Option.lang][TEXT_AUTO], true, &width, &height);
@@ -208,7 +212,7 @@ void draw_option(u16 px, u16 py, unsigned int key, C2D_Sprite sprites[Sprite_Num
 		snprintf(get_buffer(), BUFFER_SIZE, "%d", get_buffer_size());
 		draw_option_text(x, y, get_buffer(), true, &width, &height);
 		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) {
-			Option.buffer_size = (int)input_number_keyboard(5, false);
+			Option.buffer_size = (int)input_number_keyboard(5, false,false);
 			if (Option.buffer_size < 1000) Option.buffer_size = 1000;
 			put_buffer_size(Option.buffer_size);
 		}
@@ -227,13 +231,29 @@ void draw_option(u16 px, u16 py, unsigned int key, C2D_Sprite sprites[Sprite_Num
 		snprintf(get_buffer(), BUFFER_SIZE, "%.2f", Option.speed);
 		draw_option_text(x, y, get_buffer(), true, &width, &height);
 		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) {
-			Option.speed = input_number_keyboard(5, true);
+			Option.speed = input_number_keyboard(5, true,false);
 			if (Option.speed > 10.0) Option.speed = 10.0;
 			if (Option.speed < 1.0) Option.speed = 1.0;
 		}
 		x = XSense * XCnt + gap, y = YSense * YCnt, XCnt++;
 		draw_option_text(x, y, Text[Option.lang][TEXT_RESET], true, &width, &height);
 		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) Option.speed = 1.0;
+		XCnt = 0, YCnt++;
+
+		//offset
+		x = XSense * XCnt, y = YSense * YCnt, XCnt++;
+		draw_option_text(x, y, "offset", true, &width, &height);
+		x = XSense * XCnt + gap, y = YSense * YCnt, XCnt++;
+		if (Option.offset == 0)snprintf(get_buffer(), BUFFER_SIZE, "±%.2f", Option.offset);
+		else if (Option.offset > 0)snprintf(get_buffer(), BUFFER_SIZE, "+%.2f", Option.offset);
+		else snprintf(get_buffer(), BUFFER_SIZE, "%.2f", Option.offset);
+		draw_option_text(x, y, get_buffer(), true, &width, &height);
+		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) {
+			Option.offset = input_number_keyboard(5, true,true);
+		}
+		x = XSense * XCnt + gap, y = YSense * YCnt, XCnt++;
+		draw_option_text(x, y, Text[Option.lang][TEXT_RESET], true, &width, &height);
+		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) Option.offset = 0;
 		XCnt = 0, YCnt++;
 
 		//fps
@@ -407,6 +427,7 @@ void init_option() {
 	Option.isSwap = false;
 	Option.lang = LANG_JP;
 	Option.buffer_size = DEFAULT_BUFFER_SIZE;
+	Option.offset = 0;
 
 	init_button_mapping();
 
@@ -423,6 +444,7 @@ void save_option() {
 	json_object_set(json, "dispFps", json_boolean(Option.dispFps));
 	json_object_set(json, "random", json_real(Option.random));
 	json_object_set(json, "speed", json_real(Option.speed));
+	json_object_set(json, "offset", json_real(Option.offset));
 	json_object_set(json, "KEY_A", json_integer(Option.KEY_A));
 	json_object_set(json, "KEY_B", json_integer(Option.KEY_B));
 	json_object_set(json, "KEY_X", json_integer(Option.KEY_X));
@@ -462,6 +484,7 @@ void load_option() {
 		Option.dispFps = json_boolean_value(json_object_get(json, "dispFps"));
 		Option.random = json_real_value(json_object_get(json, "random"));
 		Option.speed = json_real_value(json_object_get(json, "speed"));
+		Option.offset = json_real_value(json_object_get(json, "offset"));
 		Option.KEY_A = json_integer_value(json_object_get(json, "KEY_A"));
 		Option.KEY_B = json_integer_value(json_object_get(json, "KEY_B"));
 		Option.KEY_X = json_integer_value(json_object_get(json, "KEY_X"));
@@ -502,6 +525,7 @@ void get_option(OPTION_T *TMP) {
 	TMP->isStelth = Option.isStelth;
 	TMP->random = Option.random;
 	TMP->speed = Option.speed;
+	TMP->offset = Option.offset;
 	TMP->isSwap = Option.isSwap;
 	TMP->lang = Option.lang;
 	TMP->buffer_size = Option.buffer_size;

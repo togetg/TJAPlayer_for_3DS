@@ -1171,6 +1171,9 @@ void init_notes_structure() {
 
 void init_notes(TJA_HEADER_T TJA_Header) {
 
+	OPTION_T Option;
+	get_option(&Option);
+
 	init_notes_structure();
 	init_roll__notes();
 	init_balloon_notes();
@@ -1180,7 +1183,7 @@ void init_notes(TJA_HEADER_T TJA_Header) {
 	Command.val[1] = 0;
 	Command.val[2] = 0;
 	bpm = TJA_Header.bpm;
-	offset = TJA_Header.offset;
+	offset = TJA_Header.offset + Option.offset;
 	for (int i = 0; i < (int)(sizeof(balloon) / sizeof(balloon[0])); i++) {
 		balloon[i] = TJA_Header.balloon[i];
 	}
