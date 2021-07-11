@@ -58,10 +58,11 @@ enum Text_knd {
 	TEXT_CONTINUE,
 	TEXT_STARTOVER,
 	TEXT_RETURNSELECT,
-	TEXT_DSP1,
+	TEXT_WARNING_DSP1,
+	TEXT_WARNING_WAVE,
 };
 
-const char Text[3][64][64] = {
+const char Text[3][64][128] = {
 	{
 		"ON",
 		"OFF",
@@ -99,6 +100,7 @@ const char Text[3][64][64] = {
 		"はじめからやり直す",
 		"曲選択に戻る",
 		"DSP1を起動していないため音は流れません",
+		"音楽ファイルが読み込めません\n\nTJAファイルをUTF-8に変換しましたか？",
 	},
 	{
 		"ON",
@@ -137,6 +139,7 @@ const char Text[3][64][64] = {
 		"Retry",
 		"Back to Select song",
 		"No sound is played because\nDSP1 is not activated.",
+		"The music file does not exist.\n\nHave you converted the character encoding\nof the TJA file to UTF8?",
 	},
 	{
 		"Sí",
@@ -175,6 +178,7 @@ const char Text[3][64][64] = {
 		"Reintentar",
 		"Volver al menú",
 		"No sound is played because\nDSP1 is not activated.",
+		"The music file does not exist.\n\nHave you converted the character encoding\nof the TJA file to UTF8?",
 	}
 };
 

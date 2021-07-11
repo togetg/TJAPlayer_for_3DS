@@ -221,4 +221,5 @@ enum TIME_KND {
 enum WARNING_KND {
 
 	WARNING_DSP1 = 0, //DSP1未起動
+	WARNING_WAVE,
 };

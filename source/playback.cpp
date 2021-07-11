@@ -247,6 +247,8 @@ int changeFile(const char* ep_file, struct playbackInfo_t* playbackInfo, bool *p
 
 void play_main_music(bool *p_isPlayMain,LIST_T Song) {
 	//char file[] = DEFAULT_DIR File_Name "/" File_Name ".ogg";
+
+
 	chdir(Song.path);
 	changeFile(Song.wave, &playbackInfo, p_isPlayMain);
 }
@@ -264,4 +266,15 @@ void stop_main_music() {
 
 void init_main_music() {
 	playbackInfo.file = NULL;
+}
+
+bool check_wave(LIST_T Song) { //音楽ファイルが存在するか確認
+
+	chdir(Song.path);
+	FILE* fp = fopen(Song.wave, "r");
+
+	if (fp == NULL) return false;
+	fclose(fp);
+
+	return true;
 }

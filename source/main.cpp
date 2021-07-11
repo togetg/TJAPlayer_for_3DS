@@ -144,8 +144,16 @@ int main() {
 			C2D_TargetClear(bottom, C2D_Color32(0x42, 0x42, 0x42, 0xFF));	//下画面
 			C2D_SceneBegin(bottom);
 
-			if (warning == WARNING_DSP1) tmp = message_window(tp, key, TEXT_DSP1);
-			if (tmp == 1) {
+			switch (warning) {
+			case WARNING_DSP1:
+				tmp = message_window(tp, key, TEXT_WARNING_DSP1);
+				break;
+
+			case WARNING_WAVE:
+				tmp = message_window(tp, key, TEXT_WARNING_WAVE);
+				break;
+			}
+			if (tmp == 1 || key & KEY_A) {
 				scene_state = SCENE_SELECTSONG;
 				warning = -1;
 			}
@@ -198,7 +206,12 @@ int main() {
 			FirstMeasureTime = INT_MAX;
 			CurrentTimeMain = -1000;
 
-			scene_state = SCENE_MAINGAME;
+			if (check_wave(SelectedSong) == true) scene_state = SCENE_MAINGAME;
+			else {
+				warning = WARNING_WAVE;
+				scene_state = SCENE_WARNING;
+				select_ini();
+			}
 			cnt = -60;
 			break;
 
@@ -216,8 +229,6 @@ int main() {
 			
 			if (cnt >= 0) CurrentTimeMain = get_current_time(TIME_MAINGAME);
 
-			//snprintf(get_buffer(), BUFFER_SIZE, "%.1f", CurrentTimeMain);
-			//draw_debug(0, 0, get_buffer());
 			if (Option.dispFps == true) draw_fps();
 
 			//譜面が先
@@ -278,7 +289,6 @@ int main() {
 			if (isDon == true)   music_play(SOUND_DON);		//ドン
 			if (isKatsu == true) music_play(SOUND_KATSU);		//カツ
 
-			//if (key & KEY_SELECT) toggle_auto();
 			if (key & KEY_SELECT || key & KEY_START) {
 				togglePlayback();
 				toggle_time(0);
@@ -454,7 +464,7 @@ int message_window(touchPosition tp, unsigned int key,int text) {
 	float width, height;
 
 	C2D_DrawRectSolid(margin, margin, 0, BOTTOM_WIDTH - margin * 2, BOTTOM_HEIGHT - margin * 2, C2D_Color32f(0, 0, 0, 1));
-	draw_window_text(-1, margin + 80, Text[get_lang()][text], &width, &height,0.5);
+	draw_window_text(-1, margin + 50, Text[get_lang()][text], &width, &height,0.5);
 
 	draw_window_text(-1, margin + 150, "OK", &width, &height);
 	x = BOTTOM_WIDTH / 2 - width / 2, y = margin + 150;
