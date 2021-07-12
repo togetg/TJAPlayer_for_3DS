@@ -276,7 +276,8 @@ void load_tja_head_simple(LIST_T *List) {		//選曲用のヘッダ取得
 
 
 	snprintf(List->title, sizeof(List->title), "No Title");
-	snprintf(List->wave, sizeof(List->title), "audio.ogg");
+	snprintf(List->wave, sizeof(List->wave), "audio.ogg");
+
 	for (int i = 0; i < 5; i++) {
 		List->level[i] = 0;
 		List->course[i] = false;
