@@ -15,6 +15,7 @@
 #define DEFAULT_DIR	"sdmc:/tjafiles/"
 #define SETTING_FILE "sdmc:/TJAPlayerfor3ds_setting.json"
 #define PATH_DSP1 "sdmc:/3ds/dspfirm.cdc"
+#define GENRE_FILE "genre.json"
 
 #define Max_Notes_Measure 256	//一小節の最大ノーツ数+1
 #define Measure_Max 8192
@@ -34,7 +35,8 @@
 #define Roll_Max 512
 #define Balloon_Max 512
 
-#define List_Max 16384		//選曲リストの最大数
+#define LIST_MAX 16384		//選曲リストの最大数
+#define GENRE_MAX 512		//ジャンルの最大数
 
 #define DEFAULT_BUFFER_SIZE 8192
 

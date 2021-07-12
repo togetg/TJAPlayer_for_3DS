@@ -7,224 +7,77 @@
 #include "option.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <jansson.h>
 
-void load_file_list(const char *path);
-void draw_select_text(float x, float y, const char *text);
+void load_file_list(const char* path);
+void set_genres();
 
-LIST_T List[List_Max];
+LIST_T List[LIST_MAX];
+GENRE_T Genre[GENRE_MAX];
 char buf_select[256];
-int SongNumber = 0;		//曲の総数
-int count = 0,cursor = 0,course_cursor = 0,course_count = 0,SelectedId = 0,course = COURSE_ONI;
-bool isSelectCourse = false,isGameStart = false;
+int SongNumber = 0;			//曲の総数
+int GenreNumber = 0;		//ジャンルの総数
+int ClosedSongNumber = 0;	//閉じたジャンル内の曲数
+int GenreCount = 0, SongCount = 0, cursor = 0, course_cursor = 0, course_count = 0, SelectedId = 0, SelectedGenreId = 0 ,course = COURSE_ONI;
+bool isSelectCourse = false, isCursorGenre = false, isGameStart = false;
+
+int list_cmp(const void* p, const void* q) {	//比較用
+
+	int pp = ((LIST_T*)p)->genre;
+	int qq = ((LIST_T*)q)->genre;
+
+	return pp - qq;
+}
+
+void list_sort() {	//曲をジャンル順にソート
+
+	qsort(List, SongNumber, sizeof(LIST_T), list_cmp);
+}
 
 void load_file_main() {
 
-	load_file_list_tjafiles();
-}
-
-void load_file_list_tjafiles() {	//バグがおこるため再帰は使わない
-
 	chdir(DEFAULT_DIR);
-
-	DIR *dir;
-	struct dirent *dp;
-
-	dir = opendir(DEFAULT_DIR);
-
-	for (dp = readdir(dir); dp != NULL; dp = readdir(dir)) {
-
-		struct stat st;
-		stat(dp->d_name, &st);
-		if ((st.st_mode & S_IFMT) != S_IFDIR) {
-
-			if (strstr(dp->d_name, ".tja") != NULL) {
-
-				snprintf(List[count].tja, sizeof(List[count].tja), dp->d_name);
-				getcwd(List[count].path, 256);
-				load_tja_head_simple(&List[count]);
-				count++;
-			}
-		}
-		else {
-			load_file_list(dp->d_name);
-			chdir("../");
-		}
-	}
-	closedir(dir);
-	SongNumber = count;
+	load_file_list(DEFAULT_DIR);
+	SongNumber = SongCount;
+	GenreNumber = GenreCount;
+	set_genres();
+	list_sort();
 }
 
+void load_genre_file(int id) {
 
-void disp_file_list() {
+	json_t* json;
+	json_error_t error_json;
+	char tmp[256];
 
-	int n = 0;
-	course_count = 0;
+	chdir(Genre[id].path);
+	json = json_load_file(GENRE_FILE, 0, &error_json);
 
-	if (cursor > 0) cursor = -1*(SongNumber - 1);
-	if (cursor < -1 * (SongNumber - 1)) cursor = 0;
+	strlcpy(Genre[id].name, "Genre", 256);
+	Genre[id].genre_color = 0x111111;
+	Genre[id].font_color = 0xffffff;
 
-	for (int i = 0; i < SongNumber; i++) {
+	if (json != NULL) {
 
-		if ((n + cursor) * 20 + 60 >= 0 && (n + cursor) * 20 + 60 <= 220) {
-
-			draw_select_text(30, (n + cursor) * 20 + 60, List[i].title);
-
-			if (i != (cursor*-1)) {
-				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[COURSE_ONI]);
-				draw_select_text(360, (n + cursor) * 20 + 60, buf_select);
-			}
-		}
-
-		n++;
-
-		if (i == (cursor*-1)) {
-
-			SelectedId = i;
-			int level;
-
-			if (List[i].course[COURSE_EDIT] == true) {
-
-				if ((n + cursor - 1) == course_cursor) course = COURSE_EDIT;
-				level = List[i].level[COURSE_EDIT];
-				if (level > 10) level = 10;
-				for (int j = 0; j < level; j++) {
-					draw_select_text(200 + j * 10, (n + cursor) * 20 + 60, "★");
-				}
-				for (int j = 0; j < (10 - level); j++) {
-					draw_select_text(200 + (j + level) * 10, (n + cursor) * 20 + 60, "・");
-				}
-				draw_select_text(80, (n + cursor) * 20 + 60, Text[get_lang()][TEXT_ONI]);
-				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[COURSE_EDIT]);
-				draw_select_text(360, (n + cursor) * 20 + 60, buf_select);
-				draw_select_text(360, (n + cursor) * 20 + 60, buf_select);
-				n++;
-				course_count++;
-			}
-
-			if (List[i].course[COURSE_ONI] == true) {
-
-				if ((n + cursor - 1) == course_cursor) course = COURSE_ONI;
-				level = List[i].level[COURSE_ONI];
-				if (level > 10) level = 10;
-				for (int j = 0; j < level; j++) {
-					draw_select_text(200 + j * 10, (n + cursor) * 20 + 60, "★");
-				}
-				for (int j = 0; j < (10 - level); j++) {
-					draw_select_text(200 + (j + level) * 10, (n + cursor) * 20 + 60, "・");
-				}
-				draw_select_text(80, (n + cursor) * 20 + 60, Text[get_lang()][TEXT_ONI]);
-				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[COURSE_ONI]);
-				draw_select_text(360, (n + cursor) * 20 + 60, buf_select);
-				n++;
-				course_count++;
-			}
-
-			if (List[i].course[COURSE_HARD] == true) {
-
-				if ((n + cursor - 1) == course_cursor) course = COURSE_HARD;
-				level = List[i].level[COURSE_HARD];
-				if (level > 10) level = 10;
-				for (int j = 0; j < level; j++) {
-					draw_select_text(200 + j * 10, (n + cursor) * 20 + 60, "★");
-				}
-				for (int j = 0; j < (10 - level); j++) {
-					draw_select_text(200 + (j + level) * 10, (n + cursor) * 20 + 60, "・");
-				}
-				draw_select_text(80, (n + cursor) * 20 + 60, Text[get_lang()][TEXT_HARD]);
-				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[COURSE_HARD]);
-				draw_select_text(360, (n + cursor) * 20 + 60, buf_select);
-				n++;
-				course_count++;
-			}
-
-			if (List[i].course[COURSE_NORMAL] == true) {
-
-				if ((n + cursor - 1) == course_cursor) course = COURSE_NORMAL;
-				level = List[i].level[COURSE_NORMAL];
-				if (level > 10) level = 10;
-				for (int j = 0; j < level; j++) {
-					draw_select_text(200 + j * 10, (n + cursor) * 20 + 60, "★");
-				}
-				for (int j = 0; j < (10 - level); j++) {
-					draw_select_text(200 + (j + level) * 10, (n + cursor) * 20 + 60, "・");
-				}
-				draw_select_text(80, (n + cursor) * 20 + 60, Text[get_lang()][TEXT_NORMAL]);
-				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[COURSE_NORMAL]);
-				draw_select_text(360, (n + cursor) * 20 + 60, buf_select);
-				n++;
-				course_count++;
-			}
-
-			if (List[i].course[COURSE_EASY] == true) {
-
-				if ((n + cursor - 1) == course_cursor) course = COURSE_EASY;
-				level = List[i].level[COURSE_EASY];
-				if (level > 10) level = 10;
-				for (int j = 0; j < level; j++) {
-					draw_select_text(200 + j * 10, (n + cursor) * 20 + 60, "★");
-				}
-				for (int j = 0; j < (10 - level); j++) {
-					draw_select_text(200 + (j + level) * 10, (n + cursor) * 20 + 60, "・");
-				}
-				draw_select_text(80, (n + cursor) * 20 + 60, Text[get_lang()][TEXT_EASY]);
-				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[COURSE_EASY]);
-				draw_select_text(360, (n + cursor) * 20 + 60, buf_select);
-				n++;
-				course_count++;
-			}
-
-			if (isSelectCourse == true) {
-
-				draw_select_text(60, (course_cursor+1) * 20 + 60, ">>");
-				//snprintf(buf_select, sizeof(buf_select), "%d",course_cursor);
-				//draw_select_text(60, (course_cursor + 1) * 20 + 60, buf_select);
-			}
-		}
+		Genre[id].flag = true;
+		strlcpy(Genre[id].name, json_string_value(json_object_get(json, "GenreName")), sizeof(Genre[id].name));
+		strlcpy(tmp, json_string_value(json_object_get(json, "GenreColor")), sizeof(tmp));
+		if (tmp[0] == '#') tmp[0] = ' ';
+		Genre[id].genre_color = strtol(tmp, NULL, 16);
+		strlcpy(tmp, json_string_value(json_object_get(json, "FontColor")), sizeof(tmp));
+		if (tmp[0] == '#') tmp[0] = ' ';
+		Genre[id].font_color = strtol(tmp, NULL, 16);
+	}
+	if (json == NULL) {	//開けなかった時
 	}
 
-	draw_select_text(10, 60, ">>");
-	//snprintf(buf_select, sizeof(buf_select), "%d",course);
-	//draw_select_text(0, 60, buf_select);
-
+	json_decref(json);
 }
 
-void cursor_update(int knd) {
-
-	if (knd == KEY_UP) {
-		if (isSelectCourse == false) cursor++;
-		else if (course_cursor > 0) course_cursor--;
-		music_play(SOUND_KATSU);
-	}
-	else if (knd == (int)KEY_DOWN) {
-		if (isSelectCourse == false) cursor--;
-		else if (course_cursor < (course_count-1)) course_cursor++;
-		music_play(SOUND_KATSU);
-	}
-	else if (knd == KEY_RIGHT) {
-		if (isSelectCourse == false) cursor -= 5;
-		music_play(SOUND_KATSU);
-	}
-	else if (knd == KEY_LEFT) {
-		if (isSelectCourse == false) cursor += 5;
-		music_play(SOUND_KATSU);
-	}
-	else if (knd == KEY_A && course_count != 0) {
-		if (isSelectCourse == true) isGameStart = true;
-		else isSelectCourse = true;
-		music_play(SOUND_DON);
-	}
-	else if (knd == KEY_B) {
-		isSelectCourse = false;
-		course_cursor = 0;
-		music_play(SOUND_KATSU);
-	}
-
-}
-
-void load_file_list(const char *path) {
+void load_file_list(const char* path) {
 
 	DIR* dir;
-	struct dirent *dp;
+	struct dirent* dp;
 
 	if ((dir = opendir(path)) != NULL) {
 
@@ -249,10 +102,18 @@ void load_file_list(const char *path) {
 
 					if (strstr(dp->d_name, ".tja") != NULL) {
 
-						strlcpy(List[count].tja, dp->d_name, strlen(dp->d_name) + 1);
-						getcwd(List[count].path, 256);
-						load_tja_head_simple(&List[count]);
-						count++;
+						strlcpy(List[SongCount].tja, dp->d_name, strlen(dp->d_name) + 1);
+						getcwd(List[SongCount].path, 256);
+						List[SongCount].genre = GENRE_MAX + 1;
+						load_tja_head_simple(&List[SongCount]);
+						SongCount++;
+					}
+
+					if (strstr(dp->d_name, GENRE_FILE) != NULL) {
+
+						getcwd(Genre[GenreCount].path, 256);
+						load_genre_file(GenreCount);
+						GenreCount++;
 					}
 				}
 			}
@@ -266,18 +127,245 @@ void load_file_list(const char *path) {
 	closedir(dir);
 }
 
+void set_genres() {
+
+	for (int i = 0; i < GenreNumber; i++) {
+
+		for (int j = 0; j < SongNumber; j++) {
+
+			if (strstr(List[j].path, Genre[i].path) != NULL) List[j].genre = i;
+		}
+	}
+}
+
+void draw_select_box(float x,float y,float w,float h,int color= 0x424242) {
+
+	float r = ((color >> 16) & 0xFF) / 255.0;
+	float g = ((color >> 8) & 0xFF) / 255.0;
+	float b = ((color >> 0) & 0xFF) / 255.0;
+	C2D_DrawRectangle(x, y, 0, w, h, C2D_Color32f(r, g, b, 1), C2D_Color32f(r, g, b, 1), C2D_Color32f(r, g, b, 1), C2D_Color32f(r, g, b, 1));
+}
+
+
+
+void disp_file_list() {
+
+	int n = 0, g = 0;	//コース用調整、ジャンル用調整
+	bool isGenre = false;
+	course_count = 0;
+
+	if (cursor > 0) cursor = -1 * (SongNumber + GenreNumber - ClosedSongNumber - 1);
+	if (cursor < -1 * (SongNumber + GenreNumber - ClosedSongNumber- 1)) cursor = 0;
+
+	ClosedSongNumber = 0;
+
+	for (int i = 0; i < SongNumber; i++) {
+
+		isGenre = false;
+
+		if (List[i].genre != GENRE_MAX + 1 && (i == 0 || List[i].genre != List[i - 1].genre)) {	//ジャンルの最初の曲
+
+			g++;
+			isGenre = true;
+		}
+
+
+		if ((n + g + cursor) * 20 + 60 >= 0 && (n + g + cursor) * 20 + 60 <= TOP_HEIGHT) {
+
+			if (isGenre == true) {
+				
+				draw_select_box(30, (n + g + cursor - 1) * 20 + 60-3,320,20, Genre[List[i].genre].genre_color);
+				snprintf(buf_select, sizeof(buf_select), "%s", Genre[List[i].genre].name);
+				draw_select_text(30, (n + g + cursor - 1) * 20 + 60, buf_select,Genre[List[i].genre].font_color);
+
+				if (n + g -1== (cursor * -1)) {
+
+					SelectedGenreId = List[i].genre;
+					isCursorGenre = true;
+				}
+			}
+			
+			if (List[i].genre == GENRE_MAX + 1 || (List[i].genre != GENRE_MAX + 1 && Genre[List[i].genre].flag == true)) {
+
+				snprintf(buf_select, sizeof(buf_select), "%s", List[i].title);
+				int x = (List[i].genre != GENRE_MAX + 1) * 25 + 30;
+				draw_select_text(x, (n + g + cursor) * 20 + 60, buf_select);
+
+				if (i + g != (cursor * -1)) {
+					snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[COURSE_ONI]);
+					draw_select_text(360, (n + g + cursor) * 20 + 60, buf_select);
+				}
+			}
+		}
+
+		if (List[i].genre != GENRE_MAX + 1 && Genre[List[i].genre].flag == false) {
+
+			ClosedSongNumber++;
+			continue;
+		}
+
+		n++;
+
+		if (n + g-1 == (cursor * -1)) {
+
+			SelectedId = i;
+			int level;
+			isCursorGenre = false;
+
+			if (List[i].course[COURSE_EDIT] == true) {
+
+				if ((n + g + cursor - 1) == course_cursor) course = COURSE_EDIT;
+				level = List[i].level[COURSE_EDIT];
+				if (level > 10) level = 10;
+				for (int j = 0; j < level; j++) {
+					draw_select_text(200 + j * 10, (n + g + cursor) * 20 + 60, "★");
+				}
+				for (int j = 0; j < (10 - level); j++) {
+					draw_select_text(200 + (j + level) * 10, (n + g + cursor) * 20 + 60, "・");
+				}
+				draw_select_text(80, (n + g + cursor) * 20 + 60, Text[get_lang()][TEXT_ONI]);
+				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[COURSE_EDIT]);
+				draw_select_text(360, (n + g + cursor) * 20 + 60, buf_select);
+				n++;
+				course_count++;
+			}
+
+			if (List[i].course[COURSE_ONI] == true) {
+
+				if ((n + g + cursor - 1) == course_cursor) course = COURSE_ONI;
+				level = List[i].level[COURSE_ONI];
+				if (level > 10) level = 10;
+				for (int j = 0; j < level; j++) {
+					draw_select_text(200 + j * 10, (n + g + cursor) * 20 + 60, "★");
+				}
+				for (int j = 0; j < (10 - level); j++) {
+					draw_select_text(200 + (j + level) * 10, (n + g + cursor) * 20 + 60, "・");
+				}
+				draw_select_text(80, (n + g + cursor) * 20 + 60, Text[get_lang()][TEXT_ONI]);
+				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[COURSE_ONI]);
+				draw_select_text(360, (n + g + cursor) * 20 + 60, buf_select);
+				n++;
+				course_count++;
+			}
+
+			if (List[i].course[COURSE_HARD] == true) {
+
+				if ((n + g + cursor - 1) == course_cursor) course = COURSE_HARD;
+				level = List[i].level[COURSE_HARD];
+				if (level > 10) level = 10;
+				for (int j = 0; j < level; j++) {
+					draw_select_text(200 + j * 10, (n + g + cursor) * 20 + 60, "★");
+				}
+				for (int j = 0; j < (10 - level); j++) {
+					draw_select_text(200 + (j + level) * 10, (n + g + cursor) * 20 + 60, "・");
+				}
+				draw_select_text(80, (n + g + cursor) * 20 + 60, Text[get_lang()][TEXT_HARD]);
+				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[COURSE_HARD]);
+				draw_select_text(360, (n + g + cursor) * 20 + 60, buf_select);
+				n++;
+				course_count++;
+			}
+
+			if (List[i].course[COURSE_NORMAL] == true) {
+
+				if ((n + g + cursor - 1) == course_cursor) course = COURSE_NORMAL;
+				level = List[i].level[COURSE_NORMAL];
+				if (level > 10) level = 10;
+				for (int j = 0; j < level; j++) {
+					draw_select_text(200 + j * 10, (n + g + cursor) * 20 + 60, "★");
+				}
+				for (int j = 0; j < (10 - level); j++) {
+					draw_select_text(200 + (j + level) * 10, (n + g + cursor) * 20 + 60, "・");
+				}
+				draw_select_text(80, (n + g + cursor) * 20 + 60, Text[get_lang()][TEXT_NORMAL]);
+				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[COURSE_NORMAL]);
+				draw_select_text(360, (n + g + cursor) * 20 + 60, buf_select);
+				n++;
+				course_count++;
+			}
+
+			if (List[i].course[COURSE_EASY] == true) {
+
+				if ((n + g + cursor - 1) == course_cursor) course = COURSE_EASY;
+				level = List[i].level[COURSE_EASY];
+				if (level > 10) level = 10;
+				for (int j = 0; j < level; j++) {
+					draw_select_text(200 + j * 10, (n + g + cursor) * 20 + 60, "★");
+				}
+				for (int j = 0; j < (10 - level); j++) {
+					draw_select_text(200 + (j + level) * 10, (n + g + cursor) * 20 + 60, "・");
+				}
+				draw_select_text(80, (n + g + cursor) * 20 + 60, Text[get_lang()][TEXT_EASY]);
+				snprintf(buf_select, sizeof(buf_select), "★x%d", List[i].level[COURSE_EASY]);
+				draw_select_text(360, (n + g + cursor) * 20 + 60, buf_select);
+				n++;
+				course_count++;
+			}
+
+			if (isSelectCourse == true) {
+
+				draw_select_text(60, (course_cursor + 1) * 20 + 60, ">>");
+				//snprintf(buf_select, sizeof(buf_select), "%d",course_cursor);
+				//draw_select_text(60, (course_cursor + 1) * 20 + 60, buf_select);
+			}
+		}
+	}
+
+	draw_select_text(10, 60, ">>");
+	//snprintf(buf_select, sizeof(buf_select), "isCS:%d SI:%d SGI:%dGf:%d",isCursorGenre,SelectedId, SelectedGenreId,Genre[SelectedGenreId].flag);
+	//draw_select_text(0, 50, buf_select);
+
+}
+
+void cursor_update(int knd) {
+
+	if (knd == KEY_UP) {
+		if (isSelectCourse == false) cursor++;
+		else if (course_cursor > 0) course_cursor--;
+		music_play(SOUND_KATSU);
+	}
+	else if (knd == (int)KEY_DOWN) {
+		if (isSelectCourse == false) cursor--;
+		else if (course_cursor < (course_count - 1)) course_cursor++;
+		music_play(SOUND_KATSU);
+	}
+	else if (knd == KEY_RIGHT) {
+		if (isSelectCourse == false) cursor -= 5;
+		music_play(SOUND_KATSU);
+	}
+	else if (knd == KEY_LEFT) {
+		if (isSelectCourse == false) cursor += 5;
+		music_play(SOUND_KATSU);
+	}
+	else if (knd == KEY_A && (course_count != 0 || isCursorGenre == true)) {
+		if (isCursorGenre == true) Genre[SelectedGenreId].flag = !Genre[SelectedGenreId].flag;
+		else if (isSelectCourse == true) isGameStart = true;
+		else isSelectCourse = true;
+		music_play(SOUND_DON);
+	}
+	else if (knd == KEY_B) {
+		isSelectCourse = false;
+		course_cursor = 0;
+		music_play(SOUND_KATSU);
+	}
+
+}
+
 C2D_TextBuf g_SelectText = C2D_TextBufNew(4096);
 C2D_Text SelectText;
 
-void draw_select_text(float x, float y, const char *text) {
+void draw_select_text(float x, float y, const char* text,int color) {	//color省略可(0xffffff)
 
 	C2D_TextBufClear(g_SelectText);
 	C2D_TextParse(&SelectText, g_SelectText, text);
 	C2D_TextOptimize(&SelectText);
-	C2D_DrawText(&SelectText, C2D_WithColor, x, y, 1.0f, 0.5f, 0.5f, C2D_Color32f(1.0f, 1.0f, 1.0f, 1.0f));
+	float r = ((color >> 16) & 0xFF)/255.0;
+	float g = ((color >> 8) & 0xFF)/255.0;
+	float b = ((color >> 0) & 0xFF)/255.0;
+	C2D_DrawText(&SelectText, C2D_WithColor, x, y, 1.0f, 0.5f, 0.5f, C2D_Color32f(r, g, b, 1.0f));
 }
 
-void draw_result_text(float x, float y,float size, const char *text) {
+void draw_result_text(float x, float y, float size, const char* text) {
 
 	C2D_TextBufClear(g_SelectText);
 	C2D_TextParse(&SelectText, g_SelectText, text);
@@ -285,7 +373,7 @@ void draw_result_text(float x, float y,float size, const char *text) {
 	C2D_DrawText(&SelectText, C2D_WithColor, x, y, 0.5f, size, size, C2D_Color32f(1.0f, 1.0f, 1.0f, 1.0f));
 }
 
-void calc_result_text(const char *text, float *width, float *height) {
+void calc_result_text(const char* text, float* width, float* height) {
 
 	C2D_TextBufClear(g_SelectText);
 	C2D_TextParse(&SelectText, g_SelectText, text);
@@ -294,7 +382,7 @@ void calc_result_text(const char *text, float *width, float *height) {
 	C2D_TextGetDimensions(&SelectText, size, size, width, height);
 }
 
-void draw_option_text(float x, float y, const char *text,bool state, float *width, float *height, float sizex, float sizey) {	//size省略可(0.7)
+void draw_option_text(float x, float y, const char* text, bool state, float* width, float* height, float sizex, float sizey) {	//size省略可(0.7)
 
 	C2D_TextBufClear(g_SelectText);
 	C2D_TextParse(&SelectText, g_SelectText, text);
@@ -309,7 +397,7 @@ void draw_option_text(float x, float y, const char *text,bool state, float *widt
 	C2D_TextGetDimensions(&SelectText, sizex, sizey, width, height);
 }
 
-void get_SelectedId(LIST_T *TMP,int *arg) {
+void get_SelectedId(LIST_T* TMP, int* arg) {
 
 	for (int i = 0; i < 5; i++) {
 		TMP->course[i] = List[SelectedId].course[i];
@@ -332,7 +420,9 @@ void select_ini() {
 	course_cursor = 0;
 	course_count = 0;
 	SelectedId = 0;
+	SelectedGenreId = 0;
 	course = COURSE_ONI;
 	isSelectCourse = false;
+	isCursorGenre = false;
 	isGameStart = false;
 }
