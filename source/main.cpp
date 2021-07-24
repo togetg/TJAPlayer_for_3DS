@@ -149,8 +149,12 @@ int main() {
 				tmp = message_window(tp, key, TEXT_WARNING_DSP1);
 				break;
 
-			case WARNING_WAVE:
-				tmp = message_window(tp, key, TEXT_WARNING_WAVE);
+			case WARNING_WAVE_NO_EXIST:
+				tmp = message_window(tp, key, TEXT_WARNING_WAVE_NO_EXIST);
+				break;
+
+			case WARNING_WAVE_NOT_OGG:
+				tmp = message_window(tp, key, TEXT_WARNING_WAVE_NOT_OGG);
 				break;
 			}
 			if (tmp == 1 || key & KEY_A) {
@@ -206,9 +210,11 @@ int main() {
 			FirstMeasureTime = INT_MAX;
 			CurrentTimeMain = -1000;
 
-			if (check_wave(SelectedSong) == true) scene_state = SCENE_MAINGAME;
+			tmp = check_wave(SelectedSong);
+			if (tmp == -1) scene_state = SCENE_MAINGAME;
 			else {
-				warning = WARNING_WAVE;
+
+				warning = tmp;
 				scene_state = SCENE_WARNING;
 				select_ini();
 			}
@@ -286,7 +292,7 @@ int main() {
 				button_game(&isDon, &isKatsu, Option, key);
 			}
 
-			if (isDon == true)   play_sound(SOUND_DON);		//ドン
+			if (isDon == true)   play_sound(SOUND_DON);			//ドン
 			if (isKatsu == true) play_sound(SOUND_KATSU);		//カツ
 
 			if (key & KEY_SELECT || key & KEY_START) {
@@ -392,6 +398,7 @@ void load_sprites() {
 }
 
 bool get_isPause() {
+
 	return isPause;
 }
 
@@ -406,10 +413,12 @@ void debug_touch(int x,int y) {
 }
 
 bool get_isMusicStart() {
+
 	return isMusicStart;
 }
 
 char *get_buffer() {
+
 	return buffer;
 }
 

@@ -38,4 +38,4 @@ void play_main_music(bool *p_isPlayMain, LIST_T Song);
 void pasue_main_music();
 void stop_main_music();
 void init_main_music();
-bool check_wave(LIST_T Song);
+int check_wave(LIST_T Song);

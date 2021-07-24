@@ -11,16 +11,19 @@
 static volatile bool stop = true;
 
 bool togglePlayback(void){
+
 	bool paused = ndspChnIsPaused(CHANNEL);
 	ndspChnSetPaused(CHANNEL, !paused);
 	return !paused;
 }
 
 void stopPlayback(void){
+
 	stop = true;
 }
 
 bool isPlaying(void){
+
 	return !stop;
 }
 
@@ -87,6 +90,7 @@ err:
 int testtest = 0;
 
 void playFile(void* infoIn){
+
 	struct decoder_fn decoder;
 	struct playbackInfo_t* info = (playbackInfo_t*)infoIn;
 	int16_t*		buffer1 = NULL;
@@ -220,6 +224,7 @@ err:
 struct playbackInfo_t playbackInfo;
 
 int changeFile(const char* ep_file, struct playbackInfo_t* playbackInfo, bool *p_isPlayMain){
+
 	s32 prio;
 	static Thread thread = NULL;
 
@@ -246,35 +251,36 @@ int changeFile(const char* ep_file, struct playbackInfo_t* playbackInfo, bool *p
 }
 
 void play_main_music(bool *p_isPlayMain,LIST_T Song) {
-	//char file[] = DEFAULT_DIR File_Name "/" File_Name ".ogg";
-
 
 	chdir(Song.path);
 	changeFile(Song.wave, &playbackInfo, p_isPlayMain);
 }
 
 void pasue_main_music() {
+
 	if (isPlaying() == true) {
 		togglePlayback();
 	}
 }
 
 void stop_main_music() {
+
 	stopPlayback();
 	changeFile(NULL, &playbackInfo ,NULL);
 }
 
 void init_main_music() {
+
 	playbackInfo.file = NULL;
 }
 
-bool check_wave(LIST_T Song) { //音楽ファイルが存在するか確認
+int check_wave(LIST_T Song) { //音楽ファイルの確認
 
 	chdir(Song.path);
-	FILE* fp = fopen(Song.wave, "r");
+	int result = getFileType(Song.wave);
 
-	if (fp == NULL) return false;
-	fclose(fp);
+	if (result == -1) return WARNING_WAVE_NO_EXIST;
+	else if (result != FILE_TYPE_VORBIS) return WARNING_WAVE_NOT_OGG;
 
-	return true;
+	return -1;
 }
