@@ -39,6 +39,7 @@ const char Text[3][64][128] = {
 		"曲選択に戻る",
 		"DSP1を起動していないため音は流れません",
 		"音楽ファイルが読み込めません\n\nTJAファイルをUTF-8に変換しましたか？",
+		"音楽ファイルがOggファイルではありません",
 	},
 	{
 		"ON",
@@ -78,6 +79,7 @@ const char Text[3][64][128] = {
 		"Back to Select song",
 		"No sound is played because\nDSP1 is not activated.",
 		"The sound file does not exist.\n\nHave you converted the character encoding\nof the TJA file to UTF8?",
+		"The sound file is not an Ogg file.",
 	},
 	{
 		"Sí",
@@ -117,6 +119,7 @@ const char Text[3][64][128] = {
 		"Volver al menú",
 		"No sound is played because\nDSP1 is not activated.",
 		"The sound file does not exist.\n\nHave you converted the character encoding\nof the TJA file to UTF8?",
+		"The sound file is not an Ogg file.",
 	}
 };
 
@@ -180,7 +183,8 @@ enum Text_knd {
 	TEXT_STARTOVER,
 	TEXT_RETURNSELECT,
 	TEXT_WARNING_DSP1,
-	TEXT_WARNING_WAVE,
+	TEXT_WARNING_WAVE_NO_EXIST,
+	TEXT_WARNING_WAVE_NOT_OGG,
 };
 
 int get_lang();
