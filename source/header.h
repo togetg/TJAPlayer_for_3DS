@@ -11,7 +11,7 @@
 #include <unistd.h>
 #include <ctype.h>
 
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 #define DEFAULT_DIR	"sdmc:/tjafiles/"
 #define SETTING_FILE "sdmc:/TJAPlayerfor3ds_setting.json"
 #define PATH_DSP1 "sdmc:/3ds/dspfirm.cdc"
@@ -24,7 +24,7 @@
 #define NOTES_MEASURE_MAX 256	//一小節の最大ノーツ数+1
 #define MEASURE_MAX 8192
 #define NOTES_AREA 338.0		//ノーツ表示エリアの長さ
-#define NOTES_JUDGE_X 93			//判定枠の中心のX座標
+#define NOTES_JUDGE_X 93		//判定枠の中心のX座標
 #define NOTES_JUDGE_RANGE 327	//判定枠の中心から小節生成位置の距離(右端+20)
 
 #define TOP_WIDTH  400
