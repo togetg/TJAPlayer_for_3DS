@@ -14,15 +14,15 @@ int balloon[256], BalloonCount;
 double bpm, offset;
 
 int find_notes_id(), find_line_id(), make_roll_start(int NotesId), make_roll_end(int NotesId), make_balloon_start(int NotesId), make_balloon_end(int NotesId);
-void notes_calc(bool isDon, bool isKatsu, double bpm, double CurrentTimeNotes, int cnt, C2D_Sprite sprites[Sprite_Number]);
-void notes_draw(C2D_Sprite sprites[Sprite_Number]), notes_sort(), delete_roll(int i), init_notes(TJA_HEADER_T TJA_Header), delete_notes(int i), make_balloon_break();
-void draw_judge(double CurrentTimeNotes, C2D_Sprite sprites[Sprite_Number]);
+void notes_calc(bool isDon, bool isKatsu, double bpm, double CurrentTimeNotes, int cnt, C2D_Sprite sprites[SPRITES_NUMER]);
+void notes_draw(C2D_Sprite sprites[SPRITES_NUMER]), notes_sort(), delete_roll(int i), init_notes(TJA_HEADER_T TJA_Header), delete_notes(int i), make_balloon_break();
+void draw_judge(double CurrentTimeNotes, C2D_Sprite sprites[SPRITES_NUMER]);
 
-NOTES_T Notes[Notes_Max];
+NOTES_T Notes[NOTES_MAX];
 COMMAND_T Command;
-BARLINE_T BarLine[BarLine_Max];
-ROLL_T RollNotes[Roll_Max];
-BALLOON_T BalloonNotes[Balloon_Max];
+BARLINE_T BarLine[BARLINE_MAX];
+ROLL_T RollNotes[ROLL_MAX];
+BALLOON_T BalloonNotes[BALLOON_MAX];
 BRANCH_T Branch;
 
 int MeasureCount, RollState, NotesCount, JudgeDispknd, JudgeRollState, BalloonBreakCount, PreNotesKnd,
@@ -31,7 +31,7 @@ bool  isNotesLoad = true, isJudgeDisp = false, isBalloonBreakDisp = false, isGOG
 double JudgeMakeTime, JudgeY,JudgeEffectCnt;
 
 
-void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_Measure], MEASURE_T Measure[Measure_Max], int cnt, C2D_Sprite  sprites[Sprite_Number]) {
+void notes_main(bool isDon, bool isKatsu, char tja_notes[MEASURE_MAX][NOTES_MEASURE_MAX], MEASURE_T Measure[MEASURE_MAX], int cnt, C2D_Sprite  sprites[SPRITES_NUMER]) {
 
 	OPTION_T Option;
 	get_option(&Option);
@@ -46,7 +46,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 		//分岐
 		if (Branch.next == true) {
 
-			while (MeasureCount < Measure_Max) {
+			while (MeasureCount < MEASURE_MAX) {
 
 				MeasureCount++;
 				break;
@@ -112,17 +112,17 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 				BarLine[BarLineId].scroll = Measure[MeasureCount].scroll * Option.speed;
 				BarLine[BarLineId].x = BarLine[BarLineId].x_ini;
 				BarLine[BarLineId].measure = MeasureCount;
-				BarLine[BarLineId].x_ini = Notes_Judge_Range * BarLine[BarLineId].scroll + Notes_Judge;
+				BarLine[BarLineId].x_ini = NOTES_JUDGE_RANGE * BarLine[BarLineId].scroll + NOTES_JUDGE_X;
 				BarLine[BarLineId].create_time = CurrentTimeNotes;
 				BarLine[BarLineId].isDisp = Measure[MeasureCount].isDispBarLine;
 			}
 
 			int NotesCountMax;
 
-			if (Measure[MeasureCount].firstmeasure != -1 && MeasureIdFromOriginalId(Measure[MeasureCount].firstmeasure) != -1
+			if (Measure[MeasureCount].firstmeasure != -1 && get_MeasureId_From_OriginalId(Measure[MeasureCount].firstmeasure) != -1
 				) {
 
-				NotesCountMax = Measure[MeasureIdFromOriginalId(Measure[MeasureCount].firstmeasure)].max_notes;
+				NotesCountMax = Measure[get_MeasureId_From_OriginalId(Measure[MeasureCount].firstmeasure)].max_notes;
 			}
 			else {
 				NotesCountMax = NotesCount;
@@ -166,7 +166,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 					Notes[id].notes_max = NotesCount;
 					Notes[id].num = NotesNumber;
 					Notes[id].scroll = Measure[MeasureCount].scroll * Option.speed;
-					Notes[id].x_ini = ((Notes_Area*Measure[MeasureCount].measure / NotesCountMax)*i + Notes_Judge_Range)*Notes[id].scroll + Notes_Judge;
+					Notes[id].x_ini = ((NOTES_AREA*Measure[MeasureCount].measure / NotesCountMax)*i + NOTES_JUDGE_RANGE)*Notes[id].scroll + NOTES_JUDGE_X;
 					Notes[id].x = Notes[id].x_ini;
 					Notes[id].bpm = Measure[MeasureCount].bpm;
 					Notes[id].knd = knd;
@@ -278,12 +278,12 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 	}
 
-	for (int i = 0; i < BarLine_Max - 1; i++) {
+	for (int i = 0; i < BARLINE_MAX - 1; i++) {
 
 		if (BarLine[i].flag == true) {
 
 			BarLine[i].x = BarLine[i].x_ini -
-				Notes_Area * BarLine[i].scroll * (CurrentTimeNotes - Measure[BarLine[i].measure].pop_time) / (60 / Measure[BarLine[i].measure].bpm * 4);
+				NOTES_AREA * BarLine[i].scroll * (CurrentTimeNotes - Measure[BarLine[i].measure].pop_time) / (60 / Measure[BarLine[i].measure].bpm * 4);
 
 			if (BarLine[i].isDisp == true) {
 				C2D_DrawRectangle(BarLine[i].x, 86, 0, 1, 46, C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1));
@@ -301,7 +301,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 	if (get_isPause() == false) notes_calc(isDon, isKatsu, bpm, CurrentTimeNotes, cnt, sprites);
 	
-	for (int i = 0; i < Measure_Max - 1; i++) {	//判定時に発動する命令
+	for (int i = 0; i < MEASURE_MAX - 1; i++) {	//判定時に発動する命令
 
 		if ((Measure[i].branch == Branch.course || Measure[i].branch == -1) && Measure[i].flag == true) {
 
@@ -323,7 +323,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 					if (isLevelHold == false && (Branch.knd != 0 || JudgeRollState == -1) ) {	//連打分岐の時は連打が無くなってから分岐
 
-						Branch.course = branch_start(Branch.knd, Branch.x, Branch.y);
+						Branch.course = start_branch(Branch.knd, Branch.x, Branch.y);
 						Branch.next = true;
 						Branch.wait = false;
 					}
@@ -365,7 +365,7 @@ void notes_main(bool isDon, bool isKatsu, char tja_notes[Measure_Max][Max_Notes_
 
 int find_notes_id() {
 
-	for (int i = 0; i < Notes_Max - 1; i++) {
+	for (int i = 0; i < NOTES_MAX - 1; i++) {
 
 		if (Notes[i].flag == false) return i;
 	}
@@ -374,7 +374,7 @@ int find_notes_id() {
 
 int find_line_id() {
 
-	for (int i = 0; i < BarLine_Max - 1; i++) {
+	for (int i = 0; i < BARLINE_MAX - 1; i++) {
 
 		if (BarLine[i].flag == false) return i;
 	}
@@ -389,7 +389,7 @@ void make_judge(int knd, double CurrentTimeNotes) {
 	JudgeEffectCnt = 0;
 }
 
-void draw_judge(double CurrentTimeNotes, C2D_Sprite sprites[Sprite_Number]) {
+void draw_judge(double CurrentTimeNotes, C2D_Sprite sprites[SPRITES_NUMER]) {
 
 	if (isJudgeDisp == true) {
 
@@ -452,7 +452,7 @@ void notes_judge(double CurrentTimeNotes, bool isDon, bool isKatsu, int cnt) {
 	JudgeRollState = -1;
 
 	//連打の状態
-	for (int i = 0; i < Roll_Max - 1; i++) {
+	for (int i = 0; i < ROLL_MAX - 1; i++) {
 
 		if (RollNotes[i].flag == true &&
 			Notes[RollNotes[i].start_id].judge_time < CurrentTimeNotes &&
@@ -461,7 +461,7 @@ void notes_judge(double CurrentTimeNotes, bool isDon, bool isKatsu, int cnt) {
 
 	//風船の処理
 	int JudgeBalloonState = -1;
-	for (int i = 0; i < Balloon_Max - 1; i++) {
+	for (int i = 0; i < BALLOON_MAX - 1; i++) {
 
 		if (BalloonNotes[i].flag == true && Notes[BalloonNotes[i].start_id].judge_time <= CurrentTimeNotes) {
 			JudgeBalloonState = i;
@@ -470,7 +470,7 @@ void notes_judge(double CurrentTimeNotes, bool isDon, bool isKatsu, int cnt) {
 	}
 
 	//判定すべきノーツを検索
-	for (int i = 0; i < Notes_Max - 1; i++) {
+	for (int i = 0; i < NOTES_MAX - 1; i++) {
 
 		if (Notes[i].flag == true) {
 
@@ -501,7 +501,7 @@ void notes_judge(double CurrentTimeNotes, bool isDon, bool isKatsu, int cnt) {
 
 	if (Option.isAuto == true) {	//オート
 
-		for (int i = 0; i < Notes_Max - 1; i++) {
+		for (int i = 0; i < NOTES_MAX - 1; i++) {
 
 			if (Notes[i].flag == true && Notes[i].judge_time <= CurrentTimeNotes &&
 				(Notes[i].knd != NOTES_ROLL && Notes[i].knd != NOTES_BIGROLL && Notes[i].knd != NOTES_BIGROLLEND &&
@@ -510,24 +510,24 @@ void notes_judge(double CurrentTimeNotes, bool isDon, bool isKatsu, int cnt) {
 				if (Notes[i].knd == NOTES_DON ||
 					Notes[i].knd == NOTES_POTATO) {
 
-					music_play(SOUND_DON);
+					play_sound(SOUND_DON);
 					make_judge(PERFECT, CurrentTimeNotes);
 				}
 				else if (Notes[i].knd == NOTES_BIGDON) {
-					music_play(SOUND_DON);
+					play_sound(SOUND_DON);
 					make_judge(SPECIAL_PERFECT, CurrentTimeNotes);
 				}
 				else if (Notes[i].knd == NOTES_KATSU) {
-					music_play(SOUND_KATSU);
+					play_sound(SOUND_KATSU);
 					make_judge(PERFECT, CurrentTimeNotes);
 				}
 				else if (Notes[i].knd == NOTES_BIGKATSU) {
-					music_play(SOUND_KATSU);
+					play_sound(SOUND_KATSU);
 					make_judge(SPECIAL_PERFECT, CurrentTimeNotes);
 				}
 
-				if (Notes[i].knd == NOTES_BIGDON || Notes[i].knd == NOTES_BIGKATSU) score_update(SPECIAL_PERFECT);
-				else if (Notes[i].knd == NOTES_DON || Notes[i].knd == NOTES_KATSU) score_update(PERFECT);
+				if (Notes[i].knd == NOTES_BIGDON || Notes[i].knd == NOTES_BIGKATSU) update_score(SPECIAL_PERFECT);
+				else if (Notes[i].knd == NOTES_DON || Notes[i].knd == NOTES_KATSU) update_score(PERFECT);
 
 				delete_notes(i);
 			}
@@ -537,10 +537,10 @@ void notes_judge(double CurrentTimeNotes, bool isDon, bool isKatsu, int cnt) {
 
 			if (cnt % AUTO_ROLL_FRAME == 0) {
 
-				if (JudgeRollState == NOTES_ROLL) score_update(ROLL);
-				else if (JudgeRollState == NOTES_BIGROLL) score_update(BIG_ROLL);
+				if (JudgeRollState == NOTES_ROLL) update_score(ROLL);
+				else if (JudgeRollState == NOTES_BIGROLL) update_score(BIG_ROLL);
 
-				music_play(SOUND_DON);
+				play_sound(SOUND_DON);
 			}
 		}
 
@@ -548,15 +548,15 @@ void notes_judge(double CurrentTimeNotes, bool isDon, bool isKatsu, int cnt) {
 
 			if (cnt % AUTO_ROLL_FRAME == 0) {
 
-				music_play(SOUND_DON);
+				play_sound(SOUND_DON);
 				BalloonNotes[JudgeBalloonState].current_hit++;
 
 				if (BalloonNotes[JudgeBalloonState].current_hit >= BalloonNotes[JudgeBalloonState].need_hit) {
 
-					score_update(BALLOON_BREAK);	//破裂
+					update_score(BALLOON_BREAK);	//破裂
 					make_balloon_break();
 				}
-				else score_update(BALLOON);
+				else update_score(BALLOON);
 			}
 		}
 	}
@@ -569,77 +569,77 @@ void notes_judge(double CurrentTimeNotes, bool isDon, bool isKatsu, int cnt) {
 
 		if (isDon == true && CurrentJudgeNotes[0] != -1) {	//ドン
 
-			if (CurrentJudgeNotesLag[0] <= 0.034) {			//良
+			if (CurrentJudgeNotesLag[0] <= Option.judge_range_perfect) {			//良
 				delete_notes(CurrentJudgeNotes[0]);
 				if (isBig == true) {
 					make_judge(SPECIAL_PERFECT, CurrentTimeNotes);
-					score_update(SPECIAL_PERFECT);
+					update_score(SPECIAL_PERFECT);
 				}
 				else {
 					make_judge(PERFECT, CurrentTimeNotes);
-					score_update(PERFECT);
+					update_score(PERFECT);
 				}
 			}
-			else if (CurrentJudgeNotesLag[0] <= 0.117) {	//可
+			else if (CurrentJudgeNotesLag[0] <= Option.judge_range_nice) {	//可
 				make_judge(1, CurrentTimeNotes);
 				delete_notes(CurrentJudgeNotes[0]);
 				if (isBig == true) {
 					make_judge(SPECIAL_NICE, CurrentTimeNotes);
-					score_update(SPECIAL_NICE);
+					update_score(SPECIAL_NICE);
 				}
 				else {
 					make_judge(NICE, CurrentTimeNotes);
-					score_update(NICE);
+					update_score(NICE);
 				}
 			}
-			else if (CurrentJudgeNotesLag[0] <= 0.150) {	//不可
+			else if (CurrentJudgeNotesLag[0] <= Option.judge_range_bad) {	//不可
 				make_judge(BAD, CurrentTimeNotes);
 				delete_notes(CurrentJudgeNotes[0]);
-				score_update(BAD);
+				update_score(BAD);
 			}
 		}
 
 		if (isKatsu == true && CurrentJudgeNotes[1] != -1) {	//カツ
 
-			if (CurrentJudgeNotesLag[1] <= 0.034) {			//良
+			if (CurrentJudgeNotesLag[1] <= Option.judge_range_perfect) {			//良
 				delete_notes(CurrentJudgeNotes[1]);
 				if (isBig == true) {
 					make_judge(SPECIAL_PERFECT, CurrentTimeNotes);
-					score_update(SPECIAL_PERFECT);
+					update_score(SPECIAL_PERFECT);
 				}
 				else {
 					make_judge(PERFECT, CurrentTimeNotes);
-					score_update(PERFECT);
+					update_score(PERFECT);
 				}
 			}
-			else if (CurrentJudgeNotesLag[1] <= 0.117) {	//可
+			else if (CurrentJudgeNotesLag[1] <= Option.judge_range_nice) {	//可
 				make_judge(1, CurrentTimeNotes);
 				delete_notes(CurrentJudgeNotes[1]);
 				if (isBig == true) {
 					make_judge(SPECIAL_NICE, CurrentTimeNotes);
-					score_update(SPECIAL_NICE);
+					update_score(SPECIAL_NICE);
 				}
 				else {
 					make_judge(NICE, CurrentTimeNotes);
-					score_update(NICE);
+					update_score(NICE);
 				}
 			}
-			else if (CurrentJudgeNotesLag[1] <= 0.150) {	//不可
+			else if (CurrentJudgeNotesLag[1] <= Option.judge_range_bad) {	//不可
 				make_judge(BAD, CurrentTimeNotes);
 				delete_notes(CurrentJudgeNotes[1]);
-				score_update(BAD);
+				update_score(BAD);
 			}
 		}
 
 		if (JudgeRollState != -1) {	//連打
 
 			if (isDon == true) {
-				if (JudgeRollState == NOTES_ROLL) score_update(ROLL);
-				else if (JudgeRollState == NOTES_BIGROLL) score_update(BIG_ROLL);
+				if (JudgeRollState == NOTES_ROLL) update_score(ROLL);
+				else if (JudgeRollState == NOTES_BIGROLL) update_score(BIG_ROLL);
 			}
 			if (isKatsu == true) {
-				if (JudgeRollState == NOTES_ROLL) score_update(ROLL);
-				else if (JudgeRollState == NOTES_BIGROLL) score_update(BIG_ROLL);
+				if (JudgeRollState == NOTES_ROLL) update_score(ROLL);
+				else if (JudgeRollState == NOTES_BIGROLL) update_score(BIG_ROLL);
 			}
 		}
 
@@ -649,10 +649,10 @@ void notes_judge(double CurrentTimeNotes, bool isDon, bool isKatsu, int cnt) {
 
 			if (BalloonNotes[JudgeBalloonState].current_hit >= BalloonNotes[JudgeBalloonState].need_hit) {
 
-				score_update(BALLOON_BREAK);	//破裂
+				update_score(BALLOON_BREAK);	//破裂
 				make_balloon_break();
 			}
-			else score_update(BALLOON);
+			else update_score(BALLOON);
 		}
 	}
 
@@ -662,22 +662,22 @@ void notes_judge(double CurrentTimeNotes, bool isDon, bool isKatsu, int cnt) {
 		if (BalloonNotes[JudgeBalloonState].end_id != -1) delete_notes(BalloonNotes[JudgeBalloonState].end_id);
 		else delete_notes(BalloonNotes[JudgeBalloonState].start_id);
 
-		music_play(SOUND_BALLOONBREAK);
-		balloon_count_update(0);
+		play_sound(SOUND_BALLOONBREAK);
+		update_balloon_count(0);
 	}
 }
 
-void notes_calc(bool isDon, bool isKatsu, double bpm, double CurrentTimeNotes, int cnt, C2D_Sprite sprites[Sprite_Number]) {
+void notes_calc(bool isDon, bool isKatsu, double bpm, double CurrentTimeNotes, int cnt, C2D_Sprite sprites[SPRITES_NUMER]) {
 
 	OPTION_T Option;
 	get_option(&Option);
 
-	for (int i = 0; i < Notes_Max - 1; i++) {	//計算
+	for (int i = 0; i < NOTES_MAX - 1; i++) {	//計算
 
 		if (Notes[i].flag == true) {
 
 			Notes[i].x = Notes[i].x_ini -
-				Notes_Area * Notes[i].scroll * (CurrentTimeNotes - Notes[i].pop_time) / (60 / Notes[i].bpm * 4);
+				NOTES_AREA * Notes[i].scroll * (CurrentTimeNotes - Notes[i].pop_time) / (60 / Notes[i].bpm * 4);
 
 			switch (Notes[i].knd) {
 
@@ -710,7 +710,7 @@ void notes_calc(bool isDon, bool isKatsu, double bpm, double CurrentTimeNotes, i
 				break;
 
 			case NOTES_BALLOON:
-				if (Notes[i].x <= Notes_Judge) Notes[i].x = Notes_Judge;
+				if (Notes[i].x <= NOTES_JUDGE_X) Notes[i].x = NOTES_JUDGE_X;
 				if (Notes[i].roll_id != -1) {
 					BalloonNotes[Notes[i].roll_id].start_id = i;
 				}
@@ -730,7 +730,7 @@ void notes_calc(bool isDon, bool isKatsu, double bpm, double CurrentTimeNotes, i
 			case NOTES_BIGDON:
 			case NOTES_BIGKATSU:
 				if (CurrentTimeNotes - Notes[i].judge_time > 0.150 && Notes[i].isThrough == false) {
-					score_update(THROUGH);
+					update_score(THROUGH);
 					Notes[i].isThrough = true;
 				}
 				break;
@@ -741,7 +741,7 @@ void notes_calc(bool isDon, bool isKatsu, double bpm, double CurrentTimeNotes, i
 		}
 	}
 
-	for (int i = 0; i < Notes_Max - 1; i++) {	//連打のバグ回避のためノーツの削除は一番最後
+	for (int i = 0; i < NOTES_MAX - 1; i++) {	//連打のバグ回避のためノーツの削除は一番最後
 
 		if (Notes[i].flag == true &&
 			Notes[i].x <= 20 &&
@@ -751,14 +751,14 @@ void notes_calc(bool isDon, bool isKatsu, double bpm, double CurrentTimeNotes, i
 				(Notes[i].knd == NOTES_DON || Notes[i].knd == NOTES_KATSU || Notes[i].knd == NOTES_BIGDON || Notes[i].knd == NOTES_BIGKATSU)) {
 
 				if (Option.isAuto == false) {
-					score_update(THROUGH);
+					update_score(THROUGH);
 					Notes[i].isThrough = true;
 				}
 				else {	//オート時はスルーでも良判定に
-					if (Notes[i].knd == NOTES_DON || Notes[i].knd == NOTES_KATSU) score_update(PERFECT);
-					else if (Notes[i].knd == NOTES_BIGDON || Notes[i].knd == NOTES_BIGKATSU) score_update(SPECIAL_PERFECT);
-					if (Notes[i].knd == NOTES_DON || Notes[i].knd == NOTES_BIGDON) music_play(SOUND_DON);
-					if (Notes[i].knd == NOTES_KATSU || Notes[i].knd == NOTES_BIGKATSU) music_play(SOUND_KATSU);
+					if (Notes[i].knd == NOTES_DON || Notes[i].knd == NOTES_KATSU) update_score(PERFECT);
+					else if (Notes[i].knd == NOTES_BIGDON || Notes[i].knd == NOTES_BIGKATSU) update_score(SPECIAL_PERFECT);
+					if (Notes[i].knd == NOTES_DON || Notes[i].knd == NOTES_BIGDON) play_sound(SOUND_DON);
+					if (Notes[i].knd == NOTES_KATSU || Notes[i].knd == NOTES_BIGKATSU) play_sound(SOUND_KATSU);
 				}
 			}
 			delete_notes(i);
@@ -768,11 +768,11 @@ void notes_calc(bool isDon, bool isKatsu, double bpm, double CurrentTimeNotes, i
 	notes_judge(CurrentTimeNotes, isDon, isKatsu, cnt);
 }
 
-void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
+void notes_draw(C2D_Sprite sprites[SPRITES_NUMER]) {
 
 	int notes_y = 109;
 
-	for (int i = 0; i < Notes_Max - 1; i++) {	//描画
+	for (int i = 0; i < NOTES_MAX - 1; i++) {	//描画
 
 		if (Notes[i].flag == true) {
 
@@ -861,7 +861,7 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 					C2D_DrawSprite(&sprites[SPRITE_BALLOON_5]);
 				}
 
-				if (BalloonNotes[Notes[i].roll_id].current_hit >= 1) balloon_count_update(BalloonNotes[Notes[i].roll_id].need_hit - BalloonNotes[Notes[i].roll_id].current_hit);
+				if (BalloonNotes[Notes[i].roll_id].current_hit >= 1) update_balloon_count(BalloonNotes[Notes[i].roll_id].need_hit - BalloonNotes[Notes[i].roll_id].current_hit);
 
 				//snprintf(buf_notes, sizeof(buf_notes), "%d", BalloonNotes[Notes[i].roll_id].need_hit - BalloonNotes[Notes[i].roll_id].current_hit);
 				//draw_debug(Notes[i].x, 132, buf_notes);
@@ -892,7 +892,7 @@ void notes_draw(C2D_Sprite sprites[Sprite_Number]) {
 		BalloonBreakCount--;
 		C2D_ImageTint Tint;
 		C2D_AlphaImageTint(&Tint, BalloonBreakCount / 40.0);
-		C2D_SpriteSetPos(&sprites[SPRITE_BALLOON_6], Notes_Judge, notes_y);
+		C2D_SpriteSetPos(&sprites[SPRITE_BALLOON_6], NOTES_JUDGE_X, notes_y);
 		C2D_DrawSpriteTinted(&sprites[SPRITE_BALLOON_6], &Tint);
 	}
 	if (BalloonBreakCount <= 0) isBalloonBreakDisp = false;
@@ -939,7 +939,7 @@ void notes_sort() {	//ノーツを出現順にソート
 
 void delete_roll(int i) {
 
-	if (i >= 0 && i < Roll_Max) {
+	if (i >= 0 && i < ROLL_MAX) {
 		if (RollNotes[i].start_id != -1 && Notes[RollNotes[i].start_id].flag == true) delete_notes(RollNotes[i].start_id);
 		RollNotes[i].id = -1;
 		RollNotes[i].start_x = -1;
@@ -953,14 +953,14 @@ void delete_roll(int i) {
 
 void init_roll__notes() {
 
-	for (int i = 0; i < Roll_Max - 1; i++) {
+	for (int i = 0; i < ROLL_MAX - 1; i++) {
 		delete_roll(i);
 	}
 }
 
 int find_roll_id() {
 
-	for (int i = 0; i < Roll_Max - 1; i++) {
+	for (int i = 0; i < ROLL_MAX - 1; i++) {
 
 		if (RollNotes[i].flag == false) return i;
 	}
@@ -984,7 +984,7 @@ int make_roll_start(int NotesId) {
 
 int find_roll_end_id() {	//startの値だけ入ってる連打idを返す
 
-	for (int i = 0; i < Roll_Max - 1; i++) {
+	for (int i = 0; i < ROLL_MAX - 1; i++) {
 
 		if (RollNotes[i].flag == true &&
 			RollNotes[i].start_x != -1 &&
@@ -1012,7 +1012,7 @@ void make_balloon_break() {
 
 void delete_balloon(int i) {
 
-	if (i >= 0 && i < Balloon_Max) {
+	if (i >= 0 && i < BALLOON_MAX) {
 		BalloonNotes[i].id = -1;
 		BalloonNotes[i].start_id = -1;
 		BalloonNotes[i].end_id = -1;
@@ -1024,14 +1024,14 @@ void delete_balloon(int i) {
 
 void init_balloon_notes() {
 
-	for (int i = 0; i < Balloon_Max - 1; i++) {
+	for (int i = 0; i < BALLOON_MAX - 1; i++) {
 		delete_balloon(i);
 	}
 }
 
 int find_balloon_id() {
 
-	for (int i = 0; i < Balloon_Max - 1; i++) {
+	for (int i = 0; i < BALLOON_MAX - 1; i++) {
 
 		if (BalloonNotes[i].flag == false) return i;
 	}
@@ -1058,7 +1058,7 @@ int make_balloon_start(int NotesId) {
 
 int find_balloon_end_id() {	//startの値だけ入ってる風船idを返す
 
-	for (int i = 0; i < Balloon_Max - 1; i++) {
+	for (int i = 0; i < BALLOON_MAX - 1; i++) {
 
 		if (BalloonNotes[i].flag == true &&
 			BalloonNotes[i].start_id != -1 &&
@@ -1084,7 +1084,7 @@ void delete_notes(int i) {
 
 		delete_notes(RollNotes[Notes[i].roll_id].start_id);
 		delete_roll(Notes[i].roll_id);
-		score_update(ROLL_END);
+		update_score(ROLL_END);
 
 	}
 
@@ -1096,7 +1096,7 @@ void delete_notes(int i) {
 
 			if (BalloonNotes[Notes[i].roll_id].start_id != -1) delete_notes(BalloonNotes[Notes[i].roll_id].start_id);
 			delete_balloon(Notes[i].roll_id);
-			balloon_count_update(0);
+			update_balloon_count(0);
 		}
 		else if (Notes[i].knd == NOTES_BALLOON) {
 
@@ -1109,7 +1109,7 @@ void delete_notes(int i) {
 		}
 	}
 
-	if (i >= 0 && i < Notes_Max) {
+	if (i >= 0 && i < NOTES_MAX) {
 		Notes[i].flag = false;
 		Notes[i].num = 0;
 		Notes[i].knd = 0;
@@ -1128,7 +1128,7 @@ void delete_notes(int i) {
 bool get_notes_finish() {
 
 	if (isNotesLoad == true) return false;
-	for (int i = 0; i < Notes_Max - 1; i++) {
+	for (int i = 0; i < NOTES_MAX - 1; i++) {
 
 		if (Notes[i].flag == true) return false;
 	}
@@ -1164,7 +1164,7 @@ void draw_title() {
 }
 void init_notes_structure() {
 
-	for (int i = 0; i < Notes_Max - 1; i++) {
+	for (int i = 0; i < NOTES_MAX - 1; i++) {
 		delete_notes(i);
 	}
 }

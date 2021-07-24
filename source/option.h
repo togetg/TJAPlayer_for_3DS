@@ -1,67 +1,5 @@
 ﻿#pragma once
 
-typedef struct {
-
-	int lang,buffer_size;
-	bool isAuto, isStelth,isSwap,dispFps;
-	double speed, random,offset;
-	int KEY_A, KEY_B, KEY_DRIGHT, KEY_DLEFT, KEY_DUP, KEY_DDOWN, KEY_R, KEY_L, KEY_X, KEY_Y,
-		KEY_ZL, KEY_ZR, KEY_CSTICK_RIGHT, KEY_CSTICK_LEFT, KEY_CSTICK_UP, KEY_CSTICK_DOWN,
-		KEY_CPAD_RIGHT, KEY_CPAD_LEFT, KEY_CPAD_UP, KEY_CPAD_DOWN;
-} OPTION_T;
-
-enum Lang_knd {
-	LANG_JP = 0,
-	LANG_EN,
-	LANG_ES,
-};
-
-enum KEY_KND {
-	KEY_NONE = 0,
-	KEY_DON,
-	KEY_KATSU,
-};
-
-enum Text_knd {
-	TEXT_ON,
-	TEXT_OFF,
-	TEXT_EASY,
-	TEXT_NORMAL,
-	TEXT_HARD,
-	TEXT_ONI,
-	TEXT_AUTO,
-	TEXT_SPEED,
-	TEXT_X1,
-	TEXT_X2,
-	TEXT_X3,
-	TEXT_X4,
-	TEXT_STELTH,
-	TEXT_SWAP,
-	TEXT_RANDOM,
-	TEXT_R25,
-	TEXT_R50,
-	TEXT_LANG,
-	TEXT_JP,
-	TEXT_EN,
-	TEXT_ES,
-	TEXT_BUFFERSIZE,
-	TEXT_RESET,
-	TEXT_DISP_FPS,
-	TEXT_BUTTON_MAPPING,
-	TEXT_SCORE,
-	TEXT_MAXCOMBO,
-	TEXT_PERFECT,
-	TEXT_NICE,
-	TEXT_BAD,
-	TEXT_ROLLCOUNT,
-	TEXT_PRESSSTART,
-	TEXT_CONTINUE,
-	TEXT_STARTOVER,
-	TEXT_RETURNSELECT,
-	TEXT_WARNING_DSP1,
-	TEXT_WARNING_WAVE,
-};
-
 const char Text[3][64][128] = {
 	{
 		"ON",
@@ -139,7 +77,7 @@ const char Text[3][64][128] = {
 		"Retry",
 		"Back to Select song",
 		"No sound is played because\nDSP1 is not activated.",
-		"The music file does not exist.\n\nHave you converted the character encoding\nof the TJA file to UTF8?",
+		"The sound file does not exist.\n\nHave you converted the character encoding\nof the TJA file to UTF8?",
 	},
 	{
 		"Sí",
@@ -178,12 +116,75 @@ const char Text[3][64][128] = {
 		"Reintentar",
 		"Volver al menú",
 		"No sound is played because\nDSP1 is not activated.",
-		"The music file does not exist.\n\nHave you converted the character encoding\nof the TJA file to UTF8?",
+		"The sound file does not exist.\n\nHave you converted the character encoding\nof the TJA file to UTF8?",
 	}
 };
 
+typedef struct {
+
+	int lang,buffer_size;
+	bool isAuto, isStelth,isSwap,dispFps;
+	double speed, random,offset,
+		judge_range_perfect,judge_range_nice,judge_range_bad;
+	int KEY_A, KEY_B, KEY_DRIGHT, KEY_DLEFT, KEY_DUP, KEY_DDOWN, KEY_R, KEY_L, KEY_X, KEY_Y,
+		KEY_ZL, KEY_ZR, KEY_CSTICK_RIGHT, KEY_CSTICK_LEFT, KEY_CSTICK_UP, KEY_CSTICK_DOWN,
+		KEY_CPAD_RIGHT, KEY_CPAD_LEFT, KEY_CPAD_UP, KEY_CPAD_DOWN;
+} OPTION_T;
+
+enum Lang_knd {
+	LANG_JP = 0,
+	LANG_EN,
+	LANG_ES,
+};
+
+enum KEY_KND {
+	KEY_NONE = 0,
+	KEY_DON,
+	KEY_KATSU,
+};
+
+enum Text_knd {
+	TEXT_ON,
+	TEXT_OFF,
+	TEXT_EASY,
+	TEXT_NORMAL,
+	TEXT_HARD,
+	TEXT_ONI,
+	TEXT_AUTO,
+	TEXT_SPEED,
+	TEXT_X1,
+	TEXT_X2,
+	TEXT_X3,
+	TEXT_X4,
+	TEXT_STELTH,
+	TEXT_SWAP,
+	TEXT_RANDOM,
+	TEXT_R25,
+	TEXT_R50,
+	TEXT_LANG,
+	TEXT_JP,
+	TEXT_EN,
+	TEXT_ES,
+	TEXT_BUFFERSIZE,
+	TEXT_RESET,
+	TEXT_DISP_FPS,
+	TEXT_BUTTON_MAPPING,
+	TEXT_SCORE,
+	TEXT_MAXCOMBO,
+	TEXT_PERFECT,
+	TEXT_NICE,
+	TEXT_BAD,
+	TEXT_ROLLCOUNT,
+	TEXT_PRESSSTART,
+	TEXT_CONTINUE,
+	TEXT_STARTOVER,
+	TEXT_RETURNSELECT,
+	TEXT_WARNING_DSP1,
+	TEXT_WARNING_WAVE,
+};
+
 int get_lang();
-void draw_option(u16 px, u16 py, unsigned int key , C2D_Sprite sprites[Sprite_Number]);
+void draw_option(u16 px, u16 py, unsigned int key , C2D_Sprite sprites[SPRITES_NUMER]);
 void toggle_auto();
 void get_option(OPTION_T *TMP);
 void init_option();

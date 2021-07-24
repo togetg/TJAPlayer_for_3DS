@@ -8,7 +8,7 @@
 OPTION_T Option;
 json_t *json;
 json_error_t error_json;
-int option_page = 1,max_option_page = 3;
+int option_page = 1,max_option_page = 4;
 
 //数字キーボードで入力
 double input_number_keyboard(int max_digits,bool isFloat,bool isMinus) {	//最大桁数、少数かどうか
@@ -49,7 +49,7 @@ void init_button_mapping() {
 	Option.KEY_CSTICK_UP = KEY_KATSU;
 }
 
-void draw_button_mapping_icon(double x,double y,int key, C2D_Sprite sprites[Sprite_Number]) {
+void draw_button_mapping_icon(double x,double y,int key, C2D_Sprite sprites[SPRITES_NUMER]) {
 
 	C2D_ImageTint Tint;
 	C2D_AlphaImageTint(&Tint, 0.5);
@@ -113,7 +113,7 @@ void calc_option_page(u16 px, u16 py, unsigned int key) {
 	draw_option_text(145, 218, get_buffer(), true, &width, &height);
 }
 
-void draw_option(u16 px, u16 py, unsigned int key, C2D_Sprite sprites[Sprite_Number]) {
+void draw_option(u16 px, u16 py, unsigned int key, C2D_Sprite sprites[SPRITES_NUMER]) {
 	
 	float width,height,x,y;
 	int XSense=65, YSense=30,XCnt = 0,YCnt = 1,gap = 25;
@@ -269,10 +269,51 @@ void draw_option(u16 px, u16 py, unsigned int key, C2D_Sprite sprites[Sprite_Num
 		break;
 
 	case 3:
-		//ボタンマッピング
-		draw_option_text(80, 25, Text[Option.lang][TEXT_BUTTON_MAPPING], true, &width, &height);
-		x = 130, y = 120;
+		XSense = 65, YSense = 30, XCnt = 0, YCnt = 1, gap = 100;
+		//良
+		x = XSense * XCnt, y = YSense * YCnt, XCnt++;
+		draw_option_text(x, y, Text[Option.lang][TEXT_PERFECT], true, &width, &height);
+		x = XSense * XCnt + gap, y = YSense * YCnt, XCnt++;
+		snprintf(get_buffer(), BUFFER_SIZE, "%.3f", Option.judge_range_perfect);
+		draw_option_text(x, y, get_buffer(), true, &width, &height);
+		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) Option.judge_range_perfect = input_number_keyboard(5, true, true);
+		x = XSense * XCnt + gap, y = YSense * YCnt, XCnt++;
 		draw_option_text(x, y, Text[Option.lang][TEXT_RESET], true, &width, &height);
+		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) Option.judge_range_perfect = DEFAULT_JUDGE_RANGE_PERFECT;
+		XCnt = 0, YCnt++;
+
+		//可
+		x = XSense * XCnt, y = YSense * YCnt, XCnt++;
+		draw_option_text(x, y, Text[Option.lang][TEXT_NICE], true, &width, &height);
+		x = XSense * XCnt + gap, y = YSense * YCnt, XCnt++;
+		snprintf(get_buffer(), BUFFER_SIZE, "%.3f", Option.judge_range_nice);
+		draw_option_text(x, y, get_buffer(), true, &width, &height);
+		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) Option.judge_range_nice = input_number_keyboard(5, true, true);
+		x = XSense * XCnt + gap, y = YSense * YCnt, XCnt++;
+		draw_option_text(x, y, Text[Option.lang][TEXT_RESET], true, &width, &height);
+		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) Option.judge_range_nice = DEFAULT_JUDGE_RANGE_NICE;
+		XCnt = 0, YCnt++;
+
+		//不可
+		x = XSense * XCnt, y = YSense * YCnt, XCnt++;
+		draw_option_text(x, y, Text[Option.lang][TEXT_BAD], true, &width, &height);
+		x = XSense * XCnt + gap, y = YSense * YCnt, XCnt++;
+		snprintf(get_buffer(), BUFFER_SIZE, "%.3f", Option.judge_range_bad);
+		draw_option_text(x, y, get_buffer(), true, &width, &height);
+		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) Option.judge_range_bad = input_number_keyboard(5, true, true);
+		x = XSense * XCnt + gap, y = YSense * YCnt, XCnt++;
+		draw_option_text(x, y, Text[Option.lang][TEXT_RESET], true, &width, &height);
+		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) Option.judge_range_bad = DEFAULT_JUDGE_RANGE_BAD;
+		XCnt = 0, YCnt++;
+		break;
+
+	case 4:
+		//ボタンマッピング
+
+		draw_option_text(-1, 25, Text[Option.lang][TEXT_BUTTON_MAPPING], true, &width, &height);
+		x = 130, y = 120;
+		draw_option_text(-1, y, Text[Option.lang][TEXT_RESET], true, &width, &height);
+		x = BOTTOM_WIDTH / 2 - width / 2;
 		if ((y < py && y + height > py && x < px && x + width > px) && key & KEY_TOUCH) init_button_mapping();
 
 		//ABYX
@@ -398,8 +439,6 @@ void draw_option(u16 px, u16 py, unsigned int key, C2D_Sprite sprites[Sprite_Num
 		draw_option_text(x, y, "R", true, &width, &height);
 		width = 26, height = 26, x2 = x - 5, y2 = y - 5;
 		if ((y2 < py && y2 + height > py && x2 < px && x2 + width > px) && key & KEY_TOUCH) switch_button_mapping(&Option.KEY_R);
-		//C2D_DrawRectangle(x2, y2, 0, width, height, C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1), C2D_Color32f(1, 1, 1, 1));
-		
 		break;
 
 	default:
@@ -428,6 +467,9 @@ void init_option() {
 	Option.lang = LANG_JP;
 	Option.buffer_size = DEFAULT_BUFFER_SIZE;
 	Option.offset = 0;
+	Option.judge_range_perfect = DEFAULT_JUDGE_RANGE_PERFECT;
+	Option.judge_range_nice = DEFAULT_JUDGE_RANGE_NICE;
+	Option.judge_range_bad = DEFAULT_JUDGE_RANGE_BAD;
 
 	init_button_mapping();
 
@@ -465,6 +507,10 @@ void save_option() {
 	json_object_set(json, "KEY_CSTICK_DOWN", json_integer(Option.KEY_CSTICK_DOWN));
 	json_object_set(json, "KEY_CSTICK_RIGHT", json_integer(Option.KEY_CSTICK_RIGHT));
 	json_object_set(json, "KEY_CSTICK_LEFT", json_integer(Option.KEY_CSTICK_LEFT));
+	json_object_set(json, "judge_range_perfect", json_integer(round(Option.judge_range_perfect * 1000)));
+	json_object_set(json, "judge_range_nice", json_integer(round(Option.judge_range_nice * 1000)));
+	json_object_set(json, "judge_range_bad", json_integer(round(Option.judge_range_bad * 1000)));
+
 	json_dump_file(json, SETTING_FILE, 0);
 }
 
@@ -505,9 +551,14 @@ void load_option() {
 		Option.KEY_CSTICK_DOWN = json_integer_value(json_object_get(json, "KEY_CSTICK_DOWN"));
 		Option.KEY_CSTICK_RIGHT = json_integer_value(json_object_get(json, "KEY_CSTICK_RIGHT"));
 		Option.KEY_CSTICK_LEFT = json_integer_value(json_object_get(json, "KEY_CSTICK_LEFT"));
-
+		Option.judge_range_perfect = (double)json_integer_value(json_object_get(json, "judge_range_perfect"))/1000;
+		Option.judge_range_nice = (double)json_integer_value(json_object_get(json, "judge_range_nice"))/1000;
+		Option.judge_range_bad = (double)json_integer_value(json_object_get(json, "judge_range_bad"))/1000;
+		if (Option.judge_range_perfect == 0) Option.judge_range_perfect = DEFAULT_JUDGE_RANGE_PERFECT;
+		if (Option.judge_range_nice == 0) Option.judge_range_nice = DEFAULT_JUDGE_RANGE_NICE;
+		if (Option.judge_range_bad == 0) Option.judge_range_bad = DEFAULT_JUDGE_RANGE_BAD;
 	}
-	if (json == NULL) {	//開けなかった時
+	if (json == NULL) {			//開けなかった時
 		json = json_pack("{}");	//ファイル空の時はこれしないとセットできなくなる
 		save_option();			//書き込み
 	}
@@ -550,4 +601,7 @@ void get_option(OPTION_T *TMP) {
 	TMP->KEY_CSTICK_LEFT = Option.KEY_CSTICK_LEFT;
 	TMP->KEY_CSTICK_UP = Option.KEY_CSTICK_UP;
 	TMP->KEY_CSTICK_DOWN = Option.KEY_CSTICK_DOWN;
+	TMP->judge_range_perfect = Option.judge_range_perfect;
+	TMP->judge_range_nice = Option.judge_range_nice;
+	TMP->judge_range_bad = Option.judge_range_bad;
 }
