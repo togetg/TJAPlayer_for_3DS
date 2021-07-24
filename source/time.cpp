@@ -79,7 +79,7 @@ int get_time_isStop(int id) {
 	return isStop[id];
 }
 
-#define FPS_SAMPLE 60
+#define FPS_SAMPLE 30
 double fps_time[2],fps_cnt,fps_sum,fps;	//要初期化
 void draw_fps() {
 	

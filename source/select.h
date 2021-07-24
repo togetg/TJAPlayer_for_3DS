@@ -12,12 +12,12 @@ typedef struct {
 
 	int genre_color,font_color;
 	char name[256], path[256];
-	bool flag;
+	bool isOpened;
 } GENRE_T;
 
 void disp_file_list();
 void load_file_main();
-void cursor_update(int knd);
+void update_cursor(int knd);
 void get_SelectedId(LIST_T *TMP, int *arg);
 void draw_select_text(float x, float y, const char* text, int color = 0xffffff);
 bool get_isGameStart();

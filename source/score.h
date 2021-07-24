@@ -21,16 +21,16 @@ enum Judge_Knd {
 };
 
 void init_score();
-void score_debug();
-void score_update(int knd);
+void debug_score();
+void update_score(int knd);
 void send_gogotime(bool temp);
 int round_down(int arg);
-void calc_base_score(MEASURE_T Measure[Measure_Max], char tja_notes[Measure_Max][Max_Notes_Measure]);
+void calc_base_score(MEASURE_T Measure[MEASURE_MAX], char tja_notes[MEASURE_MAX][NOTES_MEASURE_MAX]);
 void init_branch_section();
-int branch_start(int knd, double x, double y);
-void draw_lane(C2D_Sprite  sprites[Sprite_Number]);
-void draw_gauge(C2D_Sprite  sprites[Sprite_Number]);
-void draw_score(C2D_Sprite  sprites[Sprite_Number]);
-void balloon_count_update(int arg);
-void draw_emblem(C2D_Sprite  sprites[Sprite_Number]);
-void draw_gauge_result(C2D_Sprite  sprites[Sprite_Number]);
+int start_branch(int knd, double x, double y);
+void draw_lane(C2D_Sprite  sprites[SPRITES_NUMER]);
+void draw_gauge(C2D_Sprite  sprites[SPRITES_NUMER]);
+void draw_score(C2D_Sprite  sprites[SPRITES_NUMER]);
+void update_balloon_count(int arg);
+void draw_emblem(C2D_Sprite  sprites[SPRITES_NUMER]);
+void draw_gauge_result(C2D_Sprite  sprites[SPRITES_NUMER]);

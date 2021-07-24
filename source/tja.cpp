@@ -7,20 +7,20 @@
 #include "option.h"
 
 
-char tja_notes[Measure_Max][Max_Notes_Measure];
+char tja_notes[MEASURE_MAX][NOTES_MEASURE_MAX];
 int tja_cnt = 0, MeasureMaxNumber = 0;
 double MainFirstMeasureTime;	//最初に"到達"する小節の到達所要時間　最初に"生成"はMeasure[0]で取得
 bool isBranch = false;
 
 
 TJA_HEADER_T Current_Header;
-MEASURE_T Measure[Measure_Max];
+MEASURE_T Measure[MEASURE_MAX];
 
 void get_command_value(char* buf, COMMAND_T *Command);
 
 void init_measure_structure() {
 
-	for (int i = 0; i < Measure_Max; i++) {
+	for (int i = 0; i < MEASURE_MAX; i++) {
 
 		Measure[i].create_time = INT_MAX;
 		Measure[i].judge_time = INT_MAX;
@@ -353,7 +353,7 @@ void load_tja_head_simple(LIST_T *List) {		//選曲用のヘッダ取得
 	fclose(fp);
 }
 
-void MeasureInsertionSort(MEASURE_T t[], int array_size) {	//create_timeでソート
+void sort_measure_insertion(MEASURE_T t[], int array_size) {	//create_timeでソート
 
 	for (int i = 1; i < array_size; i++) {
 
@@ -374,7 +374,7 @@ double calc_first_measure_time() {	//最初に到達する小節の所要時間�
 
 	int tmp = -1;
 
-	for (int i = 0; i < Measure_Max; i++) {
+	for (int i = 0; i < MEASURE_MAX; i++) {
 
 		if (Measure[i].flag == true && Measure[i].command == -1) {
 
@@ -422,12 +422,12 @@ void load_tja_notes(int course, LIST_T Song) {
 		int MeasureCount = 0,CurrentCourse = -1;
 		double PreJudge = 0, FirstMeasureTime = 0;
 
-		FirstMeasureTime = (60.0 / bpm * 4 * measure)*(Notes_Judge_Range / Notes_Area) - 60.0 / bpm * 4 * measure;
+		FirstMeasureTime = (60.0 / bpm * 4 * measure)*(NOTES_JUDGE_RANGE / NOTES_AREA) - 60.0 / bpm * 4 * measure;
 		PreJudge = FirstMeasureTime;
 
 
 		while (
-			(fgets(tja_notes[tja_cnt], Max_Notes_Measure, fp) != NULL || tja_cnt < Measure_Max) &&
+			(fgets(tja_notes[tja_cnt], NOTES_MEASURE_MAX, fp) != NULL || tja_cnt < MEASURE_MAX) &&
 			isEnd == false
 			) {
 
@@ -549,8 +549,8 @@ void load_tja_notes(int course, LIST_T Song) {
 				Measure[MeasureCount].measure = NextMeasure;
 				Measure[MeasureCount].scroll = scroll;
 				Measure[MeasureCount].judge_time = 60.0 / bpm * 4 * measure * percent + PreJudge + delay;
-				Measure[MeasureCount].pop_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4)*(Notes_Judge_Range / Notes_Area);
-				Measure[MeasureCount].create_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4)*(Notes_Judge_Range / (Notes_Area*scroll* Option.speed));
+				Measure[MeasureCount].pop_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4)*(NOTES_JUDGE_RANGE / NOTES_AREA);
+				Measure[MeasureCount].create_time = Measure[MeasureCount].judge_time - (60.0 / Measure[MeasureCount].bpm * 4)*(NOTES_JUDGE_RANGE / (NOTES_AREA*scroll* Option.speed));
 				Measure[MeasureCount].isDispBarLine = isDispBarLine;
 				Measure[MeasureCount].branch = BranchCourse;
 
@@ -626,8 +626,8 @@ void load_tja_notes(int course, LIST_T Song) {
 								(60.0 / Measure[Measure[MeasureCount].firstmeasure + i - 1].bpm * 4 * Measure[Measure[MeasureCount].firstmeasure + i - 1].measure)
 								* Measure[Measure[MeasureCount].firstmeasure + i - 1].notes_count / Measure[Measure[MeasureCount].firstmeasure].max_notes;	//delayはとりあえず放置
 							
-							Measure[Measure[MeasureCount].firstmeasure + i].pop_time    = Measure[Measure[MeasureCount].firstmeasure + i].judge_time - (60.0 / Measure[Measure[MeasureCount].firstmeasure + i].bpm * 4)*(Notes_Judge_Range / (Notes_Area));
-							Measure[Measure[MeasureCount].firstmeasure + i].create_time = Measure[Measure[MeasureCount].firstmeasure + i].judge_time - (60.0 / Measure[Measure[MeasureCount].firstmeasure + i].bpm * 4)*((1.0/Option.speed)*Notes_Judge_Range / (Notes_Area*Measure[Measure[MeasureCount].firstmeasure + i].scroll));
+							Measure[Measure[MeasureCount].firstmeasure + i].pop_time    = Measure[Measure[MeasureCount].firstmeasure + i].judge_time - (60.0 / Measure[Measure[MeasureCount].firstmeasure + i].bpm * 4)*(NOTES_JUDGE_RANGE / (NOTES_AREA));
+							Measure[Measure[MeasureCount].firstmeasure + i].create_time = Measure[Measure[MeasureCount].firstmeasure + i].judge_time - (60.0 / Measure[Measure[MeasureCount].firstmeasure + i].bpm * 4)*((1.0/Option.speed)*NOTES_JUDGE_RANGE / (NOTES_AREA*Measure[Measure[MeasureCount].firstmeasure + i].scroll));
 							percent = (double)Measure[Measure[MeasureCount].firstmeasure + i].notes_count / (double)Measure[Measure[MeasureCount].firstmeasure].max_notes;
 
 							Measure[Measure[MeasureCount].firstmeasure + i].isDispBarLine = false;	//最初の小節は小節線をオフにしない
@@ -666,7 +666,7 @@ void load_tja_notes(int course, LIST_T Song) {
 		calc_base_score(Measure, tja_notes);
 
 		fclose(fp);
-		MeasureInsertionSort(Measure, Measure_Max);
+		sort_measure_insertion(Measure, MEASURE_MAX);
 		MainFirstMeasureTime = calc_first_measure_time();
 	}
 }
@@ -676,7 +676,7 @@ void get_tja_header(TJA_HEADER_T *TJA_Header) {
 	*TJA_Header = Current_Header;
 }
 
-void tja_to_notes(bool isDon, bool isKatsu, int count, C2D_Sprite sprites[Sprite_Number]) {
+void tja_to_notes(bool isDon, bool isKatsu, int count, C2D_Sprite sprites[SPRITES_NUMER]) {
 
 	notes_main(isDon, isKatsu, tja_notes, Measure, count, sprites);
 
@@ -813,9 +813,9 @@ double get_FirstMeasureTime() {
 	return MainFirstMeasureTime;
 }
 
-int MeasureIdFromOriginalId(int id) {
+int get_MeasureId_From_OriginalId(int id) {
 
-	for (int i = 0; i < Measure_Max; i++) {
+	for (int i = 0; i < MEASURE_MAX; i++) {
 
 		if (Measure[i].original_id == id) return i;
 	}

@@ -21,7 +21,7 @@ int ClosedSongNumber = 0;	//閉じたジャンル内の曲数
 int GenreCount = 0, SongCount = 0, cursor = 0, course_cursor = 0, course_count = 0, SelectedId = 0, SelectedGenreId = 0 ,course = COURSE_ONI;
 bool isSelectCourse = false, isCursorGenre = false, isGameStart = false;
 
-int list_cmp(const void* p, const void* q) {	//比較用
+int cmp_list(const void* p, const void* q) {	//比較用
 
 	int pp = ((LIST_T*)p)->genre;
 	int qq = ((LIST_T*)q)->genre;
@@ -29,9 +29,9 @@ int list_cmp(const void* p, const void* q) {	//比較用
 	return pp - qq;
 }
 
-void list_sort() {	//曲をジャンル順にソート
+void sort_list() {	//曲をジャンル順にソート
 
-	qsort(List, SongNumber, sizeof(LIST_T), list_cmp);
+	qsort(List, SongNumber, sizeof(LIST_T), cmp_list);
 }
 
 void load_file_main() {
@@ -41,7 +41,7 @@ void load_file_main() {
 	SongNumber = SongCount;
 	GenreNumber = GenreCount;
 	set_genres();
-	list_sort();
+	sort_list();
 }
 
 void load_genre_file(int id) {
@@ -59,7 +59,7 @@ void load_genre_file(int id) {
 
 	if (json != NULL) {
 
-		Genre[id].flag = true;
+		Genre[id].isOpened = false;
 		strlcpy(Genre[id].name, json_string_value(json_object_get(json, "GenreName")), sizeof(Genre[id].name));
 		strlcpy(tmp, json_string_value(json_object_get(json, "GenreColor")), sizeof(tmp));
 		if (tmp[0] == '#') tmp[0] = ' ';
@@ -185,7 +185,7 @@ void disp_file_list() {
 				}
 			}
 			
-			if (List[i].genre == GENRE_MAX + 1 || (List[i].genre != GENRE_MAX + 1 && Genre[List[i].genre].flag == true)) {
+			if (List[i].genre == GENRE_MAX + 1 || (List[i].genre != GENRE_MAX + 1 && Genre[List[i].genre].isOpened == true)) {
 
 				snprintf(buf_select, sizeof(buf_select), "%s", List[i].title);
 				int x = (List[i].genre != GENRE_MAX + 1) * 25 + 30;
@@ -198,7 +198,7 @@ void disp_file_list() {
 			}
 		}
 
-		if (List[i].genre != GENRE_MAX + 1 && Genre[List[i].genre].flag == false) {
+		if (List[i].genre != GENRE_MAX + 1 && Genre[List[i].genre].isOpened == false) {
 
 			ClosedSongNumber++;
 			continue;
@@ -317,36 +317,36 @@ void disp_file_list() {
 
 }
 
-void cursor_update(int knd) {
+void update_cursor(int knd) {
 
 	if (knd == KEY_UP) {
 		if (isSelectCourse == false) cursor++;
 		else if (course_cursor > 0) course_cursor--;
-		music_play(SOUND_KATSU);
+		play_sound(SOUND_KATSU);
 	}
 	else if (knd == (int)KEY_DOWN) {
 		if (isSelectCourse == false) cursor--;
 		else if (course_cursor < (course_count - 1)) course_cursor++;
-		music_play(SOUND_KATSU);
+		play_sound(SOUND_KATSU);
 	}
 	else if (knd == KEY_RIGHT) {
 		if (isSelectCourse == false) cursor -= 5;
-		music_play(SOUND_KATSU);
+		play_sound(SOUND_KATSU);
 	}
 	else if (knd == KEY_LEFT) {
 		if (isSelectCourse == false) cursor += 5;
-		music_play(SOUND_KATSU);
+		play_sound(SOUND_KATSU);
 	}
 	else if (knd == KEY_A && (course_count != 0 || isCursorGenre == true)) {
-		if (isCursorGenre == true) Genre[SelectedGenreId].flag = !Genre[SelectedGenreId].flag;
+		if (isCursorGenre == true) Genre[SelectedGenreId].isOpened = !Genre[SelectedGenreId].isOpened;
 		else if (isSelectCourse == true) isGameStart = true;
 		else isSelectCourse = true;
-		music_play(SOUND_DON);
+		play_sound(SOUND_DON);
 	}
 	else if (knd == KEY_B) {
 		isSelectCourse = false;
 		course_cursor = 0;
-		music_play(SOUND_KATSU);
+		play_sound(SOUND_KATSU);
 	}
 
 }
@@ -387,6 +387,9 @@ void draw_option_text(float x, float y, const char* text, bool state, float* wid
 	C2D_TextBufClear(g_SelectText);
 	C2D_TextParse(&SelectText, g_SelectText, text);
 	C2D_TextOptimize(&SelectText);
+	C2D_TextGetDimensions(&SelectText, sizex, sizey, width, height);
+
+	if (x == -1) x = BOTTOM_WIDTH / 2 - *width / 2;
 
 	if (state == false) {
 		C2D_DrawText(&SelectText, C2D_WithColor, x, y, 1.0f, sizex, sizey, C2D_Color32f(100.0 / 255.0, 100.0 / 255.0, 100.0 / 255.0, 1.0f));
@@ -394,7 +397,7 @@ void draw_option_text(float x, float y, const char* text, bool state, float* wid
 	else if (state == true) {
 		C2D_DrawText(&SelectText, C2D_WithColor, x, y, 1.0f, sizex, sizey, C2D_Color32f(1.0f, 1.0f, 1.0f, 1.0f));
 	}
-	C2D_TextGetDimensions(&SelectText, sizex, sizey, width, height);
+	
 }
 
 void get_SelectedId(LIST_T* TMP, int* arg) {

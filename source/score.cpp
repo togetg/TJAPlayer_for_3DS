@@ -55,7 +55,7 @@ void init_score() {
 }
 
 
-void score_update(int knd) {
+void update_score(int knd) {
 
 	int PreScore = TotalScore;
 	bool isCombo = false;
@@ -232,7 +232,7 @@ void score_update(int knd) {
 	else CurrentPrecision = 0;
 }
 
-void score_debug() {
+void debug_score() {
 
 	snprintf(buf_score, sizeof(buf_score), "Scoremode:%d   Init:%d   Diff:%d", TJA_Header.scoremode, init, diff);
 	draw_debug(0, 10, buf_score);
@@ -252,7 +252,7 @@ void score_debug() {
 	}
 }
 
-void draw_score(C2D_Sprite  sprites[Sprite_Number]) {
+void draw_score(C2D_Sprite  sprites[SPRITES_NUMER]) {
 
 	//スコア
 	for (int i = 0; i < 7; i++) {
@@ -324,7 +324,7 @@ void draw_score(C2D_Sprite  sprites[Sprite_Number]) {
 	}
 }
 
-void draw_gauge(C2D_Sprite  sprites[Sprite_Number]) {
+void draw_gauge(C2D_Sprite  sprites[SPRITES_NUMER]) {
 
 	double gauge = 1.0 * (Gauge.score / 200) * 200 / Gauge.soul;
 	if (gauge > 1.0) gauge = 1.0;
@@ -350,7 +350,7 @@ void draw_gauge(C2D_Sprite  sprites[Sprite_Number]) {
 	else C2D_DrawSprite(&sprites[SPRITE_SOUL_OFF]);
 }
 
-void draw_gauge_result(C2D_Sprite  sprites[Sprite_Number]) {
+void draw_gauge_result(C2D_Sprite  sprites[SPRITES_NUMER]) {
 
 	int diff = 50;
 	double x_start = 123 - diff, x_end = 250 - diff;
@@ -378,7 +378,7 @@ void draw_gauge_result(C2D_Sprite  sprites[Sprite_Number]) {
 	else C2D_DrawSprite(&sprites[SPRITE_SOUL_OFF]);
 }
 
-void draw_lane(C2D_Sprite  sprites[Sprite_Number]) {
+void draw_lane(C2D_Sprite  sprites[SPRITES_NUMER]) {
 
 
 	if (get_isBranch() == true) {
@@ -408,7 +408,7 @@ void draw_lane(C2D_Sprite  sprites[Sprite_Number]) {
 		}
 	}
 
-	C2D_SpriteSetPos(&sprites[SPRITE_JUDGE_CIRCLE], Notes_Judge, 109);
+	C2D_SpriteSetPos(&sprites[SPRITE_JUDGE_CIRCLE], NOTES_JUDGE_X, 109);
 	C2D_DrawSprite(&sprites[SPRITE_JUDGE_CIRCLE]);
 
 	if (isGOGO == true) {
@@ -418,7 +418,7 @@ void draw_lane(C2D_Sprite  sprites[Sprite_Number]) {
 	}
 }
 
-int branch_start(int knd, double x, double y) {	//分岐
+int start_branch(int knd, double x, double y) {	//分岐
 
 	int branch;
 	switch (knd) {
@@ -463,7 +463,7 @@ int round_down(int arg) {
 	return arg - temp;
 }
 
-void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max_Notes_Measure]) {	//初項と公差を計算　魂ゲージの伸びも
+void calc_base_score(MEASURE_T Measure[MEASURE_MAX], char notes[MEASURE_MAX][NOTES_MEASURE_MAX]) {	//初項と公差を計算　魂ゲージの伸びも
 
 	int NotesCount = 0, i = 0, combo = 0, DiffTmp = 0, BalloonCnt = 0, TmpBaseCeilingPoint = 0, NotesCountMax = 0, RollCnt = 0, RollKnd = 0;
 	bool isEND = false;
@@ -494,7 +494,7 @@ void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max
 	TmpBaseCeilingPoint = BaseCeilingPoint;
 
 
-	while (isEND == false && i < Measure_Max && Measure[i].flag == true) {	//小節
+	while (isEND == false && i < MEASURE_MAX && Measure[i].flag == true) {	//小節
 
 		NotesCount = 0;
 
@@ -722,11 +722,11 @@ void calc_base_score(MEASURE_T Measure[Measure_Max], char notes[Measure_Max][Max
 	//init_score_after();
 }
 
-void balloon_count_update(int arg) {
+void update_balloon_count(int arg) {
 	CurrentBalloonCount = arg;
 }
 
-void draw_emblem(C2D_Sprite  sprites[Sprite_Number]) {
+void draw_emblem(C2D_Sprite  sprites[SPRITES_NUMER]) {
 
 	switch (TJA_Header.course) {
 	case COURSE_EASY:

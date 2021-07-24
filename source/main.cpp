@@ -11,7 +11,7 @@
 #include "main.h"
 #include "vorbis.h"
 
-C2D_Sprite sprites[Sprite_Number];			//画像用
+C2D_Sprite sprites[SPRITES_NUMER];			//画像用
 static C2D_SpriteSheet spriteSheet;
 C2D_TextBuf g_dynamicBuf;
 C2D_Text dynText;
@@ -42,7 +42,7 @@ void init_main() {
 	g_dynamicBuf = C2D_TextBufNew(4096);
 }
 
-void main_exit() {
+void exit_main() {
 
 	C2D_TextBufDelete(g_dynamicBuf);
 
@@ -50,7 +50,8 @@ void main_exit() {
 	C3D_Fini();
 	gfxExit();
 	romfsExit();
-	music_exit();
+	exit_music();
+	exit_option();
 }
 
 void button_game(bool *isDon,bool *isKatsu,OPTION_T Option, unsigned int key) {
@@ -97,9 +98,6 @@ int main() {
 	LIST_T SelectedSong;
 	OPTION_T Option;
 
-	load_sprites();
-	load_music();
-
 	int cnt = 0, notes_cnt = 0, scene_state = SCENE_SELECTLOAD,warning=-1, course = COURSE_ONI, tmp=0;
 
 	double FirstMeasureTime = INT_MAX,
@@ -127,6 +125,8 @@ int main() {
 		case SCENE_SELECTLOAD:	//ロード画面
 
 			snprintf(get_buffer(), BUFFER_SIZE, "TJAPlayer for 3DS %s", VERSION);
+			load_sprites();
+			load_sound();
 			draw_select_text(120, 70, get_buffer());
 			draw_select_text(120, 100, "Now Loading...");
 			C3D_FrameEnd(0);
@@ -167,12 +167,12 @@ int main() {
 				select_ini();
 			}
 
-			if (key & KEY_UP)		cursor_update(KEY_UP);
-			if (key & KEY_DOWN)		cursor_update(KEY_DOWN);
-			if (key & KEY_RIGHT)	cursor_update(KEY_RIGHT);
-			if (key & KEY_LEFT)		cursor_update(KEY_LEFT);
-			if (key & KEY_A)		cursor_update(KEY_A);
-			if (key & KEY_B)		cursor_update(KEY_B);
+			if (key & KEY_UP)		update_cursor(KEY_UP);
+			if (key & KEY_DOWN)		update_cursor(KEY_DOWN);
+			if (key & KEY_RIGHT)	update_cursor(KEY_RIGHT);
+			if (key & KEY_LEFT)		update_cursor(KEY_LEFT);
+			if (key & KEY_A)		update_cursor(KEY_A);
+			if (key & KEY_B)		update_cursor(KEY_B);
 
 			disp_file_list();
 
@@ -286,8 +286,8 @@ int main() {
 				button_game(&isDon, &isKatsu, Option, key);
 			}
 
-			if (isDon == true)   music_play(SOUND_DON);		//ドン
-			if (isKatsu == true) music_play(SOUND_KATSU);		//カツ
+			if (isDon == true)   play_sound(SOUND_DON);		//ドン
+			if (isKatsu == true) play_sound(SOUND_KATSU);		//カツ
 
 			if (key & KEY_SELECT || key & KEY_START) {
 				togglePlayback();
@@ -337,7 +337,7 @@ int main() {
 					toggle_time(0);
 					toggle_time(1);
 					isPause = !isPause;
-					music_play(SOUND_DON);
+					play_sound(SOUND_DON);
 				}
 			}
 			if (get_notes_finish() == true && ndspChnIsPlaying(CHANNEL) == false) {
@@ -357,12 +357,12 @@ int main() {
 			break;
 		}
 
+		C2D_Flush();
 		C3D_FrameEnd(0);
 		if (isPause == false) cnt++;
 	}
 
-	exit_option();
-	main_exit();
+	exit_main();
 	return 0;
 }
 
@@ -371,7 +371,7 @@ void load_sprites() {
 	spriteSheet = C2D_SpriteSheetLoad("romfs:/gfx/sprites.t3x");
 	if (!spriteSheet) svcBreak(USERBREAK_PANIC);
 
-	for (int i = 0; i < Sprite_Number; i++) {
+	for (int i = 0; i < SPRITES_NUMER; i++) {
 		C2D_SpriteFromSheet(&sprites[i], spriteSheet, i);
 		C2D_SpriteSetCenter(&sprites[i], 0.5f, 0.5f);
 	}

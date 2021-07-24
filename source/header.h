@@ -17,23 +17,27 @@
 #define PATH_DSP1 "sdmc:/3ds/dspfirm.cdc"
 #define GENRE_FILE "genre.json"
 
-#define Max_Notes_Measure 256	//一小節の最大ノーツ数+1
-#define Measure_Max 8192
-#define Notes_Area 338.0		//ノーツ表示エリアの長さ
-#define Notes_Judge 93			//判定枠の中心のX座標
-#define Notes_Judge_Range 327	//判定枠の中心から小節生成位置の距離(右端+20)
+#define DEFAULT_JUDGE_RANGE_PERFECT	0.034
+#define DEFAULT_JUDGE_RANGE_NICE	0.117
+#define DEFAULT_JUDGE_RANGE_BAD		0.150
+
+#define NOTES_MEASURE_MAX 256	//一小節の最大ノーツ数+1
+#define MEASURE_MAX 8192
+#define NOTES_AREA 338.0		//ノーツ表示エリアの長さ
+#define NOTES_JUDGE_X 93			//判定枠の中心のX座標
+#define NOTES_JUDGE_RANGE 327	//判定枠の中心から小節生成位置の距離(右端+20)
 
 #define TOP_WIDTH  400
 #define TOP_HEIGHT 240
 #define BOTTOM_WIDTH  320
 #define BOTTOM_HEIGHT 240
 
-#define Sprite_Number 83
+#define SPRITES_NUMER 83
 
-#define Notes_Max 512
-#define BarLine_Max 512
-#define Roll_Max 512
-#define Balloon_Max 512
+#define NOTES_MAX 512
+#define BARLINE_MAX 512
+#define ROLL_MAX 512
+#define BALLOON_MAX 512
 
 #define LIST_MAX 16384		//選曲リストの最大数
 #define GENRE_MAX 512		//ジャンルの最大数
@@ -222,6 +226,6 @@ enum TIME_KND {
 
 enum WARNING_KND {
 
-	WARNING_DSP1 = 0, //DSP1未起動
-	WARNING_WAVE,
+	WARNING_DSP1 = 0,	//DSP1未起動
+	WARNING_WAVE,		//音楽ファイルが存在しない
 };

@@ -40,10 +40,10 @@ typedef struct {
 void notes_main(
 	bool isDon,
 	bool isKatsu,
-	char tja_notes[Measure_Max][Max_Notes_Measure],
-	MEASURE_T Measure[Measure_Max],
+	char tja_notes[MEASURE_MAX][NOTES_MEASURE_MAX],
+	MEASURE_T Measure[MEASURE_MAX],
 	int cnt,
-	C2D_Sprite  sprites[Sprite_Number]);
+	C2D_Sprite  sprites[SPRITES_NUMER]);
 int ctoi(char c);
 int get_branch_course();
 void init_notes(TJA_HEADER_T TJA_Header);

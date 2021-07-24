@@ -34,11 +34,11 @@ typedef struct {
 
 void load_tja_head(int course, LIST_T Song);
 void load_tja_notes(int course, LIST_T Song);
-void tja_to_notes(bool isDnon, bool isKatsu, int count, C2D_Sprite sprites[Sprite_Number]);
+void tja_to_notes(bool isDnon, bool isKatsu, int count, C2D_Sprite sprites[SPRITES_NUMER]);
 void get_command_value(char* buf, COMMAND_T *Command);
 void get_tja_header(TJA_HEADER_T *TJA_Header);
 void init_tja();
 double get_FirstMeasureTime();
-int MeasureIdFromOriginalId(int id);
+int get_MeasureId_From_OriginalId(int id);
 bool get_isBranch();
 void load_tja_head_simple(LIST_T *List);
