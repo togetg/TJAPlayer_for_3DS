@@ -47,7 +47,6 @@ If you put the following "genre.json" in the folder, it will be recognized as a 
 - Other
   - TJC format
   - TJF format
-  - Genre
   - Save score
 
 # Screenshots
