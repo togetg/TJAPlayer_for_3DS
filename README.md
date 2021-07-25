@@ -7,8 +7,22 @@
 
 # 使い方
 
+## 譜面の追加
+
 1. **TJAファイルの文字コードをUFT-8に変換します。**<br>この作業は[KanjiTranslator](https://www.kashim.com/kanjitranslator/)等を使って一括で行うことをオススメします。<br>TITLEやWAVEに日本語などのマルチバイト文字が含まれていない場合はこの作業は必要ありません。
 2. 3DSのSDカードのルートに「tjafiles」というフォルダを作り、その中にTJAファイルと音源ファイルを入れてください。
+
+## ジャンル機能
+
+フォルダ内に以下のような「genre.json」を置くとジャンルとして認識します。
+
+```json
+{
+    "GenreName":"ジャンル",
+    "GenreColor": "#d3c442",
+    "FontColor": "#ff0000"
+}
+```
 
 # 注意
 
@@ -39,9 +53,9 @@
 # スクリーンショット
 <details><summary>スクリーンショット</summary>
 
-![1](https://user-images.githubusercontent.com/18244518/121764654-886c8d80-cb80-11eb-9ab0-db90cbe2c989.png)　![2](https://user-images.githubusercontent.com/18244518/121764656-8dc9d800-cb80-11eb-8c21-be6b99fc4b0e.png)
-![3](https://user-images.githubusercontent.com/18244518/121764658-90c4c880-cb80-11eb-8ee2-af9dc31e5ea7.png)　![4](https://user-images.githubusercontent.com/18244518/121764661-94584f80-cb80-11eb-96b6-31237baea857.png)
-![5](https://user-images.githubusercontent.com/18244518/121764663-97ebd680-cb80-11eb-9ab7-c24bc7f5f8bb.png)
+![1](https://user-images.githubusercontent.com/18244518/120986498-a3718300-c7b7-11eb-9036-8d9807a1b5c0.png) ![2](https://user-images.githubusercontent.com/18244518/120986505-a66c7380-c7b7-11eb-9c61-d98f752e9f2d.png)
+![3](https://user-images.githubusercontent.com/18244518/120986516-a8363700-c7b7-11eb-83af-db1fe4a3de32.png) ![4](https://user-images.githubusercontent.com/18244518/120986526-a9fffa80-c7b7-11eb-99a4-0756e8dae4db.png)
+![5](https://user-images.githubusercontent.com/18244518/120986545-ad938180-c7b7-11eb-89ad-bafca4c2c441.png)
 
 </details>
 

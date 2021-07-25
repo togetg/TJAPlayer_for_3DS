@@ -7,8 +7,22 @@ It's a music game of the [TJA file](https://wikiwiki.jp/jiro/%E5%A4%AA%E9%BC%93%
 
 # Usage
 
+## Add TJA files
+
 1. **Convert character code of TJA file to UFT-8.**<br>I recommend that you do this task collectively with [KanjiTranslator](https://www.kashim.com/kanjitranslator/) etc.<br>If "TITLE" and "WAVE" don't contain multibyte characters such as Japanese, this work isn't necessary.
 2. Create a folder named "tjafiles" in the root of the SD card of 3DS, and put in the TJA file and the sound file in it.
+
+## Genre
+
+If you put the following "genre.json" in the folder, it will be recognized as a genre.
+
+```json
+{
+    "GenreName":"ジャンル",
+    "GenreColor": "#d3c442",
+    "FontColor": "#ff0000"
+}
+```
 
 # Note
 
