@@ -63,10 +63,13 @@ If you put the following "genre.json" in the folder, it will be recognized as a 
 
 2. Install the package with the following command
 
-`pacman -S 3ds-libogg 3ds-dev 3ds-libvorbisidec 3ds-jansson --noconfirm`
+   `pacman -S 3ds-libogg 3ds-dev 3ds-libvorbisidec 3ds-jansson --noconfirm`
 
 3. Download [MakeROM](https://github.com/3DSGuy/Project_CTR/releases) and [bannertool](https://github.com/Steveice10/bannertool/releases) and set the PATH.
-4. Run Build.bat
+
+4. Run Build.bat or execute the following command
+
+   `make`
 
 # Credits
 - [Robichani6-1](https://github.com/Robichani6-1) - Spanish Translation

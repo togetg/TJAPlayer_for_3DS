@@ -61,12 +61,15 @@
 # ビルド
 1. [devkitPro](https://github.com/devkitPro/installer/releases/)をインストール
 
-2. 以下のコマンドでパッケージをインストールする
+2. 以下のコマンドでパッケージをインストール
 
-`pacman -S 3ds-libogg 3ds-dev 3ds-libvorbisidec 3ds-jansson --noconfirm`
+   `pacman -S 3ds-libogg 3ds-dev 3ds-libvorbisidec 3ds-jansson --noconfirm`
 
 3. [MakeROM](https://github.com/3DSGuy/Project_CTR/releases)と[bannertool](https://github.com/Steveice10/bannertool/releases)をダウンロードしPATHを通す
-4. Build.batを起動
+
+4. Build.batを起動、もしくは以下のコマンドを実行
+
+   `make`
 
 # クレジット
 - [Robichani6-1](https://github.com/Robichani6-1) - スペイン語翻訳
