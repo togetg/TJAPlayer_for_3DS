@@ -72,5 +72,4 @@
    `make`
 
 # クレジット
-- [Robichani6-1](https://github.com/Robichani6-1) - スペイン語翻訳
 - [ManOfNoWonder](https://github.com/ManOfNoWonder) - 英語翻訳
