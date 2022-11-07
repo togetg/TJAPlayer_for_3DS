@@ -72,5 +72,4 @@ If you put the following "genre.json" in the folder, it will be recognized as a 
    `make`
 
 # Credits
-- [Robichani6-1](https://github.com/Robichani6-1) - Spanish Translation
 - [ManOfNoWonder](https://github.com/ManOfNoWonder) - English Translation
